@@ -1,0 +1,184 @@
+import { useState, useEffect, useCallback } from 'react';
+import { getToken } from './AuthGuard';
+
+type Field = {
+  key: string;
+  label: string;
+  type?: 'text' | 'url' | 'date' | 'select' | 'textarea';
+  options?: string[];
+};
+
+type Props = {
+  table: string;
+  row: Record<string, unknown>;
+  fields: Field[];
+  onClose: () => void;
+  onSaved: (updated: Record<string, unknown>) => void;
+};
+
+export default function EditModal({ table, row, fields, onClose, onSaved }: Props) {
+  const [form, setForm]       = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState('');
+
+  useEffect(() => {
+    const init: Record<string, string> = {};
+    for (const f of fields) {
+      const val = row[f.key];
+      init[f.key] = Array.isArray(val)
+        ? (val as string[]).join(', ')
+        : String(val ?? '');
+    }
+    setForm(init);
+  }, [row, fields]);
+
+  // Close on Escape
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  const set = useCallback((key: string, value: string) => {
+    setForm(p => ({ ...p, [key]: value }));
+  }, []);
+
+  async function save() {
+    setLoading(true);
+    setError('');
+
+    const data: Record<string, unknown> = {};
+    for (const f of fields) {
+      if (f.key === 'stack') {
+        data[f.key] = form[f.key].split(',').map(s => s.trim()).filter(Boolean);
+      } else {
+        data[f.key] = form[f.key] || null;
+      }
+    }
+
+    const r = await fetch('/api/edit', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify({ table, id: row.id, data }),
+    });
+
+    const json = await r.json();
+    if (!r.ok) {
+      setError(json.error || 'Une erreur est survenue.');
+      setLoading(false);
+      return;
+    }
+
+    onSaved({ ...row, ...data });
+    onClose();
+  }
+
+  return (
+    <>
+      {/* Overlay */}
+      <div className="modal-overlay" onClick={onClose} />
+
+      {/* Modal */}
+      <div className="modal" role="dialog" aria-modal="true">
+        {/* Header */}
+        <div className="modal-header">
+          <div>
+            <p style={{
+              fontFamily: "'Space Mono', monospace",
+              fontSize: '.55rem',
+              letterSpacing: '.12em',
+              textTransform: 'uppercase',
+              color: 'var(--orange)',
+              marginBottom: '.3rem',
+            }}>
+              // {table}
+            </p>
+            <h2 className="modal-title">Modifier l&apos;entrée</h2>
+          </div>
+          <button className="modal-close" onClick={onClose} aria-label="Fermer">
+            ✕
+          </button>
+        </div>
+
+        {/* Divider */}
+        <hr />
+
+        {/* Fields */}
+        {fields.map(f => (
+          <div key={f.key} className="field-group">
+            <label className="field-label">{f.label}</label>
+            {f.type === 'select' ? (
+              <select
+                value={form[f.key] ?? ''}
+                onChange={e => set(f.key, e.target.value)}
+              >
+                {f.options?.map(o => (
+                  <option key={o} value={o}>{o}</option>
+                ))}
+              </select>
+            ) : f.type === 'textarea' ? (
+              <textarea
+                rows={3}
+                value={form[f.key] ?? ''}
+                onChange={e => set(f.key, e.target.value)}
+                style={{ resize: 'vertical' }}
+              />
+            ) : (
+              <input
+                type={f.type ?? 'text'}
+                value={form[f.key] ?? ''}
+                onChange={e => set(f.key, e.target.value)}
+              />
+            )}
+          </div>
+        ))}
+
+        {/* Error */}
+        {error && (
+          <p style={{
+            fontFamily: "'Space Mono', monospace",
+            fontSize: '.68rem',
+            color: 'var(--red)',
+            background: 'var(--red-bg)',
+            border: '1px solid var(--red-border)',
+            borderRadius: 'var(--radius-sm)',
+            padding: '.6rem .85rem',
+            margin: 0,
+          }}>
+            ⚠ {error}
+          </p>
+        )}
+
+        {/* Actions */}
+        <div className="modal-actions">
+          <button
+            className="btn btn-ghost"
+            onClick={onClose}
+            disabled={loading}
+          >
+            Annuler
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={save}
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <span className="spinner" style={{ width: 12, height: 12, borderWidth: 1.5 }} />
+                Sauvegarde…
+              </>
+            ) : (
+              'Sauvegarder'
+            )}
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
