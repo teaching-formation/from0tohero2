@@ -12,7 +12,7 @@ type Props = { onSuccess: () => void; linkedinUrl?: string };
 
 export default function FormEvenement({ onSuccess, linkedinUrl = '' }: Props) {
   const [form, setForm] = useState({
-    title: '', linkedin_url: linkedinUrl,
+    title: '', linkedin_url: linkedinUrl, email: '',
     type: '', type_autre: '',
     pays: '', lieu: '',
     online: false, gratuit: false,
@@ -36,6 +36,8 @@ export default function FormEvenement({ onSuccess, linkedinUrl = '' }: Props) {
     if (!form.url.trim())      e.url      = 'Champ requis';
     if (!form.date_debut)      e.date_debut = 'Champ requis';
     if (!form.excerpt.trim())  e.excerpt  = 'Champ requis';
+    if (!form.email.trim())    e.email    = 'Champ requis';
+    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Email invalide';
     if (form.date_fin && form.date_debut && form.date_fin < form.date_debut)
       e.date_fin = 'La date de fin doit être après la date de début';
     return e;
@@ -135,6 +137,11 @@ export default function FormEvenement({ onSuccess, linkedinUrl = '' }: Props) {
         <textarea className="f-input" placeholder="En quoi consiste cet événement ? Qui peut participer ?"
           value={form.excerpt} onChange={e => set('excerpt', e.target.value)}
           rows={3} style={{ maxWidth: '100%', resize: 'vertical' }} />
+      </Field>
+
+      <Field label="Email de contact" required error={errors.email}>
+        <input className="f-input" type="email" placeholder="ton@email.com" value={form.email} onChange={e => set('email', e.target.value)} style={{ maxWidth: '100%' }} />
+        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
       </Field>
 
       <button type="submit" className="btn-f btn-f-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>

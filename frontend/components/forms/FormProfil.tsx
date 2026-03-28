@@ -54,7 +54,7 @@ type Props = { onSuccess: () => void };
 export default function FormProfil({ onSuccess }: Props) {
   const [form, setForm] = useState({
     name: '', role: '', pays: '', ville: '', bio: '',
-    category: '', linkedin_url: '', github_url: '',
+    category: '', linkedin_url: '', github_url: '', email: '',
   });
   const [skills, setSkills] = useState<SkillMap>({});
   const [customSkill, setCustomSkill] = useState('');
@@ -111,6 +111,8 @@ export default function FormProfil({ onSuccess }: Props) {
     if (!form.bio.trim())          e.bio          = 'Champ requis';
     if (!form.category)            e.category     = 'Sélectionne une catégorie';
     if (!form.linkedin_url.trim()) e.linkedin_url = 'Champ requis';
+    if (!form.email.trim())        e.email        = 'Champ requis';
+    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Email invalide';
     if (totalSkills() === 0)       e.skills       = 'Sélectionne au moins une compétence';
     return e;
   }
@@ -259,6 +261,11 @@ export default function FormProfil({ onSuccess }: Props) {
 
       <Field label="GitHub" error={errors.github_url}>
         <input className="f-input" type="url" placeholder="https://github.com/..." value={form.github_url} onChange={e => set('github_url', e.target.value)} style={{ maxWidth: '100%' }} />
+      </Field>
+
+      <Field label="Email de contact" required error={errors.email}>
+        <input className="f-input" type="email" placeholder="ton@email.com" value={form.email} onChange={e => set('email', e.target.value)} style={{ maxWidth: '100%' }} />
+        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
       </Field>
 
       <button type="submit" className="btn-f btn-f-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>

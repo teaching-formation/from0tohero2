@@ -100,8 +100,8 @@ export default async function Home() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1.25rem' }}>
           {[
             { num: '01', title: 'Crée ton profil', desc: "Nom, rôle, stack, bio et liens. C'est l'étape fondatrice — elle ancre tout le reste sur la plateforme.", sub: '⏱ ~2 minutes', done: false },
-            { num: '02', title: 'Soumets une réalisation ou un article', desc: "Pipeline, dashboard, API, bootcamp, article Medium ou LinkedIn — ce que tu as vraiment construit.", sub: 'Optionnel · illimité', done: false },
-            { num: '03', title: 'Publication sous 48h', desc: "Ton profil apparaît dans l'annuaire. Visible par des milliers de praticiens et recruteurs.", sub: '✓ Délai max · 48h', done: true },
+            { num: '02', title: 'Soumets une réalisation, un article ou un événement', desc: "Pipeline, dashboard, API, bootcamp, article Medium ou LinkedIn, conférence, meetup — ce que tu as vraiment construit ou organisé.", sub: 'Optionnel · illimité', done: false },
+            { num: '03', title: 'Publication sous 48h', desc: "Ton profil, tes réalisations et tes événements apparaissent sur la plateforme. Visibles par des milliers de praticiens et recruteurs.", sub: '✓ Délai max · 48h', done: true },
           ].map(s => (
             <div key={s.num} className="f-card" style={{ cursor: 'default' }}>
               <div className={`step-num${s.done ? ' done' : ''}`}>{s.num}</div>

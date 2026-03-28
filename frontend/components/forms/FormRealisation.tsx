@@ -12,7 +12,7 @@ type Props = { onSuccess: () => void; linkedinUrl?: string };
 export default function FormRealisation({ onSuccess, linkedinUrl = '' }: Props) {
   const [form, setForm] = useState({
     title: '', linkedin_url: linkedinUrl, category: '', type: '', type_autre: '',
-    stack: '', excerpt: '', demo_url: '', repo_url: '', date_published: '',
+    stack: '', excerpt: '', demo_url: '', repo_url: '', date_published: '', email: '',
   });
   const [errors, setErrors]   = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -32,6 +32,8 @@ export default function FormRealisation({ onSuccess, linkedinUrl = '' }: Props) 
     if (!form.stack.trim())        e.stack        = 'Champ requis';
     if (!form.excerpt.trim())      e.excerpt      = 'Champ requis';
     if (!form.date_published)      e.date_published = 'Champ requis';
+    if (!form.email.trim())        e.email        = 'Champ requis';
+    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Email invalide';
     return e;
   }
 
@@ -117,6 +119,11 @@ export default function FormRealisation({ onSuccess, linkedinUrl = '' }: Props) 
 
       <Field label="Date de réalisation" required error={errors.date_published}>
         <input className="f-input" type="date" value={form.date_published} onChange={e => set('date_published', e.target.value)} style={{ maxWidth: '280px' }} />
+      </Field>
+
+      <Field label="Email de contact" required error={errors.email}>
+        <input className="f-input" type="email" placeholder="ton@email.com" value={form.email} onChange={e => set('email', e.target.value)} style={{ maxWidth: '100%' }} />
+        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
       </Field>
 
       <button type="submit" className="btn-f btn-f-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>

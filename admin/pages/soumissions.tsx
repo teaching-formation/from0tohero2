@@ -365,6 +365,21 @@ function SoumissionsPage() {
               Cette action est définitive.
             </p>
 
+            {confirm.action === 'reject' && (
+              <div style={{ marginBottom: '1rem' }}>
+                <label style={{ fontFamily: "'Space Mono', monospace", fontSize: '.6rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--text-3)', display: 'block', marginBottom: '.5rem' }}>
+                  Raison du rejet (envoyée par email) *
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Ex: Le contenu ne correspond pas aux critères de la plateforme…"
+                  value={note}
+                  onChange={e => setNote(e.target.value)}
+                  style={{ width: '100%', resize: 'vertical', boxSizing: 'border-box' }}
+                />
+              </div>
+            )}
+
             <div style={{ display: 'flex', gap: '.75rem', justifyContent: 'flex-end' }}>
               <button className="btn btn-ghost" onClick={() => setConfirm(null)}>
                 Annuler

@@ -1,6 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { supabaseAdmin } from '@/lib/supabase';
 import { slugify } from '@/lib/slugify';
+import { Resend } from 'resend';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end();
@@ -16,6 +19,40 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       note_admin: note || null,
       reviewed_at: new Date().toISOString(),
     }).eq('id', id);
+
+    // Envoyer email de rejet si email disponible dans le payload
+    const email = String(payload?.email || '');
+    const title = String(payload?.title || payload?.name || 'ta soumission');
+    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      await resend.emails.send({
+        from: 'from0tohero <onboarding@resend.dev>',
+        to: email,
+        subject: '[from0tohero] Ta soumission n\'a pas été retenue',
+        html: `
+          <div style="font-family:monospace;max-width:520px;margin:0 auto;padding:2rem;background:#0d1117;color:#e6edf3;border-radius:8px;">
+            <h2 style="color:#f97316;font-size:1rem;margin:0 0 1.5rem 0;letter-spacing:.05em;">// SOUMISSION NON RETENUE</h2>
+            <p style="font-size:.85rem;color:#8b949e;line-height:1.7;margin:0 0 1rem 0;">
+              Merci pour ta soumission <strong style="color:#e6edf3;">${title}</strong>.<br/>
+              Après examen, elle n&apos;a pas été retenue pour la plateforme.
+            </p>
+            ${note ? `
+            <div style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:1rem;margin:1.25rem 0;">
+              <p style="font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:#656d76;margin:0 0 .5rem 0;">Note de l&apos;équipe</p>
+              <p style="font-size:.82rem;color:#e6edf3;line-height:1.6;margin:0;">${note}</p>
+            </div>` : ''}
+            <p style="font-size:.82rem;color:#8b949e;line-height:1.7;margin:1rem 0 0 0;">
+              Tu peux re-soumettre une fois les ajustements faits.
+            </p>
+            <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #21262d;">
+              <a href="https://from0tohero.dev/soumettre" style="display:inline-block;background:#f97316;color:#fff;text-decoration:none;padding:.6rem 1.2rem;border-radius:4px;font-size:.8rem;letter-spacing:.04em;">
+                Soumettre à nouveau →
+              </a>
+            </div>
+          </div>
+        `,
+      }).catch(() => {}); // ne pas bloquer si l'email échoue
+    }
+
     return res.json({ ok: true });
   }
 
