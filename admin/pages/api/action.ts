@@ -129,10 +129,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     } else if (type === 'evenement') {
       const slug = slugify(payload.title);
+      const evType = payload.type === 'autre' ? 'autre' : payload.type;
       const { error } = await supabaseAdmin.from('evenements').insert({
         slug,
         title: payload.title,
-        type: payload.type === 'autre' ? 'autre' : payload.type,
+        type: evType,
+        type_label: payload.type === 'autre' ? (payload.type_autre || null) : null,
         lieu: payload.lieu || null,
         pays: payload.pays || null,
         online: payload.online || false,
