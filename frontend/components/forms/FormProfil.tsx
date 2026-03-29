@@ -302,40 +302,50 @@ export default function FormProfil({ onSuccess }: Props) {
           </div>
         ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1.25rem' }}>
-          {SKILL_GROUPS
-            .filter(group => group.categories.some(c => (form.categories as string[]).includes(c)))
-            .map(group => (
-            <div key={group.key}>
-              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '.6rem' }}>
-                {group.label}
-              </p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.4rem' }}>
-                {group.skills.map(skill => {
-                  const selected = selectedSkills.includes(skill);
-                  return (
-                    <button
-                      key={skill}
-                      type="button"
-                      onClick={() => toggleSkill(skill)}
-                      style={{
-                        fontFamily: "'Geist Mono', monospace",
-                        fontSize: '.68rem',
-                        padding: '4px 10px',
-                        borderRadius: 4,
-                        border: selected ? '1px solid var(--f-sky)' : '1px solid var(--f-border)',
-                        background: selected ? 'var(--f-sky-bg)' : 'transparent',
-                        color: selected ? 'var(--f-sky)' : 'var(--f-text-2)',
-                        cursor: 'pointer',
-                        transition: 'all .15s',
-                      }}
-                    >
-                      {skill}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+          {(() => {
+            // Chaque skill n'apparaît qu'une seule fois — dans le premier groupe qui la liste
+            const alreadyShown = new Set<string>();
+            return SKILL_GROUPS
+              .filter(group => group.categories.some(c => (form.categories as string[]).includes(c)))
+              .map(group => {
+                // Skills de ce groupe pas encore affichées dans un groupe précédent
+                const uniqueSkills = group.skills.filter(s => !alreadyShown.has(s));
+                uniqueSkills.forEach(s => alreadyShown.add(s));
+                if (uniqueSkills.length === 0) return null;
+                return (
+                  <div key={group.key}>
+                    <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '.6rem' }}>
+                      {group.label}
+                    </p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.4rem' }}>
+                      {uniqueSkills.map(skill => {
+                        const selected = selectedSkills.includes(skill);
+                        return (
+                          <button
+                            key={skill}
+                            type="button"
+                            onClick={() => toggleSkill(skill)}
+                            style={{
+                              fontFamily: "'Geist Mono', monospace",
+                              fontSize: '.68rem',
+                              padding: '4px 10px',
+                              borderRadius: 4,
+                              border: selected ? '1px solid var(--f-sky)' : '1px solid var(--f-border)',
+                              background: selected ? 'var(--f-sky-bg)' : 'transparent',
+                              color: selected ? 'var(--f-sky)' : 'var(--f-text-2)',
+                              cursor: 'pointer',
+                              transition: 'all .15s',
+                            }}
+                          >
+                            {skill}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              });
+          })()}
 
           {/* Compétence custom */}
           <div>
