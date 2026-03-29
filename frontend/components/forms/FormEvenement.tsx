@@ -48,7 +48,7 @@ export default function FormEvenement({ onSuccess, username = '' }: Props) {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setLoading(true);
-    await fetch('/api/submit', {
+    const res = await fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -60,6 +60,11 @@ export default function FormEvenement({ onSuccess, username = '' }: Props) {
       }),
     });
     setLoading(false);
+    if (!res.ok) {
+      const { error } = await res.json().catch(() => ({ error: 'Erreur serveur' }));
+      setErrors(e => ({ ...e, title: error || 'Erreur lors de la soumission' }));
+      return;
+    }
     onSuccess();
   }
 
