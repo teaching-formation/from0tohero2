@@ -105,7 +105,9 @@ const SKILL_GROUPS = [
   },
 ];
 
-type SkillMap = Record<string, string[]>;
+// Ensemble de toutes les skills listées dans les groupes (pour distinguer les skills custom)
+const ALL_GROUP_SKILLS = new Set(SKILL_GROUPS.flatMap(g => g.skills));
+
 type Props = { onSuccess: () => void };
 
 export default function FormProfil({ onSuccess }: Props) {
@@ -115,7 +117,8 @@ export default function FormProfil({ onSuccess }: Props) {
     twitter_url: '', youtube_url: '', website_url: '', whatsapp_url: '', email: '',
   });
   const [activeSocials, setActiveSocials] = useState<string[]>([]);
-  const [skills, setSkills] = useState<SkillMap>({});
+  // État global plat — chaque skill est unique, peu importe le groupe où il est affiché
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [customSkill, setCustomSkill] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
@@ -148,40 +151,37 @@ export default function FormProfil({ onSuccess }: Props) {
     }, 500);
   }
 
-  function toggleSkill(groupKey: string, skill: string) {
-    setSkills(prev => {
-      const current = prev[groupKey] ?? [];
-      const next = current.includes(skill)
-        ? current.filter(s => s !== skill)
-        : [...current, skill];
-      return { ...prev, [groupKey]: next };
-    });
+  function toggleSkill(skill: string) {
+    setSelectedSkills(prev =>
+      prev.includes(skill) ? prev.filter(s => s !== skill) : [...prev, skill]
+    );
     if (errors.skills) setErrors(e => ({ ...e, skills: '' }));
   }
 
   function addCustomSkill() {
     const s = customSkill.trim();
-    if (!s) return;
-    setSkills(prev => ({
-      ...prev,
-      autre: [...(prev.autre ?? []), s].filter((v, i, a) => a.indexOf(v) === i),
-    }));
+    if (!s || selectedSkills.includes(s)) return;
+    setSelectedSkills(prev => [...prev, s]);
     setCustomSkill('');
   }
 
   function totalSkills() {
-    return Object.values(skills).flat().length;
+    return selectedSkills.length;
   }
 
   function buildSkillsPayload() {
-    return SKILL_GROUPS
-      .map(g => ({ category: g.label, items: skills[g.key] ?? [] }))
-      .filter(g => g.items.length > 0)
-      .concat(skills.autre?.length ? [{ category: 'Autre', items: skills.autre }] : []);
+    // Regroupe les skills sélectionnées dans leurs groupes d'origine
+    const payload = SKILL_GROUPS
+      .map(g => ({ category: g.label, items: g.skills.filter(s => selectedSkills.includes(s)) }))
+      .filter(g => g.items.length > 0);
+    // Skills custom (non listées dans aucun groupe)
+    const custom = selectedSkills.filter(s => !ALL_GROUP_SKILLS.has(s));
+    if (custom.length) payload.push({ category: 'Autre', items: custom });
+    return payload;
   }
 
   function buildStack() {
-    return Object.values(skills).flat();
+    return selectedSkills;
   }
 
   function validate() {
@@ -311,12 +311,12 @@ export default function FormProfil({ onSuccess }: Props) {
               </p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.4rem' }}>
                 {group.skills.map(skill => {
-                  const selected = (skills[group.key] ?? []).includes(skill);
+                  const selected = selectedSkills.includes(skill);
                   return (
                     <button
                       key={skill}
                       type="button"
-                      onClick={() => toggleSkill(group.key, skill)}
+                      onClick={() => toggleSkill(skill)}
                       style={{
                         fontFamily: "'Geist Mono', monospace",
                         fontSize: '.68rem',
@@ -343,8 +343,8 @@ export default function FormProfil({ onSuccess }: Props) {
               Autre (non listée)
             </p>
             <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap', marginBottom: '.5rem' }}>
-              {(skills.autre ?? []).map(s => (
-                <button key={s} type="button" onClick={() => toggleSkill('autre', s)}
+              {selectedSkills.filter(s => !ALL_GROUP_SKILLS.has(s)).map(s => (
+                <button key={s} type="button" onClick={() => toggleSkill(s)}
                   style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', padding: '4px 10px', borderRadius: 4, border: '1px solid var(--f-sky)', background: 'var(--f-sky-bg)', color: 'var(--f-sky)', cursor: 'pointer' }}>
                   {s} ×
                 </button>
