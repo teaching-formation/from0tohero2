@@ -94,11 +94,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const { error } = await supabaseAdmin.from('articles').insert({
         slug,
         title: payload.title,
-        author: praticien?.name || String(payload.author_name || payload.name || 'Inconnu'),
+        author: praticien?.name || String(payload.name || 'Inconnu'),
         author_country: payload.author_country || null,
         praticien_id: praticien?.id || null,
         category: payload.category,
         source: payload.source,
+        source_label: payload.source === 'autre' ? (payload.source_autre || null) : null,
         external_url: payload.external_url,
         excerpt: payload.excerpt || null,
         date_published: payload.date_published || null,

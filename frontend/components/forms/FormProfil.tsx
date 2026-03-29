@@ -215,7 +215,7 @@ export default function FormProfil({ onSuccess }: Props) {
     await fetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'praticien', name: form.name, linkedinUrl: form.linkedin_url }),
+      body: JSON.stringify({ type: 'praticien', name: form.name, username: form.username }),
     });
     setLoading(false);
     onSuccess();

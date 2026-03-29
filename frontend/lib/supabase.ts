@@ -13,6 +13,7 @@ export type Praticien = {
   name: string
   role: string
   category: 'data' | 'devops' | 'cloud' | 'ia' | 'cyber' | 'frontend' | 'backend' | 'fullstack' | 'mobile' | 'web3' | 'embedded'
+  categories: string[]
   country: string
   city?: string
   bio?: string
@@ -24,6 +25,8 @@ export type Praticien = {
   github_url?: string
   youtube_url?: string
   website_url?: string
+  twitter_url?: string
+  whatsapp_url?: string
   open_to_work: boolean
   status: 'pending' | 'approved' | 'rejected'
   created_at: string
@@ -51,7 +54,8 @@ export type Evenement = {
   id: string
   slug: string
   title: string
-  type: 'conference' | 'meetup' | 'hackathon' | 'webinaire' | 'bootcamp'
+  type: 'conference' | 'meetup' | 'hackathon' | 'webinaire' | 'bootcamp' | 'autre'
+  type_label?: string
   lieu?: string
   pays?: string
   online: boolean

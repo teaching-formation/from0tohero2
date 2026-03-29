@@ -127,7 +127,7 @@ export default function FormEvenement({ onSuccess, username = '' }: Props) {
           <input className="f-input" type="date" value={form.date_debut}
             onChange={e => set('date_debut', e.target.value)} style={{ maxWidth: '100%' }} />
         </Field>
-        <Field label="Date de fin" error={errors.date_fin} style={{ flex: 1, minWidth: 180 }}>
+        <Field label="Date de fin (optionnel)" error={errors.date_fin} style={{ flex: 1, minWidth: 180 }}>
           <input className="f-input" type="date" value={form.date_fin}
             onChange={e => set('date_fin', e.target.value)} style={{ maxWidth: '100%' }} />
         </Field>

@@ -12,14 +12,14 @@ const TYPE_LABELS: Record<string, string> = {
 
 export async function POST(req: Request) {
   try {
-    const { type, name, linkedinUrl, title } = await req.json();
+    const { type, name, username, title } = await req.json();
 
     const label = TYPE_LABELS[type] || type;
-    const adminUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3001'}/admin`;
+    const adminUrl = process.env.ADMIN_URL || 'http://localhost:3001';
 
     await resend.emails.send({
       from: 'from0tohero <onboarding@resend.dev>',
-      to: 'dmy08459837@gmail.com',
+      to: process.env.ADMIN_EMAIL!,
       subject: `[from0tohero] Nouvelle soumission — ${label}`,
       html: `
         <div style="font-family:monospace;max-width:520px;margin:0 auto;padding:2rem;background:#0d1117;color:#e6edf3;border-radius:8px;">
@@ -40,10 +40,10 @@ export async function POST(req: Request) {
               <td style="padding:.4rem 0;color:#8b949e;">Titre</td>
               <td style="padding:.4rem 0;color:#e6edf3;">${title}</td>
             </tr>` : ''}
-            ${linkedinUrl ? `
+            ${username ? `
             <tr>
-              <td style="padding:.4rem 0;color:#8b949e;">LinkedIn</td>
-              <td style="padding:.4rem 0;"><a href="${linkedinUrl}" style="color:#38bdf8;">${linkedinUrl}</a></td>
+              <td style="padding:.4rem 0;color:#8b949e;">Username</td>
+              <td style="padding:.4rem 0;color:#e6edf3;">@${username}</td>
             </tr>` : ''}
           </table>
 
