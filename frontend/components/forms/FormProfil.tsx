@@ -204,18 +204,13 @@ export default function FormProfil({ onSuccess }: Props) {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setLoading(true);
-    await supabase.from('soumissions').insert({
-      type: 'praticien',
-      payload: {
-        ...form,
-        stack: buildStack(),
-        skills: buildSkillsPayload(),
-      },
-    });
-    await fetch('/api/notify', {
+    await fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'praticien', name: form.name, username: form.username }),
+      body: JSON.stringify({
+        type: 'praticien',
+        payload: { ...form, stack: buildStack(), skills: buildSkillsPayload() },
+      }),
     });
     setLoading(false);
     onSuccess();

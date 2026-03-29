@@ -46,11 +46,24 @@ const EVENT_TYPE_LABEL: Record<string, string> = {
 };
 
 function EvenementsPage() {
-  const [rows, setRows]       = useState<Row[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter]   = useState('all');
-  const [search, setSearch]   = useState('');
-  const [editing, setEditing] = useState<Row | null>(null);
+  const [rows, setRows]         = useState<Row[]>([]);
+  const [loading, setLoading]   = useState(true);
+  const [filter, setFilter]     = useState('all');
+  const [search, setSearch]     = useState('');
+  const [editing, setEditing]   = useState<Row | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  async function deleteRow(id: string, title: string) {
+    if (!window.confirm(`Supprimer "${title}" ? Cette action est irréversible.`)) return;
+    setDeleting(id);
+    await fetch('/api/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+      body: JSON.stringify({ table: 'evenements', id }),
+    });
+    setRows(prev => prev.filter(r => r.id !== id));
+    setDeleting(null);
+  }
 
   useEffect(() => {
     fetch('/api/content?table=evenements', { headers: { Authorization: `Bearer ${getToken()}` } })
@@ -191,12 +204,20 @@ function EvenementsPage() {
                   <td>
                     <span className={`badge badge-${r.status}`}>{r.status}</span>
                   </td>
-                  <td>
+                  <td style={{ whiteSpace: 'nowrap' }}>
                     <button
                       className="btn btn-ghost btn-sm"
                       onClick={() => setEditing(r)}
                     >
                       ✎ Modifier
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      style={{ marginLeft: '.4rem' }}
+                      disabled={deleting === r.id}
+                      onClick={() => deleteRow(r.id, r.title)}
+                    >
+                      {deleting === r.id ? '…' : '✕'}
                     </button>
                   </td>
                 </tr>

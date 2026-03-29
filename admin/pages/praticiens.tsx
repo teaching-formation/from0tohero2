@@ -33,11 +33,24 @@ const STATUS_LABEL: Record<string, string> = { all: 'Tous', approved: 'Approuvé
 const STATUS_CLASS: Record<string, string> = { approved: 'active-green', pending: 'active-orange', rejected: 'active-red', all: 'active-sky' };
 
 function PraticiensPage() {
-  const [rows, setRows]       = useState<Row[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter]   = useState('all');
-  const [search, setSearch]   = useState('');
-  const [editing, setEditing] = useState<Row | null>(null);
+  const [rows, setRows]         = useState<Row[]>([]);
+  const [loading, setLoading]   = useState(true);
+  const [filter, setFilter]     = useState('all');
+  const [search, setSearch]     = useState('');
+  const [editing, setEditing]   = useState<Row | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  async function deleteRow(id: string, name: string) {
+    if (!window.confirm(`Supprimer "${name}" ? Cette action est irréversible.`)) return;
+    setDeleting(id);
+    await fetch('/api/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+      body: JSON.stringify({ table: 'praticiens', id }),
+    });
+    setRows(prev => prev.filter(r => r.id !== id));
+    setDeleting(null);
+  }
 
   useEffect(() => {
     fetch('/api/content?table=praticiens', { headers: { Authorization: `Bearer ${getToken()}` } })
@@ -138,12 +151,20 @@ function PraticiensPage() {
                       {new Date(r.created_at).toLocaleDateString('fr-FR')}
                     </span>
                   </td>
-                  <td>
+                  <td style={{ whiteSpace: 'nowrap' }}>
                     <button
                       className="btn btn-ghost btn-sm"
                       onClick={() => setEditing(r)}
                     >
                       ✎ Modifier
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      style={{ marginLeft: '.4rem' }}
+                      disabled={deleting === r.id}
+                      onClick={() => deleteRow(r.id, r.name)}
+                    >
+                      {deleting === r.id ? '…' : '✕'}
                     </button>
                   </td>
                 </tr>

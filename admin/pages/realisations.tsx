@@ -35,11 +35,24 @@ const STATUS_LABEL: Record<string, string> = { all: 'Tous', approved: 'Approuvé
 const STATUS_CLASS: Record<string, string> = { approved: 'active-green', pending: 'active-orange', rejected: 'active-red', all: 'active-sky' };
 
 function RealisationsPage() {
-  const [rows, setRows]       = useState<Row[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter]   = useState('all');
-  const [search, setSearch]   = useState('');
-  const [editing, setEditing] = useState<Row | null>(null);
+  const [rows, setRows]         = useState<Row[]>([]);
+  const [loading, setLoading]   = useState(true);
+  const [filter, setFilter]     = useState('all');
+  const [search, setSearch]     = useState('');
+  const [editing, setEditing]   = useState<Row | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  async function deleteRow(id: string, title: string) {
+    if (!window.confirm(`Supprimer "${title}" ? Cette action est irréversible.`)) return;
+    setDeleting(id);
+    await fetch('/api/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+      body: JSON.stringify({ table: 'realisations', id }),
+    });
+    setRows(prev => prev.filter(r => r.id !== id));
+    setDeleting(null);
+  }
 
   useEffect(() => {
     fetch('/api/content?table=realisations', { headers: { Authorization: `Bearer ${getToken()}` } })
@@ -174,12 +187,20 @@ function RealisationsPage() {
                       )}
                     </div>
                   </td>
-                  <td>
+                  <td style={{ whiteSpace: 'nowrap' }}>
                     <button
                       className="btn btn-ghost btn-sm"
                       onClick={() => setEditing(r)}
                     >
                       ✎ Modifier
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      style={{ marginLeft: '.4rem' }}
+                      disabled={deleting === r.id}
+                      onClick={() => deleteRow(r.id, r.title)}
+                    >
+                      {deleting === r.id ? '…' : '✕'}
                     </button>
                   </td>
                 </tr>

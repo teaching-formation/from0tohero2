@@ -44,17 +44,16 @@ export default function FormArticle({ onSuccess, username = '' }: Props) {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setLoading(true);
-    await supabase.from('soumissions').insert({
-      type: 'article',
-      payload: {
-        ...form,
-        source_label: form.source === 'autre' ? form.source_autre : PLAT_LABELS[form.source],
-      },
-    });
-    await fetch('/api/notify', {
+    await fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'article', title: form.title, username: form.username }),
+      body: JSON.stringify({
+        type: 'article',
+        payload: {
+          ...form,
+          source_label: form.source === 'autre' ? form.source_autre : PLAT_LABELS[form.source],
+        },
+      }),
     });
     setLoading(false);
     onSuccess();

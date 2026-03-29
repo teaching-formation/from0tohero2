@@ -48,17 +48,16 @@ export default function FormEvenement({ onSuccess, username = '' }: Props) {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setLoading(true);
-    await supabase.from('soumissions').insert({
-      type: 'evenement',
-      payload: {
-        ...form,
-        type_label: form.type === 'autre' ? form.type_autre : TYPE_LABELS[form.type],
-      },
-    });
-    await fetch('/api/notify', {
+    await fetch('/api/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'evenement', title: form.title, username: form.username }),
+      body: JSON.stringify({
+        type: 'evenement',
+        payload: {
+          ...form,
+          type_label: form.type === 'autre' ? form.type_autre : TYPE_LABELS[form.type],
+        },
+      }),
     });
     setLoading(false);
     onSuccess();
