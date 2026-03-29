@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { supabaseAdmin } from '@/lib/supabase';
 
 const ALLOWED: Record<string, string[]> = {
-  praticiens:   ['name','role','country','city','category','bio','stack','linkedin_url','github_url','youtube_url','website_url','open_to_work','status'],
+  praticiens:   ['name','role','country','city','category','categories','bio','stack','linkedin_url','github_url','youtube_url','website_url','twitter_url','whatsapp_url','open_to_work','status'],
   articles:     ['title','author','author_country','category','source','external_url','excerpt','date_published','status'],
   realisations: ['title','category','type','stack','excerpt','demo_url','repo_url','date_published','status'],
 };

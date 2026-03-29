@@ -58,22 +58,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (action === 'approve') {
     if (type === 'praticien') {
-      const slug = slugify(payload.name);
+      const cats: string[] = Array.isArray(payload.categories) ? payload.categories : (payload.category ? [payload.category] : []);
+      const primaryCat = cats[0] || 'data';
+      const slug = payload.username || slugify(payload.name);
       const { error } = await supabaseAdmin.from('praticiens').insert({
         slug,
         name: payload.name,
         role: payload.role,
         country: payload.pays,
         city: payload.ville,
-        category: payload.category,
-        bio: payload.bio,
+        category: primaryCat,
+        categories: cats,
+        bio: payload.bio || null,
         stack: Array.isArray(payload.stack)
           ? payload.stack
-          : String(payload.stack).split(',').map((s: string) => s.trim()).filter(Boolean),
+          : String(payload.stack || '').split(',').map((s: string) => s.trim()).filter(Boolean),
         linkedin_url: payload.linkedin_url || null,
         github_url: payload.github_url || null,
         youtube_url: payload.youtube_url || null,
         website_url: payload.website_url || null,
+        twitter_url: payload.twitter_url || null,
+        whatsapp_url: payload.whatsapp_url || null,
         open_to_work: payload.open_to_work || false,
         badges: Array.isArray(payload.badges) ? payload.badges : [],
         skills: Array.isArray(payload.skills) ? payload.skills : [],
@@ -85,7 +90,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else if (type === 'article') {
       const slug = slugify(payload.title);
       const { data: praticien } = await supabaseAdmin
-        .from('praticiens').select('id, name').ilike('linkedin_url', `%${String(payload.linkedin_url || '').replace(/\/$/, '')}%`).maybeSingle();
+        .from('praticiens').select('id, name').eq('slug', String(payload.username || '')).maybeSingle();
       const { error } = await supabaseAdmin.from('articles').insert({
         slug,
         title: payload.title,
@@ -104,7 +109,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else if (type === 'realisation') {
       const slug = slugify(payload.title);
       const { data: praticien } = await supabaseAdmin
-        .from('praticiens').select('id').ilike('linkedin_url', `%${String(payload.linkedin_url || '').replace(/\/$/, '')}%`).maybeSingle();
+        .from('praticiens').select('id').eq('slug', String(payload.username || '')).maybeSingle();
       const { error } = await supabaseAdmin.from('realisations').insert({
         slug,
         title: payload.title,

@@ -14,44 +14,94 @@ const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:
 
 const SKILL_GROUPS = [
   {
-    key: 'langages',
-    label: 'Langages & Frameworks',
-    skills: ['Python','JavaScript','TypeScript','Go','Java','Scala','Bash','R','SQL','PySpark','Pandas','FastAPI','Django','React','Node.js','Rust'],
+    key: 'langages_data',
+    label: 'Langages & Data',
+    categories: ['data','ia'],
+    skills: ['Python','R','SQL','Scala','Java','Bash','PySpark','Pandas','NumPy','Julia','MATLAB','SAS','SPSS','Groovy','Haskell','Clojure','Erlang'],
   },
   {
     key: 'bigdata',
     label: 'Big Data & Streaming',
-    skills: ['Apache Spark','Kafka','Airflow','dbt','Flink','Hive','Hadoop','NiFi','Databricks','Prefect','Luigi'],
+    categories: ['data','ia','devops'],
+    skills: ['Apache Spark','Kafka','Airflow','dbt','Flink','Hive','Hadoop','NiFi','Databricks','Prefect','Luigi','Delta Lake'],
   },
   {
     key: 'ia',
     label: 'IA & ML',
-    skills: ['Machine Learning','Deep Learning','NLP','MLOps','Generative AI','TensorFlow','PyTorch','scikit-learn','LangChain','RAG','Hugging Face'],
-  },
-  {
-    key: 'databases',
-    label: 'Bases de données',
-    skills: ['PostgreSQL','MySQL','MongoDB','Redis','BigQuery','Snowflake','Elasticsearch','MinIO','Cassandra','DynamoDB','ClickHouse'],
-  },
-  {
-    key: 'cloud',
-    label: 'Cloud & DevOps',
-    skills: ['GCP','AWS','Azure','Docker','Kubernetes','Terraform','CI/CD','GitHub Actions','Ansible','Jenkins','Pulumi'],
-  },
-  {
-    key: 'cyber',
-    label: 'Cybersécurité',
-    skills: ['Pentest','SIEM','SOC','CTF','OSCP','Forensics','WAF','Zero Trust','IAM','OWASP','Burp Suite'],
+    categories: ['ia','data'],
+    skills: ['Machine Learning','Deep Learning','NLP','MLOps','Generative AI','TensorFlow','PyTorch','scikit-learn','LangChain','RAG','Hugging Face','Computer Vision','Stable Diffusion'],
   },
   {
     key: 'dataviz',
     label: 'Data Viz & BI',
-    skills: ['Power BI','Tableau','Looker','Looker Studio','Metabase','Grafana','Superset','Redash','Qlik','Excel','Plotly','Streamlit'],
+    categories: ['data','ia'],
+    skills: ['Power BI','Tableau','Looker','Looker Studio','Metabase','Grafana','Superset','Redash','Qlik','Plotly','Streamlit'],
+  },
+  {
+    key: 'databases',
+    label: 'Bases de données',
+    categories: ['data','backend','fullstack','ia','cloud'],
+    skills: ['PostgreSQL','MySQL','MongoDB','Redis','BigQuery','Snowflake','Elasticsearch','MinIO','Cassandra','DynamoDB','ClickHouse','Supabase','PlanetScale'],
+  },
+  {
+    key: 'cloud_devops',
+    label: 'Cloud & DevOps',
+    categories: ['cloud','devops','data','backend','fullstack'],
+    skills: ['GCP','AWS','Azure','Docker','Kubernetes','Terraform','CI/CD','GitHub Actions','Ansible','Jenkins','Pulumi','ArgoCD','Helm','Prometheus'],
   },
   {
     key: 'reseaux',
     label: 'Réseaux & Systèmes',
-    skills: ['Linux','Windows Server','Nginx','Apache','TCP/IP','DNS','VPN','Pare-feu','VLAN','SSH','Bash','Zabbix','Nagios','Wireshark'],
+    categories: ['devops','cloud','cyber','embedded'],
+    skills: ['Linux','Windows Server','Nginx','Apache','TCP/IP','DNS','VPN','Pare-feu','VLAN','SSH','Zabbix','Nagios','Wireshark'],
+  },
+  {
+    key: 'cyber',
+    label: 'Cybersécurité',
+    categories: ['cyber'],
+    skills: ['Pentest','SIEM','SOC','CTF','OSCP','Forensics','WAF','Zero Trust','IAM','OWASP','Burp Suite','Metasploit','Nmap','Splunk','CrowdStrike'],
+  },
+  {
+    key: 'frontend_skills',
+    label: 'Frontend',
+    categories: ['frontend','fullstack'],
+    skills: ['React','Vue.js','Angular','Next.js','Svelte','Nuxt.js','HTML/CSS','Tailwind CSS','SASS/SCSS','Redux','Zustand','GraphQL','Vite','Webpack','Storybook','Three.js','Figma'],
+  },
+  {
+    key: 'backend_skills',
+    label: 'Backend',
+    categories: ['backend','fullstack'],
+    skills: ['Node.js','Express','NestJS','FastAPI','Django','Spring Boot','Laravel','Go (Gin)','Ruby on Rails','gRPC','REST API','GraphQL','Celery','RabbitMQ','JWT','tRPC'],
+  },
+  {
+    key: 'mobile_skills',
+    label: 'Mobile',
+    categories: ['mobile'],
+    skills: ['React Native','Flutter','Swift','Kotlin','Expo','Firebase','Jetpack Compose','SwiftUI','Android Studio','Xcode','Push Notifications','SQLite','RevenueCat'],
+  },
+  {
+    key: 'web3_skills',
+    label: 'Web3 & Blockchain',
+    categories: ['web3'],
+    skills: ['Solidity','Ethereum','Hardhat','Truffle','Web3.js','Ethers.js','IPFS','Smart Contracts','Polygon','Chainlink','Foundry','OpenZeppelin','DeFi','NFT','Wagmi'],
+  },
+  {
+    key: 'embedded_skills',
+    label: 'Embedded & IoT',
+    categories: ['embedded'],
+    skills: ['C','C++','Arduino','Raspberry Pi','MQTT','FreeRTOS','STM32','ESP32','Modbus','CAN Bus','FPGA','Zephyr OS','LoRa','Bluetooth/BLE','RTOS'],
+  },
+  {
+    key: 'langages_web',
+    label: 'Langages',
+    categories: ['frontend','backend','fullstack','mobile','web3'],
+    skills: ['JavaScript','TypeScript','Python','Go','Java','Rust','C#','PHP','Ruby','Dart','Swift','Kotlin','Elixir','Lua','Groovy','Zig','OCaml','Clojure','Erlang','PowerShell','Bash'],
+  },
+  {
+    key: 'langages_systems',
+    label: 'Langages Systèmes',
+    categories: ['embedded','devops','cloud','cyber'],
+    skills: ['C','C++','Rust','Assembly','Zig','Ada','VHDL','Verilog','Python','Bash','PowerShell','Go','Java','Groovy'],
   },
 ];
 
@@ -219,9 +269,9 @@ export default function FormProfil({ onSuccess }: Props) {
             <button key={c} type="button"
               className={`filter-pill${form.categories.includes(c) ? ' active' : ''}`}
               onClick={() => {
-                const next = form.categories.includes(c)
-                  ? form.categories.filter(x => x !== c)
-                  : [...form.categories, c];
+                const next = (form.categories as string[]).includes(c)
+                  ? (form.categories as string[]).filter(x => x !== c)
+                  : [...(form.categories as string[]), c];
                 set('categories', next);
               }}>
               {CAT_LABELS[c]}
@@ -234,7 +284,7 @@ export default function FormProfil({ onSuccess }: Props) {
         <textarea className="f-input" placeholder="2-3 phrases sur ton parcours et ce que tu construis." value={form.bio} onChange={e => set('bio', e.target.value)} rows={3} style={{ maxWidth: '100%', resize: 'vertical' }} />
       </Field>
 
-      {/* COMPÉTENCES */}
+      {/* COMPÉTENCES — déroulées selon les catégories sélectionnées */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
         <label style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-2)' }}>
           Compétences techniques <span style={{ color: 'var(--f-orange)' }}>*</span>
@@ -245,8 +295,17 @@ export default function FormProfil({ onSuccess }: Props) {
           )}
         </label>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', border: '1px solid var(--f-border)', borderRadius: 6, padding: '1.25rem' }}>
-          {SKILL_GROUPS.map(group => (
+        {(form.categories as string[]).length === 0 ? (
+          <div style={{ border: '1.5px dashed var(--f-border)', borderRadius: 8, padding: '2rem', textAlign: 'center' }}>
+            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-text-3)', margin: 0 }}>
+              ↑ Sélectionne d&apos;abord une ou plusieurs catégories
+            </p>
+          </div>
+        ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1.25rem' }}>
+          {SKILL_GROUPS
+            .filter(group => group.categories.some(c => (form.categories as string[]).includes(c)))
+            .map(group => (
             <div key={group.key}>
               <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '.6rem' }}>
                 {group.label}
@@ -308,6 +367,7 @@ export default function FormProfil({ onSuccess }: Props) {
             </div>
           </div>
         </div>
+        )}
 
         {errors.skills && (
           <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{errors.skills}</span>
