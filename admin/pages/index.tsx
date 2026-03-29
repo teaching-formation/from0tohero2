@@ -79,7 +79,7 @@ function Dashboard() {
         <>
           {/* Soumissions stats */}
           <p style={{
-            fontFamily: "'Space Mono', monospace",
+            fontFamily: "'Geist Mono', monospace",
             fontSize: '.58rem',
             letterSpacing: '.12em',
             textTransform: 'uppercase',
@@ -113,7 +113,7 @@ function Dashboard() {
 
           {/* Content stats */}
           <p style={{
-            fontFamily: "'Space Mono', monospace",
+            fontFamily: "'Geist Mono', monospace",
             fontSize: '.58rem',
             letterSpacing: '.12em',
             textTransform: 'uppercase',
@@ -150,7 +150,7 @@ function Dashboard() {
             <div className="card">
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.1rem' }}>
                 <p style={{
-                  fontFamily: "'Space Mono', monospace",
+                  fontFamily: "'Geist Mono', monospace",
                   fontSize: '.6rem',
                   letterSpacing: '.1em',
                   textTransform: 'uppercase',
@@ -160,7 +160,7 @@ function Dashboard() {
                   En attente de modération
                 </p>
                 <a href="/soumissions" style={{
-                  fontFamily: "'Space Mono', monospace",
+                  fontFamily: "'Geist Mono', monospace",
                   fontSize: '.6rem',
                   color: 'var(--sky)',
                   textDecoration: 'none',
@@ -202,7 +202,7 @@ function Dashboard() {
                         {title}
                       </span>
                       <span style={{
-                        fontFamily: "'Space Mono', monospace",
+                        fontFamily: "'Geist Mono', monospace",
                         fontSize: '.6rem',
                         color: 'var(--text-3)',
                         flexShrink: 0,
@@ -217,7 +217,7 @@ function Dashboard() {
 
               {soumStats.pending > 6 && (
                 <p style={{
-                  fontFamily: "'Space Mono', monospace",
+                  fontFamily: "'Geist Mono', monospace",
                   fontSize: '.62rem',
                   color: 'var(--text-3)',
                   marginTop: '.85rem',
@@ -243,7 +243,7 @@ function Dashboard() {
                   File d&apos;attente vide
                 </p>
                 <p style={{
-                  fontFamily: "'Space Mono', monospace",
+                  fontFamily: "'Geist Mono', monospace",
                   fontSize: '.65rem',
                   color: 'var(--text-3)',
                 }}>

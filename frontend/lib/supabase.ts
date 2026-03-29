@@ -12,7 +12,7 @@ export type Praticien = {
   slug: string
   name: string
   role: string
-  category: 'data' | 'devops' | 'cloud' | 'ia' | 'cyber' | 'dev'
+  category: 'data' | 'devops' | 'cloud' | 'ia' | 'cyber' | 'frontend' | 'backend' | 'fullstack' | 'mobile' | 'web3' | 'embedded'
   country: string
   city?: string
   bio?: string
@@ -35,7 +35,7 @@ export type Realisation = {
   slug: string
   title: string
   praticien_id: string
-  category: 'data' | 'devops' | 'cloud' | 'ia' | 'cyber' | 'dev'
+  category: 'data' | 'devops' | 'cloud' | 'ia' | 'cyber' | 'frontend' | 'backend' | 'fullstack' | 'mobile' | 'web3' | 'embedded'
   type: 'pipeline' | 'dashboard' | 'api' | 'bootcamp' | 'youtube' | 'podcast' | 'newsletter' | 'blog' | 'autre'
   stack: string[]
   excerpt?: string
@@ -72,7 +72,7 @@ export type Article = {
   author: string
   author_country?: string
   praticien_id?: string
-  category: 'data' | 'devops' | 'cloud' | 'ia' | 'cyber' | 'dev'
+  category: 'data' | 'devops' | 'cloud' | 'ia' | 'cyber' | 'frontend' | 'backend' | 'fullstack' | 'mobile' | 'web3' | 'embedded'
   source: 'medium' | 'linkedin' | 'devto' | 'substack' | 'blog' | 'youtube' | 'autre'
   external_url: string
   excerpt?: string

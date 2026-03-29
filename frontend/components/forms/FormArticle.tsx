@@ -2,16 +2,16 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
-const CATEGORIES = ['data','devops','cloud','ia','cyber','dev'];
-const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cyber-Sécurité', dev:'Dev' };
+const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
+const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cyber-Sécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
 const PLATEFORMES = ['linkedin','medium','devto','substack','blog','youtube','autre'];
 const PLAT_LABELS: Record<string,string> = { linkedin:'LinkedIn', medium:'Medium', devto:'Dev.to', substack:'Substack', blog:'Blog perso', youtube:'YouTube', autre:'Autre' };
 
-type Props = { onSuccess: () => void; linkedinUrl?: string };
+type Props = { onSuccess: () => void; username?: string };
 
-export default function FormArticle({ onSuccess, linkedinUrl = '' }: Props) {
+export default function FormArticle({ onSuccess, username = '' }: Props) {
   const [form, setForm] = useState({
-    title: '', linkedin_url: linkedinUrl, author_country: '', email: '',
+    title: '', username: username, author_country: '', email: '',
     category: '', source: '', source_autre: '', external_url: '',
     date_published: '', excerpt: '',
   });
@@ -26,7 +26,7 @@ export default function FormArticle({ onSuccess, linkedinUrl = '' }: Props) {
   function validate() {
     const e: Record<string, string> = {};
     if (!form.title.trim())        e.title        = 'Champ requis';
-    if (!form.linkedin_url.trim()) e.linkedin_url = 'Champ requis';
+    if (!form.username.trim()) e.username = 'Champ requis';
     if (!form.author_country.trim()) e.author_country = 'Champ requis';
     if (!form.category)            e.category     = 'Sélectionne une catégorie';
     if (!form.source)              e.source       = 'Sélectionne une plateforme';
@@ -54,7 +54,7 @@ export default function FormArticle({ onSuccess, linkedinUrl = '' }: Props) {
     await fetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'article', title: form.title, linkedinUrl: form.linkedin_url }),
+      body: JSON.stringify({ type: 'article', title: form.title, username: form.username }),
     });
     setLoading(false);
     onSuccess();
@@ -67,8 +67,8 @@ export default function FormArticle({ onSuccess, linkedinUrl = '' }: Props) {
         <input className="f-input" placeholder="Ex: Comment j'ai migré vers dbt en production" value={form.title} onChange={e => set('title', e.target.value)} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Ton profil LinkedIn" required error={errors.linkedin_url}>
-        <input className="f-input" type="url" value={form.linkedin_url} readOnly
+      <Field label="Ton username" required error={errors.username}>
+        <input className="f-input" type="text" value={form.username} readOnly
           style={{ maxWidth: '100%', opacity: .6, cursor: 'not-allowed', background: 'var(--f-surface)' }} />
       </Field>
 
@@ -103,11 +103,11 @@ export default function FormArticle({ onSuccess, linkedinUrl = '' }: Props) {
             style={{ maxWidth: '100%', marginTop: '.75rem' }}
           />
         )}
-        {errors.source_autre && <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{errors.source_autre}</span>}
+        {errors.source_autre && <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{errors.source_autre}</span>}
       </Field>
 
       <Field label="Lien vers l'article" required error={errors.external_url}>
-        <input className="f-input" type="url" placeholder="https://medium.com/..." value={form.external_url} onChange={e => set('external_url', e.target.value)} style={{ maxWidth: '100%' }} />
+        <input className="f-input" type="text" placeholder="https://medium.com/..." value={form.external_url} onChange={e => set('external_url', e.target.value)} onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('external_url', 'https://' + v); }} style={{ maxWidth: '100%' }} />
       </Field>
 
       <Field label="Date de publication" required error={errors.date_published}>
@@ -120,7 +120,7 @@ export default function FormArticle({ onSuccess, linkedinUrl = '' }: Props) {
 
       <Field label="Email de contact" required error={errors.email}>
         <input className="f-input" type="email" placeholder="ton@email.com" value={form.email} onChange={e => set('email', e.target.value)} style={{ maxWidth: '100%' }} />
-        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
+        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
       </Field>
 
       <button type="submit" className="btn-f btn-f-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>
@@ -133,11 +133,11 @@ export default function FormArticle({ onSuccess, linkedinUrl = '' }: Props) {
 function Field({ label, required, error, children }: { label: string; required?: boolean; error?: string; children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
-      <label style={{ fontFamily: "'Space Mono', monospace", fontSize: '.72rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-2)' }}>
+      <label style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-2)' }}>
         {label} {required && <span style={{ color: 'var(--f-orange)' }}>*</span>}
       </label>
       {children}
-      {error && <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{error}</span>}
+      {error && <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{error}</span>}
     </div>
   );
 }

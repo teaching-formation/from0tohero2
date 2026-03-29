@@ -89,7 +89,7 @@ export default function EditModal({ table, row, fields, onClose, onSaved }: Prop
         <div className="modal-header">
           <div>
             <p style={{
-              fontFamily: "'Space Mono', monospace",
+              fontFamily: "'Geist Mono', monospace",
               fontSize: '.55rem',
               letterSpacing: '.12em',
               textTransform: 'uppercase',
@@ -141,7 +141,7 @@ export default function EditModal({ table, row, fields, onClose, onSaved }: Prop
         {/* Error */}
         {error && (
           <p style={{
-            fontFamily: "'Space Mono', monospace",
+            fontFamily: "'Geist Mono', monospace",
             fontSize: '.68rem',
             color: 'var(--red)',
             background: 'var(--red-bg)',

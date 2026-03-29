@@ -8,11 +8,11 @@ const TYPE_LABELS: Record<string,string> = {
   webinaire:'Webinaire', bootcamp:'Bootcamp', autre:'Autre',
 };
 
-type Props = { onSuccess: () => void; linkedinUrl?: string };
+type Props = { onSuccess: () => void; username?: string };
 
-export default function FormEvenement({ onSuccess, linkedinUrl = '' }: Props) {
+export default function FormEvenement({ onSuccess, username = '' }: Props) {
   const [form, setForm] = useState({
-    title: '', linkedin_url: linkedinUrl, email: '',
+    title: '', username: username, email: '',
     type: '', type_autre: '',
     pays: '', lieu: '',
     online: false, gratuit: false,
@@ -58,7 +58,7 @@ export default function FormEvenement({ onSuccess, linkedinUrl = '' }: Props) {
     await fetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'evenement', title: form.title, linkedinUrl: form.linkedin_url }),
+      body: JSON.stringify({ type: 'evenement', title: form.title, username: form.username }),
     });
     setLoading(false);
     onSuccess();
@@ -72,8 +72,8 @@ export default function FormEvenement({ onSuccess, linkedinUrl = '' }: Props) {
           value={form.title} onChange={e => set('title', e.target.value)} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Ton profil LinkedIn" required>
-        <input className="f-input" type="url" value={form.linkedin_url} readOnly
+      <Field label="Ton username" required>
+        <input className="f-input" type="text" value={form.username} readOnly
           style={{ maxWidth: '100%', opacity: .6, cursor: 'not-allowed', background: 'var(--f-surface)' }} />
       </Field>
 
@@ -90,7 +90,7 @@ export default function FormEvenement({ onSuccess, linkedinUrl = '' }: Props) {
             value={form.type_autre} onChange={e => set('type_autre', e.target.value)}
             style={{ maxWidth: '100%', marginTop: '.75rem' }} />
         )}
-        {errors.type_autre && <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{errors.type_autre}</span>}
+        {errors.type_autre && <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{errors.type_autre}</span>}
       </Field>
 
       <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
@@ -105,12 +105,12 @@ export default function FormEvenement({ onSuccess, linkedinUrl = '' }: Props) {
       </div>
 
       <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer', fontFamily: "'Space Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-2)' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer', fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-2)' }}>
           <input type="checkbox" checked={form.online} onChange={e => set('online', e.target.checked)}
             style={{ accentColor: 'var(--f-sky)', width: 16, height: 16 }} />
           En ligne
         </label>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer', fontFamily: "'Space Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-2)' }}>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer', fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-2)' }}>
           <input type="checkbox" checked={form.gratuit} onChange={e => set('gratuit', e.target.checked)}
             style={{ accentColor: 'var(--f-green)', width: 16, height: 16 }} />
           Gratuit
@@ -118,8 +118,8 @@ export default function FormEvenement({ onSuccess, linkedinUrl = '' }: Props) {
       </div>
 
       <Field label="Lien vers l'événement" required error={errors.url}>
-        <input className="f-input" type="url" placeholder="https://..."
-          value={form.url} onChange={e => set('url', e.target.value)} style={{ maxWidth: '100%' }} />
+        <input className="f-input" type="text" placeholder="https://..."
+          value={form.url} onChange={e => set('url', e.target.value)} onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('url', 'https://' + v); }} style={{ maxWidth: '100%' }} />
       </Field>
 
       <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
@@ -141,7 +141,7 @@ export default function FormEvenement({ onSuccess, linkedinUrl = '' }: Props) {
 
       <Field label="Email de contact" required error={errors.email}>
         <input className="f-input" type="email" placeholder="ton@email.com" value={form.email} onChange={e => set('email', e.target.value)} style={{ maxWidth: '100%' }} />
-        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
+        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
       </Field>
 
       <button type="submit" className="btn-f btn-f-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>
@@ -157,11 +157,11 @@ function Field({ label, required, error, children, style }: {
 }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem', ...style }}>
-      <label style={{ fontFamily: "'Space Mono', monospace", fontSize: '.72rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-2)' }}>
+      <label style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-2)' }}>
         {label} {required && <span style={{ color: 'var(--f-orange)' }}>*</span>}
       </label>
       {children}
-      {error && <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{error}</span>}
+      {error && <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{error}</span>}
     </div>
   );
 }

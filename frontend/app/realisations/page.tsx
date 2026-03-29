@@ -65,9 +65,9 @@ export default function RealisationsPage() {
           ))}
         </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
-          {['all','data','devops','cloud','ia','cyber','mlops','dev','autre'].map(c => (
+          {['all','data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded','autre'].map(c => (
             <button key={c} className={`filter-pill${activeCat === c ? ' active' : ''}`} onClick={() => setActiveCat(c)}>
-              {c === 'all' ? 'Toutes catégories' : c.charAt(0).toUpperCase() + c.slice(1)}
+              {c === 'all' ? 'Toutes catégories' : c === 'fullstack' ? 'Full-Stack' : c === 'embedded' ? 'Embedded / IoT' : c.toUpperCase()}
             </button>
           ))}
         </div>
@@ -78,7 +78,7 @@ export default function RealisationsPage() {
           {Array.from({ length: 6 }).map((_, i) => <SkeletonArticleCard key={i} />)}
         </div>
       ) : filtered.length === 0 ? (
-        <p style={{ color: 'var(--f-text-3)', fontFamily: "'Space Mono', monospace", fontSize: '0.85rem', marginTop: '2rem' }}>Aucune réalisation pour ces filtres.</p>
+        <p style={{ color: 'var(--f-text-3)', fontFamily: "'Geist Mono', monospace", fontSize: '0.85rem', marginTop: '2rem' }}>Aucune réalisation pour ces filtres.</p>
       ) : (
         <>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
@@ -89,12 +89,12 @@ export default function RealisationsPage() {
                 onMouseOver={e => (e.currentTarget.style.borderColor = 'var(--f-sky)')}
                 onMouseOut={e => (e.currentTarget.style.borderColor = 'var(--f-border)')}>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: c.color, border: `1px solid ${c.border}`, background: c.bg, padding: '2px 8px', borderRadius: 2 }}>{r.category.toUpperCase()}</span>
-                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 8px', borderRadius: 2 }}>{TYPE_LABELS[r.type] || r.type}</span>
+                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: c.color, border: `1px solid ${c.border}`, background: c.bg, padding: '2px 8px', borderRadius: 2 }}>{r.category.toUpperCase()}</span>
+                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 8px', borderRadius: 2 }}>{TYPE_LABELS[r.type] || r.type}</span>
                 </div>
                 <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: 0 }}>{r.title}</h3>
                 {r.praticiens && (
-                  <Link href={`/praticiens/${r.praticiens.slug}`} style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', color: 'var(--f-sky)', textDecoration: 'none' }}>
+                  <Link href={`/praticiens/${r.praticiens.slug}`} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '0.72rem', color: 'var(--f-sky)', textDecoration: 'none' }}>
                     {r.praticiens.name}
                   </Link>
                 )}
@@ -103,8 +103,8 @@ export default function RealisationsPage() {
                   {r.stack.map(s => <span key={s} className="f-tag">{s}</span>)}
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.25rem' }}>
-                  {r.demo_url && <a href={r.demo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '3px 10px', borderRadius: 2, textDecoration: 'none' }}>Demo →</a>}
-                  {r.repo_url && <a href={r.repo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '3px 10px', borderRadius: 2, textDecoration: 'none' }}>Repo →</a>}
+                  {r.demo_url && <a href={r.demo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '0.68rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '3px 10px', borderRadius: 2, textDecoration: 'none' }}>Demo →</a>}
+                  {r.repo_url && <a href={r.repo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '0.68rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '3px 10px', borderRadius: 2, textDecoration: 'none' }}>Repo →</a>}
                 </div>
               </div>
             );

@@ -8,7 +8,7 @@ export default function NotFound() {
       padding: '2rem', textAlign: 'center',
     }}>
       <span style={{
-        fontFamily: "'Space Mono', monospace", fontSize: '.72rem',
+        fontFamily: "'Geist Mono', monospace", fontSize: '.72rem',
         letterSpacing: '.12em', textTransform: 'uppercase',
         color: 'var(--f-orange)', marginBottom: '1.5rem',
       }}>// 404</span>

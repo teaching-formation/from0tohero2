@@ -87,7 +87,7 @@ export default function LoginPage() {
 
         {/* Footer note */}
         <p style={{
-          fontFamily: "'Space Mono', monospace",
+          fontFamily: "'Geist Mono', monospace",
           fontSize: '.56rem',
           letterSpacing: '.08em',
           color: 'var(--text-4)',

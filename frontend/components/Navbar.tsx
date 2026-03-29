@@ -49,7 +49,7 @@ export default function Navbar() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '.25rem' }} className="desktop-nav">
           {links.map(l => (
             <Link key={l.href} href={l.href} style={{
-              fontFamily: "'Space Mono', monospace",
+              fontFamily: "'Geist Mono', monospace",
               fontSize: '.73rem',
               letterSpacing: '.08em',
               textTransform: 'uppercase',

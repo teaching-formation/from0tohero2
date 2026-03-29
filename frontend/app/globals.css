@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Inter:wght@400;500;600&family=Geist+Mono:wght@400;500;700&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; }
-body { -webkit-font-smoothing: antialiased; background: var(--f-bg); color: var(--f-text-1); }
+body { -webkit-font-smoothing: antialiased; background: var(--f-bg); color: var(--f-text-1); font-family: 'Inter', sans-serif; }
 
 /* ── CSS Variables — Light ── */
 :root {
@@ -88,7 +88,7 @@ body { -webkit-font-smoothing: antialiased; background: var(--f-bg); color: var(
   border: 1px solid var(--f-green-border);
   border-radius: 99px;
   padding: .3rem .95rem;
-  font-family: 'Space Mono', monospace;
+  font-family: 'Geist Mono', monospace;
   font-size: .65rem;
   letter-spacing: .12em;
   text-transform: uppercase;
@@ -116,7 +116,7 @@ body { -webkit-font-smoothing: antialiased; background: var(--f-bg); color: var(
   display: inline-flex;
   align-items: center;
   gap: .4rem;
-  font-family: 'Space Mono', monospace;
+  font-family: 'Geist Mono', monospace;
   font-size: .76rem;
   font-weight: 700;
   letter-spacing: .08em;
@@ -152,7 +152,7 @@ body { -webkit-font-smoothing: antialiased; background: var(--f-bg); color: var(
 
 /* ── TAGS & LABELS ── */
 .f-tag {
-  font-family: 'Space Mono', monospace;
+  font-family: 'Geist Mono', monospace;
   font-size: .62rem;
   letter-spacing: .06em;
   color: var(--f-text-3);
@@ -163,7 +163,7 @@ body { -webkit-font-smoothing: antialiased; background: var(--f-bg); color: var(
   background: var(--f-surface);
 }
 .f-label {
-  font-family: 'Space Mono', monospace;
+  font-family: 'Geist Mono', monospace;
   font-size: .68rem;
   letter-spacing: .15em;
   text-transform: uppercase;
@@ -173,7 +173,7 @@ body { -webkit-font-smoothing: antialiased; background: var(--f-bg); color: var(
 
 /* ── STATS ── */
 .stat-num { font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800; line-height: 1; color: var(--f-sky); margin: 0; }
-.stat-label { font-family: 'Space Mono', monospace; font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; color: var(--f-text-3); margin: .4rem 0 0 0; }
+.stat-label { font-family: 'Geist Mono', monospace; font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; color: var(--f-text-3); margin: .4rem 0 0 0; }
 
 /* ── STEP NUMBERS ── */
 .step-num {
@@ -182,7 +182,7 @@ body { -webkit-font-smoothing: antialiased; background: var(--f-bg); color: var(
   background: var(--f-sky-bg);
   border: 1.5px solid var(--f-sky-border);
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Space Mono', monospace;
+  font-family: 'Geist Mono', monospace;
   font-size: .72rem; font-weight: 700;
   color: var(--f-sky);
   margin-bottom: 1.25rem; flex-shrink: 0;
@@ -191,7 +191,7 @@ body { -webkit-font-smoothing: antialiased; background: var(--f-bg); color: var(
 
 /* ── INPUTS ── */
 .f-input {
-  font-family: 'Space Mono', monospace;
+  font-family: 'Geist Mono', monospace;
   font-size: .78rem;
   background: var(--f-surface);
   border: 1.5px solid var(--f-border);
@@ -209,7 +209,7 @@ body { -webkit-font-smoothing: antialiased; background: var(--f-bg); color: var(
 
 /* ── FILTER PILLS ── */
 .filter-pill {
-  font-family: 'Space Mono', monospace;
+  font-family: 'Geist Mono', monospace;
   font-size: .67rem;
   letter-spacing: .08em;
   text-transform: uppercase;
@@ -258,7 +258,7 @@ body { -webkit-font-smoothing: antialiased; background: var(--f-bg); color: var(
   color: var(--f-sky); flex-shrink: 0;
 }
 .profile-link {
-  font-family: 'Space Mono', monospace; font-size: .72rem;
+  font-family: 'Geist Mono', monospace; font-size: .72rem;
   color: var(--f-text-3); border: 1px solid var(--f-border);
   background: var(--f-surface); padding: 4px 12px; border-radius: 6px;
   text-decoration: none; transition: all .15s;
@@ -267,11 +267,11 @@ body { -webkit-font-smoothing: antialiased; background: var(--f-bg); color: var(
 .profile-link:hover { border-color: var(--f-sky); color: var(--f-sky); background: var(--f-sky-bg); }
 
 /* ── BACK LINK ── */
-.link-back { font-family: 'Space Mono', monospace; font-size: .72rem; color: var(--f-text-3); text-decoration: none; letter-spacing: .06em; transition: color .15s; display: inline-flex; align-items: center; gap: .35rem; }
+.link-back { font-family: 'Geist Mono', monospace; font-size: .72rem; color: var(--f-text-3); text-decoration: none; letter-spacing: .06em; transition: color .15s; display: inline-flex; align-items: center; gap: .35rem; }
 .link-back:hover { color: var(--f-sky); }
 
 /* ── SKILL TAGS ── */
-.skill-tag { font-family: 'Space Mono', monospace; font-size: .7rem; color: var(--f-text-2); background: var(--f-surface); border: 1px solid var(--f-border); padding: 3px 10px; border-radius: 6px; display: inline-block; transition: all .12s; }
+.skill-tag { font-family: 'Geist Mono', monospace; font-size: .7rem; color: var(--f-text-2); background: var(--f-surface); border: 1px solid var(--f-border); padding: 3px 10px; border-radius: 6px; display: inline-block; transition: all .12s; }
 .skill-tag:hover { border-color: var(--f-sky); color: var(--f-sky); background: var(--f-sky-bg); }
 
 /* ── COMMUNITY STRIP ── */
@@ -287,7 +287,7 @@ body { -webkit-font-smoothing: antialiased; background: var(--f-bg); color: var(
 ::-webkit-scrollbar-thumb:hover { background: var(--f-border-2); }
 
 /* ── FORM STEP LABEL ── */
-.form-step-label { font-family: 'Space Mono', monospace; font-size: .72rem; color: var(--f-sky); letter-spacing: .1em; text-transform: uppercase; padding-bottom: 1rem; border-bottom: 1px solid var(--f-border); margin-bottom: 1.5rem; display: block; }
+.form-step-label { font-family: 'Geist Mono', monospace; font-size: .72rem; color: var(--f-sky); letter-spacing: .1em; text-transform: uppercase; padding-bottom: 1rem; border-bottom: 1px solid var(--f-border); margin-bottom: 1.5rem; display: block; }
 
 /* ── SKELETON LOADING ── */
 @keyframes shimmer {

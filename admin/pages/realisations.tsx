@@ -20,7 +20,7 @@ type Row = {
 
 const EDIT_FIELDS = [
   { key: 'title',          label: 'Titre' },
-  { key: 'category',       label: 'Catégorie', type: 'select' as const, options: ['data','devops','cloud','ia','cyber','dev'] },
+  { key: 'category',       label: 'Catégorie', type: 'select' as const, options: ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'] },
   { key: 'type',           label: 'Type', type: 'select' as const, options: ['pipeline','dashboard','api','app','bootcamp','youtube','autre'] },
   { key: 'stack',          label: 'Stack (séparé par ,)' },
   { key: 'excerpt',        label: 'Description', type: 'textarea' as const },

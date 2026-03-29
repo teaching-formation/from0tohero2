@@ -61,14 +61,14 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
         <div style={{ flex: 1, minWidth: 200 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', flexWrap: 'wrap', marginBottom: '.5rem' }}>
             <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(1.5rem,3.5vw,2rem)', fontWeight: 800, color: 'var(--f-text-1)', margin: 0 }}>{p.name}</h1>
-            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', background: 'var(--f-surface)', padding: '2px 8px', borderRadius: 4 }}>{p.country} {p.city}</span>
+            <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', background: 'var(--f-surface)', padding: '2px 8px', borderRadius: 4 }}>{p.country} {p.city}</span>
           </div>
-          <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '.78rem', color: 'var(--f-sky)', margin: '0 0 .9rem 0', letterSpacing: '.04em' }}>{p.role}</p>
+          <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-sky)', margin: '0 0 .9rem 0', letterSpacing: '.04em' }}>{p.role}</p>
           {p.badges?.length > 0 && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginBottom: '1.1rem' }}>
               {p.badges.map(b => {
                 const c = BADGE_STYLES[b] || { color: 'var(--f-text-3)', border: 'var(--f-border)', bg: 'var(--f-surface)' };
-                return <span key={b} style={{ fontFamily: "'Space Mono', monospace", fontSize: '.6rem', letterSpacing: '.08em', color: c.color, border: `1px solid ${c.border}`, background: c.bg, padding: '2px 9px', borderRadius: 4 }}>{b}</span>;
+                return <span key={b} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', letterSpacing: '.08em', color: c.color, border: `1px solid ${c.border}`, background: c.bg, padding: '2px 9px', borderRadius: 4 }}>{b}</span>;
               })}
             </div>
           )}
@@ -98,7 +98,7 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
             const title = sec.category ?? sec.label ?? '';
             return (
               <div key={`${title}-${i}`} style={{ marginBottom: '1.75rem' }}>
-                <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '.65rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 .75rem 0' }}>{title}</p>
+                <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 .75rem 0' }}>{title}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.4rem' }}>
                   {sec.items.map(s => <span key={s} className="skill-tag">{s}</span>)}
                 </div>
@@ -128,7 +128,7 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
               return (
                 <div key={r.slug} className="f-card f-card-hover">
                   <div style={{ display: 'flex', gap: '.5rem', marginBottom: '1rem' }}>
-                    <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '.62rem', letterSpacing: '.08em', textTransform: 'uppercase', color: cat.color, border: `1px solid ${cat.border}`, background: cat.bg, padding: '2px 9px', borderRadius: 4 }}>{r.category.toUpperCase()}</span>
+                    <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', letterSpacing: '.08em', textTransform: 'uppercase', color: cat.color, border: `1px solid ${cat.border}`, background: cat.bg, padding: '2px 9px', borderRadius: 4 }}>{r.category.toUpperCase()}</span>
                     <span className="f-tag">{r.type}</span>
                   </div>
                   <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.05rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0' }}>{r.title}</h3>
@@ -137,8 +137,8 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
                     {r.stack.map(s => <span key={s} className="f-tag">{s}</span>)}
                   </div>
                   <div style={{ display: 'flex', gap: '.75rem' }}>
-                    {r.demo_url && <a href={r.demo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Space Mono', monospace", fontSize: '.7rem', color: 'var(--f-sky)', textDecoration: 'none' }}>Demo →</a>}
-                    {r.repo_url && <a href={r.repo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Space Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', textDecoration: 'none' }}>Repo →</a>}
+                    {r.demo_url && <a href={r.demo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-sky)', textDecoration: 'none' }}>Demo →</a>}
+                    {r.repo_url && <a href={r.repo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', textDecoration: 'none' }}>Repo →</a>}
                   </div>
                 </div>
               );

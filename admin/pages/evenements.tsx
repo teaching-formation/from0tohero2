@@ -181,7 +181,7 @@ function EvenementsPage() {
                   </td>
                   <td>
                     <span style={{
-                      fontFamily: "'Space Mono', monospace",
+                      fontFamily: "'Geist Mono', monospace",
                       fontSize: '.65rem',
                       color: r.gratuit ? 'var(--green)' : 'var(--text-3)',
                     }}>

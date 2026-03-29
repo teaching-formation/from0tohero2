@@ -40,9 +40,9 @@ export default function ArticlesPage() {
         <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(1.9rem,4vw,2.8rem)', fontWeight: 800, color: 'var(--f-text-1)', margin: '.4rem 0 .6rem 0' }}>Ce que les praticiens écrivent</h1>
         <p style={{ color: 'var(--f-text-3)', fontSize: '.88rem', margin: '0 0 2rem 0' }}>Articles publiés sur Medium, LinkedIn, Dev.to — agrégés ici.</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
-          {['all','data','devops','cloud','ia','cyber','dev'].map(f => (
+          {['all','data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'].map(f => (
             <button key={f} className={`filter-pill${activeFilter === f ? ' active' : ''}`} onClick={() => setActiveFilter(f)}>
-              {f === 'all' ? 'Tous' : f.toUpperCase()}
+              {f === 'all' ? 'Tous' : f === 'fullstack' ? 'Full-Stack' : f === 'embedded' ? 'Embedded / IoT' : f.toUpperCase()}
             </button>
           ))}
         </div>
@@ -53,7 +53,7 @@ export default function ArticlesPage() {
           {Array.from({ length: 6 }).map((_, i) => <SkeletonArticleCard key={i} />)}
         </div>
       ) : filtered.length === 0 ? (
-        <p style={{ color: 'var(--f-text-3)', fontFamily: "'Space Mono', monospace", fontSize: '.85rem', marginTop: '2rem' }}>Aucun article dans cette catégorie pour le moment.</p>
+        <p style={{ color: 'var(--f-text-3)', fontFamily: "'Geist Mono', monospace", fontSize: '.85rem', marginTop: '2rem' }}>Aucun article dans cette catégorie pour le moment.</p>
       ) : (
         <>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
@@ -62,11 +62,11 @@ export default function ArticlesPage() {
             return (
               <a key={a.slug} href={a.external_url} target="_blank" rel="noreferrer" className="f-card-link">
                 <div className="f-card f-card-hover" style={{ display: 'flex', flexDirection: 'column', gap: '.75rem', height: '100%' }}>
-                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '.62rem', letterSpacing: '.1em', textTransform: 'uppercase', color: c.color, border: `1px solid ${c.border}`, background: c.bg, padding: '2px 9px', borderRadius: 4, width: 'fit-content' }}>{a.category.toUpperCase()}</span>
+                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', letterSpacing: '.1em', textTransform: 'uppercase', color: c.color, border: `1px solid ${c.border}`, background: c.bg, padding: '2px 9px', borderRadius: 4, width: 'fit-content' }}>{a.category.toUpperCase()}</span>
                   <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '.98rem', fontWeight: 700, color: 'var(--f-text-1)', margin: 0, flex: 1 }}>{a.title}</h3>
-                  <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '.68rem', color: 'var(--f-text-3)', margin: 0 }}>{a.author} {a.author_country} · {a.source} · {a.date_published}</p>
+                  <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', color: 'var(--f-text-3)', margin: 0 }}>{a.author} {a.author_country} · {a.source} · {a.date_published}</p>
                   <p style={{ fontSize: '.83rem', color: 'var(--f-text-2)', lineHeight: 1.65, margin: 0 }}>{a.excerpt}</p>
-                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '.7rem', color: 'var(--f-sky)' }}>Lire →</span>
+                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-sky)' }}>Lire →</span>
                 </div>
               </a>
             );

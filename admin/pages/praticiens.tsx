@@ -20,7 +20,7 @@ const EDIT_FIELDS = [
   { key: 'role',         label: 'Rôle / titre' },
   { key: 'country',      label: 'Pays' },
   { key: 'city',         label: 'Ville' },
-  { key: 'category',     label: 'Catégorie', type: 'select' as const, options: ['data','devops','cloud','ia','cyber','dev'] },
+  { key: 'category',     label: 'Catégorie', type: 'select' as const, options: ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'] },
   { key: 'bio',          label: 'Bio', type: 'textarea' as const },
   { key: 'stack',        label: 'Stack (séparé par ,)' },
   { key: 'linkedin_url', label: 'LinkedIn', type: 'url' as const },

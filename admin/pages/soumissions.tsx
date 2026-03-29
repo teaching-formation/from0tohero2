@@ -35,7 +35,7 @@ function PayloadView({ payload }: { payload: Record<string, unknown> }) {
           padding: '.6rem .75rem',
         }}>
           <p style={{
-            fontFamily: "'Space Mono', monospace",
+            fontFamily: "'Geist Mono', monospace",
             fontSize: '.55rem',
             letterSpacing: '.1em',
             textTransform: 'uppercase',
@@ -45,7 +45,7 @@ function PayloadView({ payload }: { payload: Record<string, unknown> }) {
             {k}
           </p>
           <p style={{
-            fontFamily: "'Space Mono', monospace",
+            fontFamily: "'Geist Mono', monospace",
             fontSize: '.72rem',
             color: 'var(--text-1)',
             wordBreak: 'break-all',
@@ -174,7 +174,7 @@ function SoumissionsPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div style={{
-          fontFamily: "'Space Mono', monospace",
+          fontFamily: "'Geist Mono', monospace",
           fontSize: '.78rem',
           color: 'var(--text-3)',
           padding: '3rem 0',
@@ -223,7 +223,7 @@ function SoumissionsPage() {
                   {/* Right controls */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem', flexShrink: 0, flexWrap: 'wrap' }}>
                     <span style={{
-                      fontFamily: "'Space Mono', monospace",
+                      fontFamily: "'Geist Mono', monospace",
                       fontSize: '.58rem',
                       color: 'var(--text-3)',
                     }}>
@@ -268,7 +268,7 @@ function SoumissionsPage() {
                 {isExpanded && (
                   <div className="soum-card-body">
                     <p style={{
-                      fontFamily: "'Space Mono', monospace",
+                      fontFamily: "'Geist Mono', monospace",
                       fontSize: '.58rem',
                       letterSpacing: '.1em',
                       textTransform: 'uppercase',
@@ -283,7 +283,7 @@ function SoumissionsPage() {
                     {s.status === 'pending' && (
                       <div style={{ marginTop: '1.1rem' }}>
                         <p style={{
-                          fontFamily: "'Space Mono', monospace",
+                          fontFamily: "'Geist Mono', monospace",
                           fontSize: '.58rem',
                           letterSpacing: '.1em',
                           textTransform: 'uppercase',
@@ -312,7 +312,7 @@ function SoumissionsPage() {
                         padding: '.75rem',
                       }}>
                         <p style={{
-                          fontFamily: "'Space Mono', monospace",
+                          fontFamily: "'Geist Mono', monospace",
                           fontSize: '.58rem',
                           letterSpacing: '.08em',
                           textTransform: 'uppercase',
@@ -322,7 +322,7 @@ function SoumissionsPage() {
                           Note admin
                         </p>
                         <p style={{
-                          fontFamily: "'Space Mono', monospace",
+                          fontFamily: "'Geist Mono', monospace",
                           fontSize: '.72rem',
                           color: 'var(--text-2)',
                           lineHeight: 1.6,
@@ -352,7 +352,7 @@ function SoumissionsPage() {
             </div>
 
             <p style={{
-              fontFamily: "'Space Mono', monospace",
+              fontFamily: "'Geist Mono', monospace",
               fontSize: '.72rem',
               color: 'var(--text-2)',
               lineHeight: 1.6,
@@ -367,7 +367,7 @@ function SoumissionsPage() {
 
             {confirm.action === 'reject' && (
               <div style={{ marginBottom: '1rem' }}>
-                <label style={{ fontFamily: "'Space Mono', monospace", fontSize: '.6rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--text-3)', display: 'block', marginBottom: '.5rem' }}>
+                <label style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--text-3)', display: 'block', marginBottom: '.5rem' }}>
                   Raison du rejet (envoyée par email) *
                 </label>
                 <textarea

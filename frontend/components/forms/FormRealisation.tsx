@@ -2,16 +2,16 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
-const CATEGORIES = ['data','devops','cloud','ia','cyber','dev'];
-const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cyber-Sécurité', dev:'Dev' };
+const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
+const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cyber-Sécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
 const TYPES = ['pipeline','dashboard','api','app','bootcamp','youtube','autre'];
 const TYPE_LABELS: Record<string,string> = { pipeline:'Pipeline', dashboard:'Dashboard', api:'API', app:'App Web / Mobile', bootcamp:'Bootcamp', youtube:'YouTube', autre:'Autre' };
 
-type Props = { onSuccess: () => void; linkedinUrl?: string };
+type Props = { onSuccess: () => void; username?: string };
 
-export default function FormRealisation({ onSuccess, linkedinUrl = '' }: Props) {
+export default function FormRealisation({ onSuccess, username = '' }: Props) {
   const [form, setForm] = useState({
-    title: '', linkedin_url: linkedinUrl, category: '', type: '', type_autre: '',
+    title: '', username: username, category: '', type: '', type_autre: '',
     stack: '', excerpt: '', demo_url: '', repo_url: '', date_published: '', email: '',
   });
   const [errors, setErrors]   = useState<Record<string, string>>({});
@@ -25,7 +25,7 @@ export default function FormRealisation({ onSuccess, linkedinUrl = '' }: Props) 
   function validate() {
     const e: Record<string, string> = {};
     if (!form.title.trim())        e.title        = 'Champ requis';
-    if (!form.linkedin_url.trim()) e.linkedin_url = 'Champ requis';
+    if (!form.username.trim()) e.username = 'Champ requis';
     if (!form.category)            e.category     = 'Sélectionne une catégorie';
     if (!form.type)                e.type         = 'Sélectionne un type';
     if (form.type === 'autre' && !form.type_autre.trim()) e.type_autre = 'Précise le type';
@@ -53,7 +53,7 @@ export default function FormRealisation({ onSuccess, linkedinUrl = '' }: Props) 
     await fetch('/api/notify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'realisation', title: form.title, linkedinUrl: form.linkedin_url }),
+      body: JSON.stringify({ type: 'realisation', title: form.title, username: form.username }),
     });
     setLoading(false);
     onSuccess();
@@ -66,8 +66,8 @@ export default function FormRealisation({ onSuccess, linkedinUrl = '' }: Props) 
         <input className="f-input" placeholder="Ex: Pipeline de données temps réel avec Kafka" value={form.title} onChange={e => set('title', e.target.value)} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Ton profil LinkedIn" required error={errors.linkedin_url}>
-        <input className="f-input" type="url" value={form.linkedin_url} readOnly
+      <Field label="Ton username" required error={errors.username}>
+        <input className="f-input" type="text" value={form.username} readOnly
           style={{ maxWidth: '100%', opacity: .6, cursor: 'not-allowed', background: 'var(--f-surface)' }} />
       </Field>
 
@@ -98,7 +98,7 @@ export default function FormRealisation({ onSuccess, linkedinUrl = '' }: Props) 
             style={{ maxWidth: '100%', marginTop: '.75rem' }}
           />
         )}
-        {errors.type_autre && <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{errors.type_autre}</span>}
+        {errors.type_autre && <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{errors.type_autre}</span>}
       </Field>
 
       <Field label="Stack utilisée (séparé par ,)" required error={errors.stack}>
@@ -110,11 +110,11 @@ export default function FormRealisation({ onSuccess, linkedinUrl = '' }: Props) 
       </Field>
 
       <Field label="Lien demo / site" error={errors.demo_url}>
-        <input className="f-input" type="url" placeholder="https://..." value={form.demo_url} onChange={e => set('demo_url', e.target.value)} style={{ maxWidth: '100%' }} />
+        <input className="f-input" type="text" placeholder="https://..." value={form.demo_url} onChange={e => set('demo_url', e.target.value)} onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('demo_url', 'https://' + v); }} style={{ maxWidth: '100%' }} />
       </Field>
 
       <Field label="Lien repo GitHub" error={errors.repo_url}>
-        <input className="f-input" type="url" placeholder="https://github.com/..." value={form.repo_url} onChange={e => set('repo_url', e.target.value)} style={{ maxWidth: '100%' }} />
+        <input className="f-input" type="text" placeholder="https://github.com/..." value={form.repo_url} onChange={e => set('repo_url', e.target.value)} onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('repo_url', 'https://' + v); }} style={{ maxWidth: '100%' }} />
       </Field>
 
       <Field label="Date de réalisation" required error={errors.date_published}>
@@ -123,7 +123,7 @@ export default function FormRealisation({ onSuccess, linkedinUrl = '' }: Props) 
 
       <Field label="Email de contact" required error={errors.email}>
         <input className="f-input" type="email" placeholder="ton@email.com" value={form.email} onChange={e => set('email', e.target.value)} style={{ maxWidth: '100%' }} />
-        <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
+        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
       </Field>
 
       <button type="submit" className="btn-f btn-f-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>
@@ -136,11 +136,11 @@ export default function FormRealisation({ onSuccess, linkedinUrl = '' }: Props) 
 function Field({ label, required, error, children }: { label: string; required?: boolean; error?: string; children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
-      <label style={{ fontFamily: "'Space Mono', monospace", fontSize: '.72rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-2)' }}>
+      <label style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-2)' }}>
         {label} {required && <span style={{ color: 'var(--f-orange)' }}>*</span>}
       </label>
       {children}
-      {error && <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{error}</span>}
+      {error && <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{error}</span>}
     </div>
   );
 }

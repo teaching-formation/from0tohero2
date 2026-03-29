@@ -16,7 +16,7 @@ export default function SoumettreePage() {
   const [submitted, setSubmitted]   = useState(false);
 
   // Gate
-  const [linkedinInput, setLinkedinInput] = useState('');
+  const [usernameInput, setUsernameInput] = useState('');
   const [gateState, setGateState]         = useState<GateState>('idle');
   const [praticienName, setPraticienName] = useState('');
 
@@ -25,7 +25,7 @@ export default function SoumettreePage() {
     setSubmitted(false);
     setShowForm(false);
     setGateState('idle');
-    setLinkedinInput('');
+    setUsernameInput('');
     setPraticienName('');
     if (type === 'profil') {
       setShowForm(true);
@@ -34,14 +34,14 @@ export default function SoumettreePage() {
     }
   }
 
-  async function checkLinkedin() {
-    if (!linkedinInput.trim()) return;
+  async function checkUsername() {
+    if (!usernameInput.trim()) return;
     setGateState('checking');
     const { data } = await supabase
       .from('praticiens')
       .select('name')
       .eq('status', 'approved')
-      .ilike('linkedin_url', `%${linkedinInput.trim().replace(/\/$/, '')}%`)
+      .eq('slug', usernameInput.trim().toLowerCase())
       .maybeSingle();
 
     if (data) {
@@ -102,7 +102,7 @@ export default function SoumettreePage() {
               <span style={{ fontSize: '1.5rem' }}>✅</span>
               <div>
                 <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .25rem 0' }}>Soumission reçue !</p>
-                <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '.72rem', color: 'var(--f-text-3)', margin: 0 }}>Publication sous 48h max.</p>
+                <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-text-3)', margin: 0 }}>Publication sous 48h max.</p>
               </div>
             </div>
           )}
@@ -114,24 +114,24 @@ export default function SoumettreePage() {
                 Vérifions ton profil
               </h3>
               <p style={{ fontSize: '.83rem', color: 'var(--f-text-3)', margin: '0 0 1.5rem 0' }}>
-                Entre ton lien LinkedIn — on vérifie que tu es déjà dans l&apos;annuaire.
+                Entre ton username — on vérifie que tu es déjà dans l&apos;annuaire.
               </p>
 
               <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
                 <div style={{ flex: 1, minWidth: 260 }}>
                   <input
                     className="f-input"
-                    type="url"
-                    placeholder="https://linkedin.com/in/..."
-                    value={linkedinInput}
-                    onChange={e => { setLinkedinInput(e.target.value); setGateState('idle'); }}
+                    type="text"
+                    placeholder="Ex: mamadou-diakite"
+                    value={usernameInput}
+                    onChange={e => { setUsernameInput(e.target.value); setGateState('idle'); }}
                     style={{ maxWidth: '100%' }}
                   />
                 </div>
                 <button
                   className="btn-f btn-f-primary"
-                  onClick={checkLinkedin}
-                  disabled={gateState === 'checking' || !linkedinInput.trim()}
+                  onClick={checkUsername}
+                  disabled={gateState === 'checking' || !usernameInput.trim()}
                   style={{ fontSize: '.72rem' }}>
                   {gateState === 'checking' ? 'Vérification…' : 'Vérifier →'}
                 </button>
@@ -140,7 +140,7 @@ export default function SoumettreePage() {
               {/* ✅ Profil trouvé */}
               {gateState === 'found' && (
                 <div style={{ marginTop: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', background: 'var(--f-green-bg)', border: '1px solid var(--f-green-border)', borderRadius: 10, padding: '1rem 1.25rem' }}>
-                  <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '.75rem', color: 'var(--f-green)', margin: 0 }}>
+                  <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-green)', margin: 0 }}>
                     ✓ Profil trouvé — <strong>{praticienName}</strong>
                   </p>
                   <button className="btn-f btn-f-primary" onClick={() => setShowForm(true)} style={{ fontSize: '.72rem' }}>
@@ -152,8 +152,8 @@ export default function SoumettreePage() {
               {/* ❌ Profil non trouvé */}
               {gateState === 'not_found' && (
                 <div style={{ marginTop: '1.25rem', background: 'rgba(249,115,22,.06)', border: '1px solid rgba(249,115,22,.2)', borderRadius: 10, padding: '1rem 1.25rem' }}>
-                  <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '.75rem', color: 'var(--f-orange)', margin: '0 0 .75rem 0' }}>
-                    ✗ Aucun profil trouvé avec ce LinkedIn.
+                  <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-orange)', margin: '0 0 .75rem 0' }}>
+                    ✗ Aucun profil trouvé avec ce username.
                   </p>
                   <p style={{ fontSize: '.82rem', color: 'var(--f-text-2)', margin: '0 0 1rem 0' }}>
                     Soumets d&apos;abord ton profil — il sera publié sous 48h.
@@ -170,15 +170,15 @@ export default function SoumettreePage() {
           {showForm && !submitted && (
             <>
               {activeForm === 'profil'      && <FormProfil      onSuccess={handleSuccess} />}
-              {activeForm === 'article'     && <FormArticle     onSuccess={handleSuccess} linkedinUrl={linkedinInput} />}
-              {activeForm === 'realisation' && <FormRealisation onSuccess={handleSuccess} linkedinUrl={linkedinInput} />}
-              {activeForm === 'evenement'   && <FormEvenement   onSuccess={handleSuccess} linkedinUrl={linkedinInput} />}
+              {activeForm === 'article'     && <FormArticle     onSuccess={handleSuccess} username={usernameInput} />}
+              {activeForm === 'realisation' && <FormRealisation onSuccess={handleSuccess} username={usernameInput} />}
+              {activeForm === 'evenement'   && <FormEvenement   onSuccess={handleSuccess} username={usernameInput} />}
             </>
           )}
         </div>
       )}
 
-      <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', marginTop: '3rem', lineHeight: 1.8 }}>
+      <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', marginTop: '3rem', lineHeight: 1.8 }}>
         Délai de publication : 48h max.
       </p>
     </div>

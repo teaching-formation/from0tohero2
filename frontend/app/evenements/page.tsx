@@ -81,9 +81,9 @@ export default function EvenementsPage() {
       </div>
 
       {loading ? (
-        <p style={{ color: 'var(--f-text-3)', fontFamily: "'Space Mono', monospace", fontSize: '.85rem' }}>Chargement…</p>
+        <p style={{ color: 'var(--f-text-3)', fontFamily: "'Geist Mono', monospace", fontSize: '.85rem' }}>Chargement…</p>
       ) : filtered.length === 0 ? (
-        <p style={{ color: 'var(--f-text-3)', fontFamily: "'Space Mono', monospace", fontSize: '0.85rem', marginTop: '2rem' }}>Aucun événement pour ces filtres.</p>
+        <p style={{ color: 'var(--f-text-3)', fontFamily: "'Geist Mono', monospace", fontSize: '0.85rem', marginTop: '2rem' }}>Aucun événement pour ces filtres.</p>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
           {filtered.map((e, i) => {
@@ -95,18 +95,18 @@ export default function EvenementsPage() {
                 onMouseOut={ev => (ev.currentTarget.style.borderColor = 'var(--f-border)')}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                   <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                    <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: c.color, border: `1px solid ${c.border}`, background: c.bg, padding: '2px 8px', borderRadius: 2 }}>{TYPE_LABELS[e.type] || e.type}</span>
-                    {e.gratuit && <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.62rem', color: '#34d399', border: '1px solid #34d39922', background: '#34d3990d', padding: '2px 8px', borderRadius: 2 }}>Gratuit</span>}
+                    <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: c.color, border: `1px solid ${c.border}`, background: c.bg, padding: '2px 8px', borderRadius: 2 }}>{TYPE_LABELS[e.type] || e.type}</span>
+                    {e.gratuit && <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '0.62rem', color: '#34d399', border: '1px solid #34d39922', background: '#34d3990d', padding: '2px 8px', borderRadius: 2 }}>Gratuit</span>}
                   </div>
-                  <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase',
+                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase',
                     color: status === 'upcoming' ? '#00e676' : status === 'ongoing' ? '#f97316' : 'var(--f-text-3)' }}>
                     {status === 'upcoming' ? '● À venir' : status === 'ongoing' ? '● En cours' : '○ Passé'}
                   </span>
                 </div>
                 <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: 0 }}>{e.title}</h3>
-                <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', color: 'var(--f-text-3)', margin: 0 }}>{e.pays} {e.lieu} &nbsp;·&nbsp; {formatDate(e.date_debut, e.date_fin)}</p>
+                <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '0.72rem', color: 'var(--f-text-3)', margin: 0 }}>{e.pays} {e.lieu} &nbsp;·&nbsp; {formatDate(e.date_debut, e.date_fin)}</p>
                 <p style={{ fontSize: '0.85rem', color: 'var(--f-text-2)', lineHeight: 1.6, margin: 0, flex: 1 }}>{e.excerpt}</p>
-                <a href={e.url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', color: 'var(--f-sky)', textDecoration: 'none', letterSpacing: '0.06em' }}>Voir l&apos;événement →</a>
+                <a href={e.url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '0.72rem', color: 'var(--f-sky)', textDecoration: 'none', letterSpacing: '0.06em' }}>Voir l&apos;événement →</a>
               </div>
             );
           })}

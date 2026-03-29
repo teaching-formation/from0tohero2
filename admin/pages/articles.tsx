@@ -22,7 +22,7 @@ const EDIT_FIELDS = [
   { key: 'title',          label: 'Titre' },
   { key: 'author',         label: 'Auteur' },
   { key: 'author_country', label: 'Pays auteur' },
-  { key: 'category',       label: 'Catégorie', type: 'select' as const, options: ['data','devops','cloud','ia','cyber','dev'] },
+  { key: 'category',       label: 'Catégorie', type: 'select' as const, options: ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'] },
   { key: 'source',         label: 'Source', type: 'select' as const, options: ['linkedin','medium','devto','substack','blog','youtube','autre'] },
   { key: 'external_url',   label: 'Lien article', type: 'url' as const },
   { key: 'excerpt',        label: 'Résumé', type: 'textarea' as const },
