@@ -12,6 +12,7 @@ type Props = {
   praticien:    Praticien;
   articles:     ContentRow[];
   realisations: ContentRow[];
+  evenements:   ContentRow[];
 };
 
 const SOURCE_LABEL: Record<string, string> = {
@@ -23,13 +24,18 @@ const TYPE_LABEL: Record<string, string> = {
   app: 'App', bootcamp: 'Bootcamp', youtube: 'YouTube', autre: 'Autre',
 };
 
-export default function MonCompteClient({ user, praticien, articles, realisations }: Props) {
+const EVTYPE_LABEL: Record<string, string> = {
+  conference:'Conférence', meetup:'Meetup', hackathon:'Hackathon',
+  webinaire:'Webinaire', bootcamp:'Bootcamp', autre:'Autre',
+};
+
+export default function MonCompteClient({ user, praticien, articles, realisations, evenements }: Props) {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const supabase     = createClient();
-  type Tab = 'profil' | 'articles' | 'realisations';
+  type Tab = 'profil' | 'articles' | 'realisations' | 'evenements';
   const rawTab    = searchParams.get('tab') ?? '';
-  const initialTab: Tab = (['profil','articles','realisations'] as Tab[]).includes(rawTab as Tab)
+  const initialTab: Tab = (['profil','articles','realisations','evenements'] as Tab[]).includes(rawTab as Tab)
     ? (rawTab as Tab)
     : 'profil';
   const [tab, setTab] = useState<Tab>(initialTab);
@@ -98,6 +104,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
           { key: 'profil',       label: 'Mon profil' },
           { key: 'articles',     label: `Articles (${articles.length})` },
           { key: 'realisations', label: `Réalisations (${realisations.length})` },
+          { key: 'evenements',   label: `Événements (${evenements.length})` },
         ] as { key: typeof tab; label: string }[]).map(t => (
           <button
             key={t.key}
@@ -208,6 +215,36 @@ export default function MonCompteClient({ user, praticien, articles, realisation
                 </p>
               </div>
               <a href={`/mon-compte/realisation/${String(r.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem' }}>
+                ✎ Modifier
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Onglet Événements */}
+      {tab === 'evenements' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <a href="/mon-compte/nouvel-evenement" className="btn-f btn-f-primary" style={{ fontSize: '.72rem' }}>
+              + Ajouter un événement
+            </a>
+          </div>
+          {evenements.length === 0 ? (
+            <div style={{ border: '1.5px dashed var(--f-border)', borderRadius: 8, padding: '3rem', textAlign: 'center' }}>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-text-3)', margin: 0 }}>
+                Aucun événement pour l&apos;instant.
+              </p>
+            </div>
+          ) : (evenements as Record<string, unknown>[]).map((ev) => (
+            <div key={String(ev.id)} style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+              <div>
+                <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-text-1)', margin: '0 0 .25rem 0', fontWeight: 500 }}>{String(ev.title)}</p>
+                <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', margin: 0 }}>
+                  {ev.type_label ? String(ev.type_label) : (EVTYPE_LABEL[String(ev.type)] || String(ev.type))} · {String(ev.date_debut || '—')} {ev.online ? '· En ligne' : (ev.pays ? `· ${String(ev.pays)}` : '')}
+                </p>
+              </div>
+              <a href={`/mon-compte/evenement/${String(ev.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem' }}>
                 ✎ Modifier
               </a>
             </div>

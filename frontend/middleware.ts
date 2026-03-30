@@ -25,7 +25,10 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   // Redirige vers /connexion si non authentifié et sur une route protégée
-  if (!user && request.nextUrl.pathname.startsWith('/mon-compte')) {
+  if (!user && (
+    request.nextUrl.pathname.startsWith('/mon-compte') ||
+    request.nextUrl.pathname.startsWith('/soumettre')
+  )) {
     const url = request.nextUrl.clone();
     url.pathname = '/connexion';
     url.searchParams.set('next', request.nextUrl.pathname);
@@ -36,5 +39,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/mon-compte/:path*'],
+  matcher: ['/mon-compte/:path*', '/soumettre'],
 };

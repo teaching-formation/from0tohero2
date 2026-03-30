@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const TYPES = ['conference','meetup','hackathon','webinaire','bootcamp','autre'];
 const TYPE_LABELS: Record<string,string> = {
@@ -7,19 +8,26 @@ const TYPE_LABELS: Record<string,string> = {
   webinaire:'Webinaire', bootcamp:'Bootcamp', autre:'Autre',
 };
 
-type Props = { onSuccess: () => void; username?: string; hideEmail?: boolean };
+type Props = { evenement: Record<string, unknown> };
 
-export default function FormEvenement({ onSuccess, username = '', hideEmail = false }: Props) {
+export default function EditEvenementClient({ evenement: ev }: Props) {
+  const router = useRouter();
   const [form, setForm] = useState({
-    title: '', username: username, email: '',
-    type: '', type_autre: '',
-    pays: '', lieu: '',
-    online: false, gratuit: false,
-    url: '', date_debut: '', date_fin: '',
-    excerpt: '',
+    title:      String(ev.title      || ''),
+    type:       String(ev.type       || ''),
+    type_autre: ev.type === 'autre' ? String(ev.type_label || '') : '',
+    pays:       String(ev.pays       || ''),
+    lieu:       String(ev.lieu       || ''),
+    online:     Boolean(ev.online),
+    gratuit:    Boolean(ev.gratuit),
+    url:        String(ev.url        || ''),
+    date_debut: String(ev.date_debut || ''),
+    date_fin:   String(ev.date_fin   || ''),
+    excerpt:    String(ev.excerpt    || ''),
   });
-  const [errors, setErrors]   = useState<Record<string, string>>({});
+  const [errors,  setErrors]  = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   function set(key: string, val: string | boolean) {
     setForm(f => ({ ...f, [key]: val }));
@@ -35,49 +43,49 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
     if (!form.url.trim())      e.url      = 'Champ requis';
     if (!form.date_debut)      e.date_debut = 'Champ requis';
     if (!form.excerpt.trim())  e.excerpt  = 'Champ requis';
-    if (!hideEmail && !form.email.trim())    e.email    = 'Champ requis';
-    if (!hideEmail && form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Email invalide';
     if (form.date_fin && form.date_debut && form.date_fin < form.date_debut)
       e.date_fin = 'La date de fin doit être après la date de début';
     return e;
   }
 
-  async function handleSubmit(ev: React.FormEvent) {
-    ev.preventDefault();
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setLoading(true);
-    const res = await fetch('/api/submit', {
-      method: 'POST',
+
+    const res = await fetch(`/api/evenement/${String(ev.id)}`, {
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        type: 'evenement',
-        payload: {
-          ...form,
-          type_label: form.type === 'autre' ? form.type_autre : TYPE_LABELS[form.type],
-        },
+        ...form,
+        type_label: form.type === 'autre' ? form.type_autre : TYPE_LABELS[form.type],
       }),
     });
     setLoading(false);
+
     if (!res.ok) {
       const { error } = await res.json().catch(() => ({ error: 'Erreur serveur' }));
-      setErrors(e => ({ ...e, title: error || 'Erreur lors de la soumission' }));
+      setErrors(e => ({ ...e, title: error || 'Erreur lors de la mise à jour' }));
       return;
     }
-    onSuccess();
+    setSuccess(true);
+    setTimeout(() => router.push('/mon-compte?tab=evenements'), 1200);
+  }
+
+  if (success) {
+    return (
+      <div style={{ border: '1px solid var(--f-border)', borderRadius: 8, padding: '2rem', textAlign: 'center' }}>
+        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.8rem', color: 'var(--f-green)', margin: 0 }}>✓ Événement mis à jour — redirection…</p>
+      </div>
+    );
   }
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
       <Field label="Titre de l'événement" required error={errors.title}>
-        <input className="f-input" placeholder="Ex: SIADE 2026 — Salon IA & Data d'Afrique"
-          value={form.title} onChange={e => set('title', e.target.value)} style={{ maxWidth: '100%' }} />
-      </Field>
-
-      <Field label="Ton username" required>
-        <input className="f-input" type="text" value={form.username} readOnly
-          style={{ maxWidth: '100%', opacity: .6, cursor: 'not-allowed', background: 'var(--f-surface)' }} />
+        <input className="f-input" value={form.title} onChange={e => set('title', e.target.value)} style={{ maxWidth: '100%' }} />
       </Field>
 
       <Field label="Type d'événement" required error={errors.type}>
@@ -121,8 +129,10 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
       </div>
 
       <Field label="Lien vers l'événement" required error={errors.url}>
-        <input className="f-input" type="text" placeholder="https://..."
-          value={form.url} onChange={e => set('url', e.target.value)} onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('url', 'https://' + v); }} style={{ maxWidth: '100%' }} />
+        <input className="f-input" type="text" value={form.url}
+          onChange={e => set('url', e.target.value)}
+          onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('url', 'https://' + v); }}
+          style={{ maxWidth: '100%' }} />
       </Field>
 
       <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
@@ -137,21 +147,16 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
       </div>
 
       <Field label="Description courte" required error={errors.excerpt}>
-        <textarea className="f-input" placeholder="En quoi consiste cet événement ? Qui peut participer ?"
-          value={form.excerpt} onChange={e => set('excerpt', e.target.value)}
+        <textarea className="f-input" value={form.excerpt} onChange={e => set('excerpt', e.target.value)}
           rows={3} style={{ maxWidth: '100%', resize: 'vertical' }} />
       </Field>
 
-      {!hideEmail && (
-        <Field label="Email de contact" required error={errors.email}>
-          <input className="f-input" type="email" placeholder="ton@email.com" value={form.email} onChange={e => set('email', e.target.value)} style={{ maxWidth: '100%' }} />
-          <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
-        </Field>
-      )}
-
-      <button type="submit" className="btn-f btn-f-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>
-        {loading ? 'Envoi…' : 'Soumettre l\'événement →'}
-      </button>
+      <div style={{ display: 'flex', gap: '1rem', paddingTop: '.5rem' }}>
+        <button type="submit" className="btn-f btn-f-primary" disabled={loading}>
+          {loading ? 'Enregistrement…' : 'Enregistrer →'}
+        </button>
+        <a href="/mon-compte?tab=evenements" className="btn-f btn-f-secondary">Annuler</a>
+      </div>
     </form>
   );
 }

@@ -104,20 +104,25 @@ export async function POST(req: Request) {
 
     } else if (type === 'evenement') {
       const slug = slugify(payload.title);
+      const { data: praticienEvt } = await supabaseAdmin
+        .from('praticiens').select('id')
+        .eq('slug', String(payload.username || '')).maybeSingle();
+
       const { error } = await supabaseAdmin.from('evenements').insert({
         slug,
-        title:      payload.title,
-        type:       payload.type,
-        type_label: payload.type === 'autre' ? (payload.type_autre || null) : null,
-        lieu:       payload.lieu   || null,
-        pays:       payload.pays   || null,
-        online:     payload.online  || false,
-        url:        payload.url    || null,
-        date_debut: payload.date_debut,
-        date_fin:   payload.date_fin || null,
-        gratuit:    payload.gratuit  || false,
-        excerpt:    payload.excerpt  || null,
-        status:     'approved',
+        title:        payload.title,
+        type:         payload.type,
+        type_label:   payload.type === 'autre' ? (payload.type_autre || null) : null,
+        lieu:         payload.lieu    || null,
+        pays:         payload.pays    || null,
+        online:       payload.online  || false,
+        url:          payload.url     || null,
+        date_debut:   payload.date_debut,
+        date_fin:     payload.date_fin || null,
+        gratuit:      payload.gratuit  || false,
+        excerpt:      payload.excerpt  || null,
+        praticien_id: praticienEvt?.id || null,
+        status:       'approved',
       });
       if (error) insertError = error.message;
     }
