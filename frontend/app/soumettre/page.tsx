@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import FormProfil      from '@/components/forms/FormProfil';
 import FormArticle     from '@/components/forms/FormArticle';
 import FormRealisation from '@/components/forms/FormRealisation';
@@ -17,8 +17,9 @@ export default function SoumettreePage() {
   const [userEmail, setUserEmail]   = useState('');
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session?.user?.email) setUserEmail(data.session.user.email);
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user?.email) setUserEmail(data.user.email);
     });
   }, []);
 
