@@ -108,13 +108,13 @@ const SKILL_GROUPS = [
 // Ensemble de toutes les skills listées dans les groupes (pour distinguer les skills custom)
 const ALL_GROUP_SKILLS = new Set(SKILL_GROUPS.flatMap(g => g.skills));
 
-type Props = { onSuccess: () => void };
+type Props = { onSuccess: () => void; initialEmail?: string };
 
-export default function FormProfil({ onSuccess }: Props) {
+export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
   const [form, setForm] = useState({
     name: '', username: '', role: '', pays: '', ville: '', bio: '',
     categories: [] as string[], linkedin_url: '', github_url: '',
-    twitter_url: '', youtube_url: '', website_url: '', whatsapp_url: '', email: '',
+    twitter_url: '', youtube_url: '', website_url: '', whatsapp_url: '', email: initialEmail,
   });
   const [activeSocials, setActiveSocials] = useState<string[]>([]);
   // État global plat — chaque skill est unique, peu importe le groupe où il est affiché
@@ -454,8 +454,19 @@ export default function FormProfil({ onSuccess }: Props) {
       </div>
 
       <Field label="Email de contact" required error={errors.email}>
-        <input className="f-input" type="email" placeholder="ton@email.com" value={form.email} onChange={e => set('email', e.target.value)} style={{ maxWidth: '100%' }} />
-        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
+        <input
+          className="f-input"
+          type="email"
+          placeholder="ton@email.com"
+          value={form.email}
+          onChange={e => set('email', e.target.value)}
+          readOnly={!!initialEmail}
+          style={{ maxWidth: '100%', ...(initialEmail ? { opacity: .7, cursor: 'not-allowed', background: 'var(--f-surface)' } : {}) }}
+        />
+        {initialEmail
+          ? <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-green)' }}>✓ Email récupéré depuis ton compte Google</span>
+          : <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
+        }
       </Field>
 
       <button type="submit" className="btn-f btn-f-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import FormProfil      from '@/components/forms/FormProfil';
 import FormArticle     from '@/components/forms/FormArticle';
@@ -14,6 +14,13 @@ export default function SoumettreePage() {
   const [pendingType, setPendingType] = useState<'article'|'realisation'|'evenement'|null>(null);
   const [showForm, setShowForm]     = useState(false);
   const [submitted, setSubmitted]   = useState(false);
+  const [userEmail, setUserEmail]   = useState('');
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session?.user?.email) setUserEmail(data.session.user.email);
+    });
+  }, []);
 
   // Gate
   const [usernameInput, setUsernameInput] = useState('');
@@ -169,7 +176,7 @@ export default function SoumettreePage() {
           {/* ── FORMULAIRES ── */}
           {showForm && !submitted && (
             <>
-              {activeForm === 'profil'      && <FormProfil      onSuccess={handleSuccess} />}
+              {activeForm === 'profil'      && <FormProfil      onSuccess={handleSuccess} initialEmail={userEmail} />}
               {activeForm === 'article'     && <FormArticle     onSuccess={handleSuccess} username={usernameInput} />}
               {activeForm === 'realisation' && <FormRealisation onSuccess={handleSuccess} username={usernameInput} />}
               {activeForm === 'evenement'   && <FormEvenement   onSuccess={handleSuccess} username={usernameInput} />}
