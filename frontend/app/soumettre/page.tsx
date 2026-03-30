@@ -45,7 +45,7 @@ export default function SoumettreePage() {
   async function checkUsername() {
     if (!usernameInput.trim()) return;
     setGateState('checking');
-    const { data } = await supabase
+    const { data } = await createClient()
       .from('praticiens')
       .select('name')
       .eq('status', 'approved')

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { supabase, type Praticien } from '@/lib/supabase';
 import Avatar from '@/components/Avatar';
 import { SkeletonPraticienCard } from '@/components/SkeletonCard';
+import { getCountryDisplay } from '@/lib/countryFlag';
 
 const PAGE_SIZE = 12;
 
@@ -83,7 +84,11 @@ export default function PraticiensPage() {
                         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', color: 'var(--f-sky)', margin: '.15rem 0 0 0' }}>{p.role}</p>
                       </div>
                     </div>
-                    <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{p.country}</span>
+                    {(() => { const { flag, name } = getCountryDisplay(p.country); return (
+                      <span style={{ fontSize: '1.1rem', flexShrink: 0 }} title={name || p.country}>
+                        {flag || name || p.country}
+                      </span>
+                    ); })()}
                   </div>
 
                   {p.badges?.length > 0 && (
