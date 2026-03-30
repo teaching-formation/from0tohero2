@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { createClient } from '@/lib/supabase/server';
 import { slugify } from '@/lib/slugify';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -15,6 +16,10 @@ const TYPE_LABELS: Record<string, string> = {
 export async function POST(req: Request) {
   try {
     const { type, payload } = await req.json();
+
+    // Récupère l'utilisateur connecté si disponible
+    const supabaseUser = await createClient();
+    const { data: { user } } = await supabaseUser.auth.getUser();
 
     // ── 1. Insérer dans la table cible (approuvé directement) ──────────────
     let insertError: string | null = null;
@@ -35,6 +40,7 @@ export async function POST(req: Request) {
         category:      primaryCat,
         categories:    cats,
         bio:           payload.bio || null,
+        email:         payload.email || null,
         stack:         Array.isArray(payload.stack) ? payload.stack : [],
         skills:        Array.isArray(payload.skills) ? payload.skills : [],
         linkedin_url:  payload.linkedin_url  || null,
@@ -44,6 +50,7 @@ export async function POST(req: Request) {
         twitter_url:   payload.twitter_url   || null,
         whatsapp_url:  payload.whatsapp_url  || null,
         open_to_work:  payload.open_to_work  || false,
+        user_id:       user?.id || null,
         badges:        [],
         photo_url:     null,
         status:        'approved',
