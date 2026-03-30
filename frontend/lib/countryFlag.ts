@@ -5,6 +5,8 @@ const MAP: Record<string, { flag: string; name: string }> = {
   // Afrique de l'Ouest
   "cote d'ivoire":     { flag: '🇨🇮', name: "Côte d'Ivoire" },
   "côte d'ivoire":     { flag: '🇨🇮', name: "Côte d'Ivoire" },
+  "cote d\u2019ivoire":{ flag: '🇨🇮', name: "Côte d'Ivoire" },
+  "côte d\u2019ivoire":{ flag: '🇨🇮', name: "Côte d'Ivoire" },
   "ivory coast":       { flag: '🇨🇮', name: "Côte d'Ivoire" },
   senegal:             { flag: '🇸🇳', name: 'Sénégal' },
   sénégal:             { flag: '🇸🇳', name: 'Sénégal' },
@@ -106,9 +108,13 @@ const MAP: Record<string, { flag: string; name: string }> = {
   luxembourg:          { flag: '🇱🇺', name: 'Luxembourg' },
 };
 
-// Normalise une clé : minuscules + trim (garde apostrophes et tirets)
+// Normalise une clé : minuscules + trim + apostrophes/tirets uniformisés
 function normalize(s: string) {
-  return s.toLowerCase().trim();
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/[\u2018\u2019\u02bc\u0060]/g, "'") // ' ' ʼ ` → '
+    .replace(/\u2013|\u2014/g, '-');              // – — → -
 }
 
 /** Retourne le drapeau emoji + nom canonique pour un pays.
