@@ -2,6 +2,21 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+const PAYS_AFRIQUE = [
+  'Afrique du Sud','Algérie','Angola','Bénin','Botswana','Burkina Faso','Burundi',
+  'Cabo Verde','Cameroun','Comores','Congo (Brazzaville)','Congo (RDC)',
+  "Côte d'Ivoire",'Djibouti','Égypte','Érythrée','Eswatini','Éthiopie',
+  'Gabon','Gambie','Ghana','Guinée','Guinée-Bissau','Guinée équatoriale',
+  'Kenya','Lesotho','Liberia','Libye','Madagascar','Malawi','Mali','Maroc',
+  'Maurice','Mauritanie','Mozambique','Namibie','Niger','Nigeria','Ouganda',
+  'Rwanda','São Tomé-et-Príncipe','Sénégal','Seychelles','Sierra Leone',
+  'Somalie','Soudan','Soudan du Sud','Tanzanie','Tchad','Togo','Tunisie',
+  'Zambie','Zimbabwe',
+  '─── Diaspora ───',
+  'France','Belgique','Canada','États-Unis','Royaume-Uni','Suisse','Allemagne',
+  'Italie','Espagne','Portugal','Pays-Bas','Suède','Norvège','Autre',
+];
+
 const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
 const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cyber-Sécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
 
@@ -46,7 +61,6 @@ export default function EditProfilClient({ praticien: p }: Props) {
     name:         String(p.name        || ''),
     role:         String(p.role        || ''),
     pays:         String(p.country     || ''),
-    ville:        String(p.city        || ''),
     bio:          String(p.bio         || ''),
     categories:   initCats,
     linkedin_url: String(p.linkedin_url || ''),
@@ -94,8 +108,7 @@ export default function EditProfilClient({ praticien: p }: Props) {
     const e: Record<string, string> = {};
     if (!form.name.trim())  e.name  = 'Champ requis';
     if (!form.role.trim())  e.role  = 'Champ requis';
-    if (!form.pays.trim())  e.pays  = 'Champ requis';
-    if (!form.ville.trim()) e.ville = 'Champ requis';
+    if (!form.pays.trim())  e.pays  = 'Sélectionne ton pays';
     if (form.categories.length === 0) e.categories = 'Sélectionne au moins une catégorie';
     if (selectedSkills.length === 0)  e.skills     = 'Sélectionne au moins une compétence';
     return e;
@@ -148,14 +161,21 @@ export default function EditProfilClient({ praticien: p }: Props) {
         <input className="f-input" placeholder="Ex: Data Engineer · GCP" value={form.role} onChange={e => set('role', e.target.value)} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-        <Field label="Pays" required error={errors.pays}>
-          <input className="f-input" value={form.pays} onChange={e => set('pays', e.target.value)} style={{ maxWidth: '100%' }} />
-        </Field>
-        <Field label="Ville" required error={errors.ville}>
-          <input className="f-input" value={form.ville} onChange={e => set('ville', e.target.value)} style={{ maxWidth: '100%' }} />
-        </Field>
-      </div>
+      <Field label="Pays" required error={errors.pays}>
+        <select
+          className="f-input"
+          value={form.pays}
+          onChange={e => set('pays', e.target.value)}
+          style={{ maxWidth: '100%', cursor: 'pointer' }}
+        >
+          <option value="">— Sélectionne ton pays —</option>
+          {PAYS_AFRIQUE.map(p => (
+            p.startsWith('─')
+              ? <option key={p} disabled style={{ color: 'var(--f-text-3)', fontStyle: 'italic' }}>{p}</option>
+              : <option key={p} value={p}>{p}</option>
+          ))}
+        </select>
+      </Field>
 
       <Field label="Catégories" required error={errors.categories}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
