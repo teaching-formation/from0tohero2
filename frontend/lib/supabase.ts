@@ -39,7 +39,8 @@ export type Realisation = {
   title: string
   praticien_id: string
   category: 'data' | 'devops' | 'cloud' | 'ia' | 'cyber' | 'frontend' | 'backend' | 'fullstack' | 'mobile' | 'web3' | 'embedded'
-  type: 'pipeline' | 'dashboard' | 'api' | 'bootcamp' | 'youtube' | 'podcast' | 'newsletter' | 'blog' | 'autre'
+  type: 'pipeline' | 'dashboard' | 'api' | 'app' | 'bootcamp' | 'youtube' | 'podcast' | 'newsletter' | 'blog' | 'autre'
+  type_label?: string
   stack: string[]
   excerpt?: string
   demo_url?: string
