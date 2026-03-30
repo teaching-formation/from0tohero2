@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import FormProfil      from '@/components/forms/FormProfil';
 import FormArticle     from '@/components/forms/FormArticle';
@@ -10,16 +11,22 @@ type FormType = 'profil' | 'article' | 'realisation' | 'evenement' | null;
 type GateState = 'idle' | 'checking' | 'found' | 'not_found';
 
 export default function SoumettreePage() {
+  const router = useRouter();
   const [activeForm, setActiveForm] = useState<FormType>(null);
   const [pendingType, setPendingType] = useState<'article'|'realisation'|'evenement'|null>(null);
   const [showForm, setShowForm]     = useState(false);
   const [submitted, setSubmitted]   = useState(false);
   const [userEmail, setUserEmail]   = useState('');
+  const [hasProfil, setHasProfil]   = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user?.email) setUserEmail(data.user.email);
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!data.user) return;
+      if (data.user.email) setUserEmail(data.user.email);
+      const { data: p } = await supabase
+        .from('praticiens').select('id').eq('user_id', data.user.id).maybeSingle();
+      if (p) setHasProfil(true);
     });
   }, []);
 
@@ -29,6 +36,10 @@ export default function SoumettreePage() {
   const [praticienName, setPraticienName] = useState('');
 
   function selectCard(type: FormType) {
+    if (type === 'profil' && hasProfil) {
+      router.push('/mon-compte/edit');
+      return;
+    }
     setActiveForm(type);
     setSubmitted(false);
     setShowForm(false);
@@ -66,7 +77,7 @@ export default function SoumettreePage() {
   }
 
   const CARDS = [
-    { type: 'profil'      as FormType, icon: '👤', num: '01', title: 'Mon profil',     desc: "Figurer dans l'annuaire des praticiens.",  iconBg: 'rgba(14,165,233,.1)' },
+    { type: 'profil' as FormType, icon: '👤', num: '01', title: 'Mon profil', desc: hasProfil ? 'Modifier mon profil existant →' : "Figurer dans l'annuaire des praticiens.", iconBg: 'rgba(14,165,233,.1)' },
     { type: 'article'     as FormType, icon: '✍️', num: '02', title: 'Un article',      desc: "Medium, LinkedIn, Dev.to, Substack…",      iconBg: 'rgba(249,115,22,.1)' },
     { type: 'realisation' as FormType, icon: '🚀', num: '03', title: 'Une réalisation', desc: "Pipeline, dashboard, API, bootcamp, YT…",  iconBg: 'rgba(16,185,129,.1)' },
     { type: 'evenement'   as FormType, icon: '📅', num: '04', title: 'Un événement',    desc: "Conférence, meetup, hackathon, webinaire…", iconBg: 'rgba(167,139,250,.1)' },
