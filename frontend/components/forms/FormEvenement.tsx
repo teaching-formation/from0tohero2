@@ -7,11 +7,11 @@ const TYPE_LABELS: Record<string,string> = {
   webinaire:'Webinaire', bootcamp:'Bootcamp', autre:'Autre',
 };
 
-type Props = { onSuccess: () => void; username?: string; hideEmail?: boolean };
+type Props = { onSuccess: () => void; username?: string; hideEmail?: boolean; initialEmail?: string };
 
-export default function FormEvenement({ onSuccess, username = '', hideEmail = false }: Props) {
+export default function FormEvenement({ onSuccess, username = '', hideEmail = false, initialEmail = '' }: Props) {
   const [form, setForm] = useState({
-    title: '', username: username, email: '',
+    title: '', username: username, email: initialEmail,
     type: '', type_autre: '',
     pays: '', lieu: '',
     online: false, gratuit: false,
@@ -35,8 +35,8 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
     if (!form.url.trim())      e.url      = 'Champ requis';
     if (!form.date_debut)      e.date_debut = 'Champ requis';
     if (!form.excerpt.trim())  e.excerpt  = 'Champ requis';
-    if (!hideEmail && !form.email.trim())    e.email    = 'Champ requis';
-    if (!hideEmail && form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Email invalide';
+    if (!hideEmail && !initialEmail && !form.email.trim())    e.email    = 'Champ requis';
+    if (!hideEmail && !initialEmail && form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Email invalide';
     if (form.date_fin && form.date_debut && form.date_fin < form.date_debut)
       e.date_fin = 'La date de fin doit être après la date de début';
     return e;
@@ -143,9 +143,15 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
       </Field>
 
       {!hideEmail && (
-        <Field label="Email de contact" required error={errors.email}>
-          <input className="f-input" type="email" placeholder="ton@email.com" value={form.email} onChange={e => set('email', e.target.value)} style={{ maxWidth: '100%' }} />
-          <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
+        <Field label="Email de contact" required={!initialEmail} error={errors.email}>
+          <input className="f-input" type="email" placeholder="ton@email.com"
+            value={form.email} readOnly={!!initialEmail}
+            onChange={e => set('email', e.target.value)}
+            style={{ maxWidth: '100%', ...(initialEmail ? { opacity: .7, cursor: 'not-allowed', background: 'var(--f-surface)' } : {}) }} />
+          {initialEmail
+            ? <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-green)' }}>✓ Email récupéré depuis ton compte Google</span>
+            : <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
+          }
         </Field>
       )}
 
