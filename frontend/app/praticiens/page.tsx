@@ -84,9 +84,9 @@ export default function PraticiensPage() {
                         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', color: 'var(--f-sky)', margin: '.15rem 0 0 0' }}>{p.role}</p>
                       </div>
                     </div>
-                    {(() => { const { flag, name } = getCountryDisplay(p.country); return (
-                      <span style={{ fontSize: '1.1rem', flexShrink: 0 }} title={name || p.country}>
-                        {flag || name || p.country}
+                    {(() => { const { flag, name } = getCountryDisplay(p.country); const display = flag || name || p.country; return (
+                      <span title={name || p.country} style={{ fontSize: flag ? '1.1rem' : '.72rem', flexShrink: 0, fontFamily: flag ? 'inherit' : "'Geist Mono', monospace", color: flag ? 'inherit' : 'var(--f-text-3)' }}>
+                        {display}
                       </span>
                     ); })()}
                   </div>
