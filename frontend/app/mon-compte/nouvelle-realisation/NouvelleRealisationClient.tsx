@@ -7,6 +7,7 @@ export default function NouvelleRealisationClient({ username }: { username: stri
   return (
     <FormRealisation
       username={username}
+      hideEmail
       onSuccess={() => {
         router.push('/mon-compte?tab=realisations');
         router.refresh();

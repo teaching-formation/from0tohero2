@@ -6,9 +6,9 @@ const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:
 const PLATEFORMES = ['linkedin','medium','devto','substack','blog','youtube','autre'];
 const PLAT_LABELS: Record<string,string> = { linkedin:'LinkedIn', medium:'Medium', devto:'Dev.to', substack:'Substack', blog:'Blog perso', youtube:'YouTube', autre:'Autre' };
 
-type Props = { onSuccess: () => void; username?: string };
+type Props = { onSuccess: () => void; username?: string; hideEmail?: boolean };
 
-export default function FormArticle({ onSuccess, username = '' }: Props) {
+export default function FormArticle({ onSuccess, username = '', hideEmail = false }: Props) {
   const [form, setForm] = useState({
     title: '', username: username, author_country: '', email: '',
     category: '', source: '', source_autre: '', external_url: '',
@@ -33,8 +33,8 @@ export default function FormArticle({ onSuccess, username = '' }: Props) {
     if (!form.external_url.trim()) e.external_url = 'Champ requis';
     if (!form.date_published)      e.date_published = 'Champ requis';
     if (!form.excerpt.trim())      e.excerpt      = 'Champ requis';
-    if (!form.email.trim())        e.email        = 'Champ requis';
-    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Email invalide';
+    if (!hideEmail && !form.email.trim())        e.email = 'Champ requis';
+    if (!hideEmail && form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Email invalide';
     return e;
   }
 
@@ -121,10 +121,12 @@ export default function FormArticle({ onSuccess, username = '' }: Props) {
         <textarea className="f-input" placeholder="De quoi parle cet article ?" value={form.excerpt} onChange={e => set('excerpt', e.target.value)} rows={3} style={{ maxWidth: '100%', resize: 'vertical' }} />
       </Field>
 
-      <Field label="Email de contact" required error={errors.email}>
-        <input className="f-input" type="email" placeholder="ton@email.com" value={form.email} onChange={e => set('email', e.target.value)} style={{ maxWidth: '100%' }} />
-        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
-      </Field>
+      {!hideEmail && (
+        <Field label="Email de contact" required error={errors.email}>
+          <input className="f-input" type="email" placeholder="ton@email.com" value={form.email} onChange={e => set('email', e.target.value)} style={{ maxWidth: '100%' }} />
+          <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
+        </Field>
+      )}
 
       <button type="submit" className="btn-f btn-f-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>
         {loading ? 'Envoi…' : 'Soumettre l\'article →'}

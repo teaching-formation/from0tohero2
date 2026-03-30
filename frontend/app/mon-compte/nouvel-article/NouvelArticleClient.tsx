@@ -7,6 +7,7 @@ export default function NouvelArticleClient({ username }: { username: string }) 
   return (
     <FormArticle
       username={username}
+      hideEmail
       onSuccess={() => {
         router.push('/mon-compte?tab=articles');
         router.refresh();

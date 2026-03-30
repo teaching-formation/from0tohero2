@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 type User        = { id: string; email: string; name: string };
 type Praticien   = Record<string, unknown> | null;
@@ -24,9 +24,15 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 export default function MonCompteClient({ user, praticien, articles, realisations }: Props) {
-  const router  = useRouter();
-  const supabase = createClient();
-  const [tab, setTab] = useState<'profil'|'articles'|'realisations'>('profil');
+  const router       = useRouter();
+  const searchParams = useSearchParams();
+  const supabase     = createClient();
+  type Tab = 'profil' | 'articles' | 'realisations';
+  const rawTab    = searchParams.get('tab') ?? '';
+  const initialTab: Tab = (['profil','articles','realisations'] as Tab[]).includes(rawTab as Tab)
+    ? (rawTab as Tab)
+    : 'profil';
+  const [tab, setTab] = useState<Tab>(initialTab);
 
   async function handleSignOut() {
     await supabase.auth.signOut();
