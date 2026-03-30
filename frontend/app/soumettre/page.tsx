@@ -177,9 +177,9 @@ export default function SoumettreePage() {
           {showForm && !submitted && (
             <>
               {activeForm === 'profil'      && <FormProfil      onSuccess={handleSuccess} initialEmail={userEmail} />}
-              {activeForm === 'article'     && <FormArticle     onSuccess={handleSuccess} username={usernameInput} />}
-              {activeForm === 'realisation' && <FormRealisation onSuccess={handleSuccess} username={usernameInput} />}
-              {activeForm === 'evenement'   && <FormEvenement   onSuccess={handleSuccess} username={usernameInput} />}
+              {activeForm === 'article'     && <FormArticle     onSuccess={handleSuccess} username={usernameInput} hideEmail />}
+              {activeForm === 'realisation' && <FormRealisation onSuccess={handleSuccess} username={usernameInput} hideEmail />}
+              {activeForm === 'evenement'   && <FormEvenement   onSuccess={handleSuccess} username={usernameInput} hideEmail />}
             </>
           )}
         </div>

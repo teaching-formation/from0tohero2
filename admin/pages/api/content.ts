@@ -5,6 +5,7 @@ const TABLES: Record<string, string> = {
   praticiens:   'praticiens',
   articles:     'articles',
   realisations: 'realisations',
+  evenements:   'evenements',
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
