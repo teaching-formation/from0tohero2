@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 
 const ALLOWED_FIELDS = [
   'name', 'role', 'pays', 'ville', 'bio',
-  'categories', 'stack', 'skills',
+  'categories', 'stack', 'skills', 'badges',
   'linkedin_url', 'github_url', 'youtube_url',
   'website_url', 'twitter_url', 'whatsapp_url',
   'open_to_work',

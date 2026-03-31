@@ -20,6 +20,13 @@ const PAYS_AFRIQUE = [
 const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
 const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cyber-Sécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
 
+const BADGES = [
+  { value: 'MENTOR',      label: 'Mentor',      desc: 'Tu accompagnes d\'autres praticiens',     color: 'var(--f-orange)', border: 'rgba(249,115,22,.35)', bg: 'rgba(249,115,22,.08)' },
+  { value: 'SPEAKER',     label: 'Speaker',     desc: 'Tu parles en conférences ou meetups',     color: '#a78bfa',          border: 'rgba(167,139,250,.35)', bg: 'rgba(167,139,250,.08)' },
+  { value: 'OPEN SOURCE', label: 'Open Source', desc: 'Tu contribues à des projets open source', color: 'var(--f-green)',   border: 'rgba(52,211,153,.35)',  bg: 'rgba(52,211,153,.08)' },
+  { value: 'CERTIFIÉ',    label: 'Certifié',    desc: 'Tu as des certifications professionnelles', color: 'var(--f-sky)',   border: 'var(--f-sky-border)',   bg: 'var(--f-sky-bg)' },
+];
+
 const SKILL_GROUPS = [
   { key: 'langages_data',    label: 'Langages & Data',        categories: ['data','ia'],                                           skills: ['Python','R','SQL','Scala','Java','Bash','PySpark','Pandas','NumPy','Julia','MATLAB','SAS','SPSS','Groovy','Haskell','Clojure','Erlang'] },
   { key: 'bigdata',          label: 'Big Data & Streaming',   categories: ['data','ia','devops'],                                   skills: ['Apache Spark','Kafka','Airflow','dbt','Flink','Hive','Hadoop','NiFi','Databricks','Prefect','Luigi','Delta Lake'] },
@@ -54,8 +61,9 @@ type Props = { praticien: Record<string, unknown> };
 export default function EditProfilClient({ praticien: p }: Props) {
   const router = useRouter();
 
-  const initStack = Array.isArray(p.stack) ? (p.stack as string[]) : [];
-  const initCats  = Array.isArray(p.categories) ? (p.categories as string[]) : p.category ? [String(p.category)] : [];
+  const initStack   = Array.isArray(p.stack)    ? (p.stack    as string[]) : [];
+  const initCats    = Array.isArray(p.categories) ? (p.categories as string[]) : p.category ? [String(p.category)] : [];
+  const initBadges  = Array.isArray(p.badges)   ? (p.badges   as string[]) : [];
 
   const [form, setForm] = useState({
     name:         String(p.name        || ''),
@@ -70,6 +78,7 @@ export default function EditProfilClient({ praticien: p }: Props) {
     website_url:  String(p.website_url  || ''),
     whatsapp_url: String(p.whatsapp_url || ''),
   });
+  const [selectedBadges, setSelectedBadges] = useState<string[]>(initBadges);
   const [selectedSkills, setSelectedSkills] = useState<string[]>(initStack);
   const [customSkill,    setCustomSkill]    = useState('');
   const [activeSocials,  setActiveSocials]  = useState<string[]>(
@@ -125,6 +134,7 @@ export default function EditProfilClient({ praticien: p }: Props) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ...form,
+        badges: selectedBadges,
         stack:  selectedSkills,
         skills: buildSkillsPayload(),
       }),
@@ -193,6 +203,34 @@ export default function EditProfilClient({ praticien: p }: Props) {
           ))}
         </div>
       </Field>
+
+      {/* Badges */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+        <label style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-2)' }}>
+          Badges <span style={{ color: 'var(--f-text-3)', fontWeight: 400, textTransform: 'none', letterSpacing: 0 }}>(optionnel)</span>
+        </label>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '.6rem' }}>
+          {BADGES.map(b => {
+            const active = selectedBadges.includes(b.value);
+            return (
+              <button key={b.value} type="button"
+                onClick={() => setSelectedBadges(prev => active ? prev.filter(x => x !== b.value) : [...prev, b.value])}
+                style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '.2rem',
+                  padding: '.75rem 1rem', borderRadius: 8, cursor: 'pointer', textAlign: 'left',
+                  border: `1.5px solid ${active ? b.border : 'var(--f-border)'}`,
+                  background: active ? b.bg : 'var(--f-surface)',
+                  transition: 'all .15s',
+                }}>
+                <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', fontWeight: 600, letterSpacing: '.06em', color: active ? b.color : 'var(--f-text-2)' }}>
+                  {active ? '✓ ' : ''}{b.label.toUpperCase()}
+                </span>
+                <span style={{ fontFamily: "'Inter', sans-serif", fontSize: '.72rem', color: 'var(--f-text-3)', lineHeight: 1.4 }}>{b.desc}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       <Field label="Bio courte" error={errors.bio}>
         <textarea className="f-input" placeholder="2-3 phrases sur ton parcours." value={form.bio} onChange={e => set('bio', e.target.value)} rows={3} style={{ maxWidth: '100%', resize: 'vertical' }} />
