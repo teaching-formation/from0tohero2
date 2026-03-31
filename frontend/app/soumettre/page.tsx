@@ -120,8 +120,19 @@ export default function SoumettreePage() {
             <div style={{ background: 'var(--f-green-bg)', border: '1.5px solid var(--f-green-border)', borderRadius: 14, padding: '1.5rem 2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <span style={{ fontSize: '1.5rem' }}>✅</span>
               <div>
-                <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .25rem 0' }}>Soumission reçue !</p>
-                <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-text-3)', margin: 0 }}>Publication sous 48h max.</p>
+                <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .25rem 0' }}>
+                  {activeForm === 'profil' ? 'Profil créé !' : 'Soumission reçue !'}
+                </p>
+                <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-text-3)', margin: '0 0 .5rem 0' }}>
+                  {activeForm === 'profil'
+                    ? 'Ton profil est maintenant en ligne et visible dans l\'annuaire.'
+                    : 'Contenu publié instantanément.'}
+                </p>
+                {activeForm === 'profil' && (
+                  <a href="/mon-compte" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-sky)', textDecoration: 'none' }}>
+                    → Accéder à mon espace pour soumettre des articles, réalisations et événements
+                  </a>
+                )}
               </div>
             </div>
           )}
@@ -175,7 +186,7 @@ export default function SoumettreePage() {
                     ✗ Aucun profil trouvé avec ce username.
                   </p>
                   <p style={{ fontSize: '.82rem', color: 'var(--f-text-2)', margin: '0 0 1rem 0' }}>
-                    Soumets d&apos;abord ton profil — il sera publié sous 48h.
+                    Soumets d&apos;abord ton profil — publication instantanée.
                   </p>
                   <button className="btn-f btn-f-secondary" onClick={() => { setActiveForm('profil'); setShowForm(true); }} style={{ fontSize: '.72rem' }}>
                     Soumettre mon profil →
@@ -198,7 +209,7 @@ export default function SoumettreePage() {
       )}
 
       <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', marginTop: '3rem', lineHeight: 1.8 }}>
-        Délai de publication : 48h max.
+        Publication instantanée.
       </p>
     </div>
   );
