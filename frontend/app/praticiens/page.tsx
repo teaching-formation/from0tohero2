@@ -16,11 +16,12 @@ export default function PraticiensPage() {
   const [praticiens, setPraticiens] = useState<Praticien[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
+  const [activeCountry, setActiveCountry] = useState('all');
   const [search, setSearch] = useState('');
   const [visible, setVisible] = useState(PAGE_SIZE);
 
   // Reset pagination quand filtre ou recherche change
-  useEffect(() => { setVisible(PAGE_SIZE); }, [activeFilter, search]);
+  useEffect(() => { setVisible(PAGE_SIZE); }, [activeFilter, activeCountry, search]);
 
   useEffect(() => {
     supabase
@@ -31,11 +32,29 @@ export default function PraticiensPage() {
       .then(({ data }) => { setPraticiens(data ?? []); setLoading(false); });
   }, []);
 
+  // Liste des pays présents, triés par nom normalisé
+  const countries = Array.from(
+    new Map(
+      praticiens
+        .filter(p => p.country)
+        .map(p => {
+          const { flag, name } = getCountryDisplay(p.country);
+          const label = name || p.country || '';
+          return [label, { raw: p.country!, flag, label }];
+        })
+    ).values()
+  ).sort((a, b) => a.label.localeCompare(b.label, 'fr'));
+
   const filtered = praticiens.filter(p => {
     if (activeFilter === 'open' && !p.open_to_work) return false;
     if (activeFilter !== 'all' && activeFilter !== 'open') {
       const cats: string[] = (p as any).categories ?? (p.category ? [p.category] : []);
       if (!cats.includes(activeFilter)) return false;
+    }
+    if (activeCountry !== 'all') {
+      const { name } = getCountryDisplay(p.country);
+      const label = name || p.country || '';
+      if (label !== activeCountry) return false;
     }
     if (search) {
       const q = search.toLowerCase();
@@ -50,7 +69,39 @@ export default function PraticiensPage() {
         <span className="f-label" style={{ marginBottom: '.5rem' }}>// praticiens</span>
         <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(1.9rem,4vw,2.8rem)', fontWeight: 800, color: 'var(--f-text-1)', margin: '.4rem 0 .6rem 0' }}>Les gens qui construisent</h1>
         <p style={{ color: 'var(--f-text-3)', fontSize: '.88rem', margin: '0 0 2rem 0' }}>Profils de praticiens tech — Data, DevOps, Cloud, IA, Cybersécurité, Frontend, Backend, Mobile, Web3 et plus.</p>
-        <input className="f-input" type="text" placeholder="Rechercher par nom, rôle, ville, stack…" value={search} onChange={e => setSearch(e.target.value)} style={{ marginBottom: '1.25rem' }} />
+        <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+          <input
+            className="f-input"
+            type="text"
+            placeholder="Rechercher par nom, rôle, ville, stack…"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ flex: 1, minWidth: 220 }}
+          />
+          <select
+            value={activeCountry}
+            onChange={e => setActiveCountry(e.target.value)}
+            style={{
+              fontFamily: "'Geist Mono', monospace",
+              fontSize: '.73rem',
+              padding: '.55rem .9rem',
+              borderRadius: 8,
+              border: '1.5px solid var(--f-border)',
+              background: 'var(--f-surface)',
+              color: activeCountry !== 'all' ? 'var(--f-sky)' : 'var(--f-text-2)',
+              cursor: 'pointer',
+              outline: 'none',
+              minWidth: 160,
+            }}
+          >
+            <option value="all">🌍 Tous les pays</option>
+            {countries.map(c => (
+              <option key={c.label} value={c.label}>
+                {c.flag ? `${c.flag} ` : ''}{c.label}
+              </option>
+            ))}
+          </select>
+        </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
           {FILTERS.map(f => (
             <button key={f} className={`filter-pill${activeFilter === f ? ' active' : ''}`} onClick={() => setActiveFilter(f)}>{FILTER_LABELS[f]}</button>
