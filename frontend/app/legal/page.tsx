@@ -51,8 +51,9 @@ export default function LegalPage() {
         <li style={S.li}>Les informations soumises sont exactes et vous appartiennent.</li>
         <li style={S.li}>Vous disposez des droits nécessaires sur le contenu soumis.</li>
         <li style={S.li}>Le contenu ne contient pas de propos haineux, discriminatoires ou illégaux.</li>
-        <li style={S.li}>Toute soumission est soumise à modération avant publication (délai max : 48h).</li>
-        <li style={S.li}>La plateforme se réserve le droit de refuser ou supprimer tout contenu sans justification.</li>
+        <li style={S.li}>Toute soumission est soumise à modération avant publication.</li>
+        <li style={S.li}>La plateforme se réserve le droit de refuser tout contenu ne correspondant pas à sa ligne éditoriale.</li>
+        <li style={S.li}>Tout contenu publié jugé non conforme aux présentes conditions peut être supprimé à tout moment, sans préavis et sans justification, à la seule discrétion de l'éditeur.</li>
       </ul>
       <p style={S.p}>
         Les soumissions acceptées peuvent être publiées, corrigées typographiquement ou retirées à tout moment
