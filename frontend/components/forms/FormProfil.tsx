@@ -216,9 +216,9 @@ export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
     if (!form.email.trim())        e.email        = 'Champ requis';
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Email invalide';
     if (totalSkills() === 0)       e.skills       = 'Sélectionne au moins une compétence';
-    const socialKeys = ['linkedin_url','github_url','twitter_url','youtube_url','website_url','whatsapp_url'];
+    const socialKeys = ['linkedin_url','github_url','twitter_url','youtube_url','website_url','whatsapp_url'] as const;
     for (const key of socialKeys) {
-      const val = (form as Record<string, string>)[key];
+      const val = (form as unknown as Record<string, string>)[key];
       if (val && !isValidUrl(val)) e[key] = 'URL invalide';
     }
     return e;
