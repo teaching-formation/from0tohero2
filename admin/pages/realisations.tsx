@@ -21,7 +21,8 @@ type Row = {
 const EDIT_FIELDS = [
   { key: 'title',          label: 'Titre' },
   { key: 'category',       label: 'Catégorie', type: 'select' as const, options: ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'] },
-  { key: 'type',           label: 'Type', type: 'select' as const, options: ['pipeline','dashboard','api','app','bootcamp','youtube','autre'] },
+  { key: 'type',           label: 'Type', type: 'select' as const, options: ['pipeline','dashboard','api','app','bootcamp','youtube','podcast','newsletter','blog','autre'] },
+  { key: 'type_label',     label: 'Type custom (si "autre")' },
   { key: 'stack',          label: 'Stack (séparé par ,)' },
   { key: 'excerpt',        label: 'Description', type: 'textarea' as const },
   { key: 'demo_url',       label: 'Lien Demo', type: 'url' as const },
@@ -45,11 +46,12 @@ function RealisationsPage() {
   async function deleteRow(id: string, title: string) {
     if (!window.confirm(`Supprimer "${title}" ? Cette action est irréversible.`)) return;
     setDeleting(id);
-    await fetch('/api/delete', {
+    const r = await fetch('/api/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
       body: JSON.stringify({ table: 'realisations', id }),
     });
+    if (!r.ok) { setDeleting(null); alert('Erreur lors de la suppression.'); return; }
     setRows(prev => prev.filter(r => r.id !== id));
     setDeleting(null);
   }

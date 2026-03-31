@@ -5,18 +5,12 @@ import { supabase, type Praticien } from '@/lib/supabase';
 import Avatar from '@/components/Avatar';
 import { SkeletonPraticienCard } from '@/components/SkeletonCard';
 import { getCountryDisplay } from '@/lib/countryFlag';
+import { BADGE_STYLES } from '@/lib/badges';
 
 const PAGE_SIZE = 12;
 
-const FILTERS = ['all','open','data','devops','cloud','ia','cybersecurite','mlops','frontend','backend','fullstack','mobile','web3','embedded'];
-const FILTER_LABELS: Record<string,string> = { all:'Tous', open:'● Disponibles', data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cybersecurite:'Cybersécurité', mlops:'MLOps', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
-
-const BADGE_STYLES: Record<string,{color:string,border:string,bg:string}> = {
-  'MENTOR':      { color:'var(--f-orange)', border:'rgba(249,115,22,.25)', bg:'rgba(249,115,22,.08)' },
-  'SPEAKER':     { color:'#a78bfa',         border:'rgba(167,139,250,.25)', bg:'rgba(167,139,250,.08)' },
-  'OPEN SOURCE': { color:'var(--f-green)',   border:'rgba(52,211,153,.25)', bg:'rgba(52,211,153,.08)' },
-  'CERTIFIÉ':    { color:'var(--f-sky)',      border:'var(--f-sky-border)',  bg:'var(--f-sky-bg)' },
-};
+const FILTERS = ['all','open','data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
+const FILTER_LABELS: Record<string,string> = { all:'Tous', open:'● Disponibles', data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cybersécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
 
 export default function PraticiensPage() {
   const [praticiens, setPraticiens] = useState<Praticien[]>([]);

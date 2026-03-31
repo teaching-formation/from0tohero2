@@ -4,7 +4,7 @@ import { getToken } from './AuthGuard';
 type Field = {
   key: string;
   label: string;
-  type?: 'text' | 'url' | 'date' | 'select' | 'textarea';
+  type?: 'text' | 'url' | 'date' | 'select' | 'textarea' | 'array';
   options?: string[];
 };
 
@@ -51,7 +51,7 @@ export default function EditModal({ table, row, fields, onClose, onSaved }: Prop
 
     const data: Record<string, unknown> = {};
     for (const f of fields) {
-      if (f.key === 'stack') {
+      if (f.type === 'array' || f.key === 'stack') {
         data[f.key] = form[f.key].split(',').map(s => s.trim()).filter(Boolean);
       } else {
         data[f.key] = form[f.key] || null;

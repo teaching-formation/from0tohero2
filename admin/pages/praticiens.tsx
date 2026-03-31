@@ -23,6 +23,7 @@ const EDIT_FIELDS = [
   { key: 'category',     label: 'Catégorie', type: 'select' as const, options: ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'] },
   { key: 'bio',          label: 'Bio', type: 'textarea' as const },
   { key: 'stack',        label: 'Stack (séparé par ,)' },
+  { key: 'badges',       label: 'Badges (séparé par ,)', type: 'array' as const },
   { key: 'linkedin_url', label: 'LinkedIn', type: 'url' as const },
   { key: 'github_url',   label: 'GitHub', type: 'url' as const },
   { key: 'status',       label: 'Statut', type: 'select' as const, options: ['pending','approved','rejected'] },
@@ -43,11 +44,12 @@ function PraticiensPage() {
   async function deleteRow(id: string, name: string) {
     if (!window.confirm(`Supprimer "${name}" ? Cette action est irréversible.`)) return;
     setDeleting(id);
-    await fetch('/api/delete', {
+    const r = await fetch('/api/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
       body: JSON.stringify({ table: 'praticiens', id }),
     });
+    if (!r.ok) { setDeleting(null); alert('Erreur lors de la suppression.'); return; }
     setRows(prev => prev.filter(r => r.id !== id));
     setDeleting(null);
   }

@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { supabase, type Praticien, type Realisation } from '@/lib/supabase';
 import Avatar from '@/components/Avatar';
 import { getCountryDisplay } from '@/lib/countryFlag';
+import { BADGE_STYLES } from '@/lib/badges';
 
 export default function PraticienPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
@@ -45,12 +46,6 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
   if (!p) return null;
 
   const praticienRealisations = realisations;
-
-  const BADGE_STYLES: Record<string,{color:string,border:string,bg:string}> = {
-    'MENTOR':      { color:'var(--f-orange)', border:'rgba(249,115,22,.25)', bg:'rgba(249,115,22,.08)' },
-    'SPEAKER':     { color:'#a78bfa',         border:'rgba(167,139,250,.25)', bg:'rgba(167,139,250,.08)' },
-    'OPEN SOURCE': { color:'var(--f-green)',   border:'rgba(52,211,153,.25)', bg:'rgba(52,211,153,.08)' },
-  };
 
   return (
     <div style={{ padding: '3.5rem 6vw', maxWidth: 900, margin: '0 auto' }}>

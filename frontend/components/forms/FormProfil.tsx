@@ -161,7 +161,8 @@ export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
     if (!slug.trim()) { setUsernameStatus('idle'); return; }
     setUsernameStatus('checking');
     usernameTimer.current = setTimeout(async () => {
-      const { data } = await supabase.rpc('is_slug_available', { p_slug: slug.trim() });
+      const { data, error } = await supabase.rpc('is_slug_available', { p_slug: slug.trim() });
+      if (error) { setUsernameStatus('idle'); return; }
       setUsernameStatus(data === true ? 'available' : 'taken');
     }, 500);
   }
@@ -199,10 +200,15 @@ export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
     return selectedSkills;
   }
 
+  function isValidUrl(s: string) {
+    try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch { return false; }
+  }
+
   function validate() {
     const e: Record<string, string> = {};
     if (!form.name.trim())         e.name         = 'Champ requis';
     if (!form.username.trim())     e.username     = 'Champ requis';
+    if (usernameStatus === 'checking') e.username = 'Vérification en cours…';
     if (usernameStatus === 'taken') e.username    = 'Ce username est déjà utilisé';
     if (!form.role.trim())         e.role         = 'Champ requis';
     if (!form.pays.trim())         e.pays         = 'Sélectionne ton pays';
@@ -210,6 +216,11 @@ export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
     if (!form.email.trim())        e.email        = 'Champ requis';
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Email invalide';
     if (totalSkills() === 0)       e.skills       = 'Sélectionne au moins une compétence';
+    const socialKeys = ['linkedin_url','github_url','twitter_url','youtube_url','website_url','whatsapp_url'];
+    for (const key of socialKeys) {
+      const val = (form as Record<string, string>)[key];
+      if (val && !isValidUrl(val)) e[key] = 'URL invalide';
+    }
     return e;
   }
 
@@ -467,8 +478,9 @@ export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
                 value={(form as any)[key]}
                 onChange={e => set(key, e.target.value)}
                 onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set(key, 'https://' + v); }}
-                style={{ maxWidth: '100%' }}
+                style={{ maxWidth: '100%', ...(errors[key] ? { borderColor: '#f87171' } : {}) }}
               />
+              {errors[key] && <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{errors[key]}</span>}
             </div>
           ))
         }

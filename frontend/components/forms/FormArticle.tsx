@@ -22,6 +22,10 @@ export default function FormArticle({ onSuccess, username = '', hideEmail = fals
     if (errors[key]) setErrors(e => ({ ...e, [key]: '' }));
   }
 
+  function isValidUrl(s: string) {
+    try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch { return false; }
+  }
+
   function validate() {
     const e: Record<string, string> = {};
     if (!form.title.trim())        e.title        = 'Champ requis';
@@ -31,6 +35,7 @@ export default function FormArticle({ onSuccess, username = '', hideEmail = fals
     if (!form.source)              e.source       = 'Sélectionne une plateforme';
     if (form.source === 'autre' && !form.source_autre.trim()) e.source_autre = 'Précise la plateforme';
     if (!form.external_url.trim()) e.external_url = 'Champ requis';
+    else if (!isValidUrl(form.external_url)) e.external_url = 'URL invalide';
     if (!form.date_published)      e.date_published = 'Champ requis';
     if (!form.excerpt.trim())      e.excerpt      = 'Champ requis';
     if (!hideEmail && !initialEmail && !form.email.trim())        e.email = 'Champ requis';

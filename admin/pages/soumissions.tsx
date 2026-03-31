@@ -67,6 +67,7 @@ function SoumissionsPage() {
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [expanded, setExpanded]   = useState<string | null>(null);
   const [acting, setActing]       = useState<string | null>(null);
+  const [actError, setActError]   = useState<string | null>(null);
   const [note, setNote]           = useState('');
   const [loading, setLoading]     = useState(true);
   const [confirm, setConfirm]     = useState<ConfirmState>(null);
@@ -84,7 +85,8 @@ function SoumissionsPage() {
   async function act(action: 'approve' | 'reject', s: Soumission) {
     setConfirm(null);
     setActing(s.id);
-    await fetch('/api/action', {
+    setActError(null);
+    const r = await fetch('/api/action', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -92,6 +94,12 @@ function SoumissionsPage() {
       },
       body: JSON.stringify({ action, id: s.id, type: s.type, payload: s.payload, note }),
     });
+    if (!r.ok) {
+      const json = await r.json().catch(() => ({ error: 'Erreur serveur' }));
+      setActError(json.error || 'Erreur lors de l\'action.');
+      setActing(null);
+      return;
+    }
     setAll(prev =>
       prev.map(x =>
         x.id === s.id
@@ -165,6 +173,26 @@ function SoumissionsPage() {
           </button>
         ))}
       </div>
+
+      {/* Action error */}
+      {actError && (
+        <div style={{
+          fontFamily: "'Geist Mono', monospace",
+          fontSize: '.72rem',
+          color: 'var(--red)',
+          background: 'var(--red-bg)',
+          border: '1px solid var(--red-border)',
+          borderRadius: 'var(--radius-sm)',
+          padding: '.6rem .85rem',
+          marginBottom: '1rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}>
+          ⚠ {actError}
+          <button onClick={() => setActError(null)} style={{ background: 'none', border: 'none', color: 'var(--red)', cursor: 'pointer', fontSize: '.9rem' }}>✕</button>
+        </div>
+      )}
 
       {/* Content */}
       {loading ? (

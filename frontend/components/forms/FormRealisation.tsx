@@ -21,6 +21,10 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
     if (errors[key]) setErrors(e => ({ ...e, [key]: '' }));
   }
 
+  function isValidUrl(s: string) {
+    try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch { return false; }
+  }
+
   function validate() {
     const e: Record<string, string> = {};
     if (!form.title.trim())        e.title        = 'Champ requis';
@@ -31,6 +35,8 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
     if (!form.stack.trim())        e.stack        = 'Champ requis';
     if (!form.excerpt.trim())      e.excerpt      = 'Champ requis';
     if (!form.date_published)      e.date_published = 'Champ requis';
+    if (form.demo_url && !isValidUrl(form.demo_url)) e.demo_url = 'URL invalide';
+    if (form.repo_url && !isValidUrl(form.repo_url)) e.repo_url = 'URL invalide';
     if (!hideEmail && !initialEmail && !form.email.trim())        e.email = 'Champ requis';
     if (!hideEmail && !initialEmail && form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Email invalide';
     return e;

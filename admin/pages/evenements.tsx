@@ -56,11 +56,12 @@ function EvenementsPage() {
   async function deleteRow(id: string, title: string) {
     if (!window.confirm(`Supprimer "${title}" ? Cette action est irréversible.`)) return;
     setDeleting(id);
-    await fetch('/api/delete', {
+    const r = await fetch('/api/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
       body: JSON.stringify({ table: 'evenements', id }),
     });
+    if (!r.ok) { setDeleting(null); alert('Erreur lors de la suppression.'); return; }
     setRows(prev => prev.filter(r => r.id !== id));
     setDeleting(null);
   }

@@ -26,13 +26,19 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
     if (errors[key]) setErrors(e => ({ ...e, [key]: '' }));
   }
 
+  function isValidUrl(s: string) {
+    try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch { return false; }
+  }
+
   function validate() {
     const e: Record<string, string> = {};
     if (!form.title.trim())    e.title    = 'Champ requis';
+    if (!form.username.trim()) e.username = 'Champ requis';
     if (!form.type)            e.type     = 'Sélectionne un type';
     if (form.type === 'autre' && !form.type_autre.trim()) e.type_autre = 'Précise le type';
     if (!form.pays.trim())     e.pays     = 'Champ requis';
     if (!form.url.trim())      e.url      = 'Champ requis';
+    else if (!isValidUrl(form.url)) e.url = 'URL invalide';
     if (!form.date_debut)      e.date_debut = 'Champ requis';
     if (!form.excerpt.trim())  e.excerpt  = 'Champ requis';
     if (!hideEmail && !initialEmail && !form.email.trim())    e.email    = 'Champ requis';

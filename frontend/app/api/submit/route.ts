@@ -13,6 +13,10 @@ const TYPE_LABELS: Record<string, string> = {
   evenement:   'Événement',
 };
 
+function escHtml(s: string): string {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
 export async function POST(req: Request) {
   try {
     const { type, payload } = await req.json();
@@ -31,6 +35,9 @@ export async function POST(req: Request) {
       const primaryCat = cats[0] || 'data';
       const slug = payload.username || slugify(payload.name);
 
+      const { data: existingSlug } = await supabaseAdmin.from('praticiens').select('id').eq('slug', slug).maybeSingle();
+      if (existingSlug) return NextResponse.json({ error: `Le username "${slug}" est déjà utilisé.` }, { status: 409 });
+
       const { error } = await supabaseAdmin.from('praticiens').insert({
         slug,
         name:          payload.name,
@@ -41,7 +48,7 @@ export async function POST(req: Request) {
         categories:    cats,
         bio:           payload.bio || null,
         email:         payload.email || null,
-        stack:         Array.isArray(payload.stack) ? payload.stack : [],
+        stack:         Array.isArray(payload.stack) ? payload.stack.filter(Boolean) : [],
         skills:        Array.isArray(payload.skills) ? payload.skills : [],
         linkedin_url:  payload.linkedin_url  || null,
         github_url:    payload.github_url    || null,
@@ -91,6 +98,7 @@ export async function POST(req: Request) {
         praticien_id:   praticien?.id || null,
         category:       payload.category,
         type:           payload.type,
+        type_label:     payload.type === 'autre' ? (payload.type_label || null) : null,
         stack:          Array.isArray(payload.stack)
           ? payload.stack
           : String(payload.stack || '').split(',').map((s: string) => s.trim()).filter(Boolean),
@@ -138,14 +146,15 @@ export async function POST(req: Request) {
       payload,
       status:      'approved',
       reviewed_at: new Date().toISOString(),
+      user_id:     user?.id || null,
     });
 
     // ── 3. Notification email à l'admin ────────────────────────────────────
     const label    = TYPE_LABELS[type] || type;
     const adminUrl = process.env.ADMIN_URL || 'http://localhost:3001';
-    const name     = String(payload.name  || '');
-    const title    = String(payload.title || '');
-    const username = String(payload.username || '');
+    const name     = escHtml(String(payload.name  || ''));
+    const title    = escHtml(String(payload.title || ''));
+    const username = escHtml(String(payload.username || ''));
 
     await resend.emails.send({
       from: 'from0tohero <onboarding@resend.dev>',

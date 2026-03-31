@@ -11,12 +11,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const { action, id, type, payload, note } = req.body;
+  const { action, id, type, payload, note: rawNote } = req.body;
+  const note = rawNote ? String(rawNote).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') : '';
 
   if (action === 'reject') {
     await supabaseAdmin.from('soumissions').update({
       status: 'rejected',
-      note_admin: note || null,
+      note_admin: rawNote || null,
       reviewed_at: new Date().toISOString(),
     }).eq('id', id);
 
@@ -61,6 +62,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const cats: string[] = Array.isArray(payload.categories) ? payload.categories : (payload.category ? [payload.category] : []);
       const primaryCat = cats[0] || 'data';
       const slug = payload.username || slugify(payload.name);
+      const { data: existing } = await supabaseAdmin.from('praticiens').select('id').eq('slug', slug).maybeSingle();
+      if (existing) return res.status(409).json({ error: `Le slug "${slug}" est déjà utilisé par un praticien existant.` });
       const { error } = await supabaseAdmin.from('praticiens').insert({
         slug,
         name: payload.name,
@@ -117,9 +120,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         praticien_id: praticien?.id || null,
         category: payload.category,
         type: payload.type,
+        type_label: payload.type === 'autre' ? (payload.type_label || null) : null,
         stack: Array.isArray(payload.stack)
           ? payload.stack
-          : String(payload.stack).split(',').map((s: string) => s.trim()).filter(Boolean),
+          : String(payload.stack || '').split(',').map((s: string) => s.trim()).filter(Boolean),
         excerpt: payload.excerpt || null,
         demo_url: payload.demo_url || null,
         repo_url: payload.repo_url || null,
