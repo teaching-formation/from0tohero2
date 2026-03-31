@@ -24,7 +24,6 @@ const BADGES = [
   { value: 'MENTOR',      label: 'Mentor',      desc: 'Tu accompagnes d\'autres praticiens',     color: 'var(--f-orange)', border: 'rgba(249,115,22,.35)', bg: 'rgba(249,115,22,.08)' },
   { value: 'SPEAKER',     label: 'Speaker',     desc: 'Tu parles en conférences ou meetups',     color: '#a78bfa',          border: 'rgba(167,139,250,.35)', bg: 'rgba(167,139,250,.08)' },
   { value: 'OPEN SOURCE', label: 'Open Source', desc: 'Tu contribues à des projets open source', color: 'var(--f-green)',   border: 'rgba(52,211,153,.35)',  bg: 'rgba(52,211,153,.08)' },
-  { value: 'CERTIFIÉ',    label: 'Certifié',    desc: 'Tu as des certifications professionnelles', color: 'var(--f-sky)',   border: 'var(--f-sky-border)',   bg: 'var(--f-sky-bg)' },
 ];
 
 const SKILL_GROUPS = [
