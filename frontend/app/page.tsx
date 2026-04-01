@@ -15,6 +15,16 @@ export const metadata: Metadata = {
   },
 };
 
+async function getBootcamps() {
+  const { data } = await supabase
+    .from('realisations')
+    .select('title, stack, excerpt, demo_url, repo_url')
+    .eq('type', 'bootcamp')
+    .eq('status', 'approved')
+    .order('created_at', { ascending: true });
+  return data ?? [];
+}
+
 async function getYoutubeChannels() {
   const { data } = await supabase
     .from('chaines_youtube')
@@ -50,7 +60,7 @@ async function getLastArticles() {
 }
 
 export default async function Home() {
-  const [stats, lastArticles, youtubeChannels] = await Promise.all([getStats(), getLastArticles(), getYoutubeChannels()]);
+  const [stats, lastArticles, youtubeChannels, bootcamps] = await Promise.all([getStats(), getLastArticles(), getYoutubeChannels(), getBootcamps()]);
 
   return (
     <>
@@ -124,27 +134,31 @@ export default async function Home() {
         <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(1.7rem,3vw,2.4rem)', fontWeight: 800, color: 'var(--f-text-1)', margin: '.4rem 0 3rem 0' }}>Apprendre par la pratique</h2>
 
         {/* Bootcamps */}
-        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1rem' }}>🎓 Bootcamps</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '1rem', marginBottom: '3rem' }}>
-          <a href="https://diakite-data.github.io/data-engineering-bootcamp/" className="f-card-link" target="_blank" rel="noreferrer">
-            <div className="f-card f-card-hover">
-              <span className="badge-live" style={{ marginBottom: '1rem' }}><span className="dot"></span>live</span>
-              <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '.5rem 0 .4rem 0' }}>Data Engineering Bootcamp</h3>
-              <p style={{ fontSize: '.8rem', color: 'var(--f-text-2)', margin: '0 0 1rem 0', lineHeight: 1.6 }}>Python · Airflow · dbt · Spark · GCP · Kafka</p>
-              <div style={{ display: 'flex', gap: '1.25rem', fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', flexWrap: 'wrap' }}>
-                <span>35 modules</span><span>1 100+ apprenants</span><span>40+ pays</span>
-              </div>
+        {bootcamps.length > 0 && (
+          <>
+            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1rem' }}>🎓 Bootcamps</p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '1rem', marginBottom: '3rem' }}>
+              {bootcamps.map(b => {
+                const isLive = !!b.demo_url;
+                const href   = b.demo_url || b.repo_url || '#';
+                const stack  = Array.isArray(b.stack) ? b.stack.join(' · ') : '';
+                return (
+                  <a key={b.title} href={href} className="f-card-link" target="_blank" rel="noreferrer">
+                    <div className={`f-card${isLive ? ' f-card-hover' : ''}`} style={!isLive ? { opacity: .65 } : {}}>
+                      {isLive
+                        ? <span className="badge-live" style={{ marginBottom: '1rem' }}><span className="dot"></span>live</span>
+                        : <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', display: 'block', marginBottom: '1rem' }}>○ coming soon</span>
+                      }
+                      <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .4rem 0' }}>{b.title}</h3>
+                      {stack && <p style={{ fontSize: '.8rem', color: 'var(--f-text-2)', margin: '0 0 1rem 0', lineHeight: 1.6 }}>{stack}</p>}
+                      {b.excerpt && <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>{b.excerpt}</span>}
+                    </div>
+                  </a>
+                );
+              })}
             </div>
-          </a>
-          <a href="https://da.from0tohero.dev" className="f-card-link" target="_blank" rel="noreferrer">
-            <div className="f-card" style={{ opacity: .65 }}>
-              <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', display: 'block', marginBottom: '1rem' }}>○ coming soon</span>
-              <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .4rem 0' }}>Data Analyst Bootcamp</h3>
-              <p style={{ fontSize: '.8rem', color: 'var(--f-text-2)', margin: '0 0 1rem 0', lineHeight: 1.6 }}>SQL · Python · Power BI · Tableau · Stats</p>
-              <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>En construction</span>
-            </div>
-          </a>
-        </div>
+          </>
+        )}
 
         {/* Chaînes YouTube */}
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1rem' }}>▶ Chaînes YouTube francophones</p>
