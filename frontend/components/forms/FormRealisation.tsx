@@ -34,7 +34,6 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
     if (form.type === 'autre' && !form.type_autre.trim()) e.type_autre = 'Précise le type';
     if (!form.stack.trim())        e.stack        = 'Champ requis';
     if (!form.excerpt.trim())      e.excerpt      = 'Champ requis';
-    if (!form.date_published)      e.date_published = 'Champ requis';
     if (form.demo_url && !isValidUrl(form.demo_url)) e.demo_url = 'URL invalide';
     if (form.repo_url && !isValidUrl(form.repo_url)) e.repo_url = 'URL invalide';
     if (!hideEmail && !initialEmail && !form.email.trim())        e.email = 'Champ requis';
@@ -126,7 +125,7 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
         <input className="f-input" type="text" placeholder="https://github.com/..." value={form.repo_url} onChange={e => set('repo_url', e.target.value)} onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('repo_url', 'https://' + v); }} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Date de réalisation" required error={errors.date_published}>
+      <Field label="Date de réalisation" error={errors.date_published}>
         <input className="f-input" type="date" value={form.date_published} onChange={e => set('date_published', e.target.value)} style={{ maxWidth: '280px' }} />
       </Field>
 
