@@ -18,6 +18,8 @@ export default function SoumettreePage() {
   const [submitted, setSubmitted]   = useState(false);
   const [userEmail, setUserEmail]   = useState('');
   const [hasProfil, setHasProfil]   = useState(false);
+  const [userSlug,  setUserSlug]    = useState('');
+  const [userName,  setUserName]    = useState('');
 
   useEffect(() => {
     const supabase = createClient();
@@ -25,8 +27,12 @@ export default function SoumettreePage() {
       if (!data.user) return;
       if (data.user.email) setUserEmail(data.user.email);
       const { data: p } = await supabase
-        .from('praticiens').select('id').eq('user_id', data.user.id).maybeSingle();
-      if (p) setHasProfil(true);
+        .from('praticiens').select('id, slug, name').eq('user_id', data.user.id).maybeSingle();
+      if (p) {
+        setHasProfil(true);
+        setUserSlug(p.slug);
+        setUserName(p.name);
+      }
     });
   }, []);
 
@@ -42,13 +48,20 @@ export default function SoumettreePage() {
     }
     setActiveForm(type);
     setSubmitted(false);
-    setShowForm(false);
     setGateState('idle');
-    setUsernameInput('');
     setPraticienName('');
     if (type === 'profil') {
+      setUsernameInput('');
+      setShowForm(true);
+    } else if (userSlug) {
+      // Connecté avec un profil → on saute la gate
+      setUsernameInput(userSlug);
+      setPraticienName(userName);
+      setGateState('found');
       setShowForm(true);
     } else {
+      setUsernameInput('');
+      setShowForm(false);
       setPendingType(type as 'article'|'realisation'|'evenement');
     }
   }
