@@ -9,7 +9,8 @@ create table if not exists chaines_youtube (
   subs        text,
   ordre       integer default 0,
   active      boolean default true,
-  created_at  timestamptz default now()
+  created_at  timestamptz default now(),
+  updated_at  timestamptz default now()
 );
 
 -- RLS
