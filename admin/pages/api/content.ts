@@ -2,10 +2,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { supabaseAdmin } from '@/lib/supabase';
 
 const TABLES: Record<string, string> = {
-  praticiens:   'praticiens',
-  articles:     'articles',
-  realisations: 'realisations',
-  evenements:   'evenements',
+  praticiens:      'praticiens',
+  articles:        'articles',
+  realisations:    'realisations',
+  evenements:      'evenements',
+  chaines_youtube: 'chaines_youtube',
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

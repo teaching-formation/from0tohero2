@@ -13,13 +13,14 @@ export const metadata: Metadata = {
   },
 };
 
-const YOUTUBE_CHANNELS = [
-  { name: 'from0tohero', desc: 'Data Engineering · Cloud · DevOps · pratique', url: 'https://www.youtube.com/@from0tohero', subs: '1 100+ apprenants' },
-  { name: 'Xavki', desc: 'DevOps · Linux · Ansible · Docker · Kubernetes', url: 'https://www.youtube.com/@xavki', subs: '100k+ abonnés' },
-  { name: 'Grafikart', desc: 'Dev Web · PHP · JavaScript · frameworks modernes', url: 'https://www.youtube.com/@grafikart', subs: '200k+ abonnés' },
-  { name: 'Cocadmin', desc: 'Sysadmin · Linux · Réseau · Infra', url: 'https://www.youtube.com/@cocadmin', subs: 'FR · Sysadmin' },
-  { name: 'Cookie connecté', desc: 'Cybersécurité · OSCP · pentest · CTF', url: 'https://www.youtube.com/@cookieconnecte', subs: 'FR · Cyber' },
-];
+async function getYoutubeChannels() {
+  const { data } = await supabase
+    .from('chaines_youtube')
+    .select('name, description, url, subs')
+    .eq('active', true)
+    .order('ordre', { ascending: true });
+  return data ?? [];
+}
 
 async function getStats() {
   const [p, r, e, a] = await Promise.all([
@@ -47,7 +48,7 @@ async function getLastArticles() {
 }
 
 export default async function Home() {
-  const [stats, lastArticles] = await Promise.all([getStats(), getLastArticles()]);
+  const [stats, lastArticles, youtubeChannels] = await Promise.all([getStats(), getLastArticles(), getYoutubeChannels()]);
 
   return (
     <>
@@ -146,14 +147,14 @@ export default async function Home() {
         {/* Chaînes YouTube */}
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1rem' }}>▶ Chaînes YouTube francophones</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '1rem', marginBottom: '3rem' }}>
-          {YOUTUBE_CHANNELS.map(ch => (
+          {youtubeChannels.map(ch => (
             <a key={ch.name} href={ch.url} className="f-card-link" target="_blank" rel="noreferrer">
               <div className="f-card f-card-hover" style={{ padding: '1.1rem 1.25rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem', marginBottom: '.75rem' }}>
                   <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: 'rgba(239,68,68,.12)', color: '#ef4444', fontSize: '.75rem', flexShrink: 0 }}>▶</span>
                   <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: '.9rem', color: 'var(--f-text-1)' }}>{ch.name}</span>
                 </div>
-                <p style={{ fontSize: '.78rem', color: 'var(--f-text-2)', lineHeight: 1.55, margin: '0 0 .75rem 0' }}>{ch.desc}</p>
+                <p style={{ fontSize: '.78rem', color: 'var(--f-text-2)', lineHeight: 1.55, margin: '0 0 .75rem 0' }}>{ch.description}</p>
                 <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)' }}>{ch.subs}</span>
               </div>
             </a>
