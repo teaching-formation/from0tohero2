@@ -98,6 +98,18 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
               })}
             </div>
           )}
+          {p.certifications && (
+            <div style={{ marginBottom: '1rem' }}>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '.4rem' }}>🎓 Certifications</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem' }}>
+                {String(p.certifications).split(',').map(c => c.trim()).filter(Boolean).map(cert => (
+                  <span key={cert} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-sky)', border: '1px solid rgba(56,189,248,.25)', background: 'rgba(56,189,248,.08)', padding: '2px 9px', borderRadius: 4 }}>
+                    {cert}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
           <p style={{ fontSize: '.9rem', color: 'var(--f-text-2)', lineHeight: 1.8, maxWidth: 560, margin: '0 0 1.25rem 0' }}>{p.bio}</p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
             {p.linkedin_url && (

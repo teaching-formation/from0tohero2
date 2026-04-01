@@ -24,6 +24,7 @@ const BADGES = [
   { value: 'MENTOR',      label: 'Mentor',      desc: 'Tu accompagnes d\'autres praticiens',     color: 'var(--f-orange)', border: 'rgba(249,115,22,.35)', bg: 'rgba(249,115,22,.08)' },
   { value: 'SPEAKER',     label: 'Speaker',     desc: 'Tu parles en conférences ou meetups',     color: '#a78bfa',          border: 'rgba(167,139,250,.35)', bg: 'rgba(167,139,250,.08)' },
   { value: 'OPEN SOURCE', label: 'Open Source', desc: 'Tu contribues à des projets open source', color: 'var(--f-green)',   border: 'rgba(52,211,153,.35)',  bg: 'rgba(52,211,153,.08)' },
+  { value: 'CERTIFIÉ',    label: 'Certifié',    desc: 'Tu détiens des certifications reconnues',  color: 'var(--f-sky)',     border: 'rgba(56,189,248,.35)',  bg: 'rgba(56,189,248,.08)' },
 ];
 
 const SKILL_GROUPS = [
@@ -60,9 +61,9 @@ type Props = { praticien: Record<string, unknown> };
 export default function EditProfilClient({ praticien: p }: Props) {
   const router = useRouter();
 
-  const initStack   = Array.isArray(p.stack)    ? (p.stack    as string[]) : [];
+  const initStack   = Array.isArray(p.stack)      ? (p.stack      as string[]) : [];
   const initCats    = Array.isArray(p.categories) ? (p.categories as string[]) : p.category ? [String(p.category)] : [];
-  const initBadges  = Array.isArray(p.badges)   ? (p.badges   as string[]) : [];
+  const initBadges  = Array.isArray(p.badges)     ? (p.badges     as string[]) : [];
 
   const [form, setForm] = useState({
     name:         String(p.name        || ''),
@@ -77,7 +78,8 @@ export default function EditProfilClient({ praticien: p }: Props) {
     website_url:  String(p.website_url  || ''),
     whatsapp_url: String(p.whatsapp_url || ''),
   });
-  const [selectedBadges, setSelectedBadges] = useState<string[]>(initBadges);
+  const [selectedBadges,  setSelectedBadges]  = useState<string[]>(initBadges);
+  const [certifications,  setCertifications]  = useState(String(p.certifications || ''));
   const [selectedSkills, setSelectedSkills] = useState<string[]>(initStack);
   const [customSkill,    setCustomSkill]    = useState('');
   const [activeSocials,  setActiveSocials]  = useState<string[]>(
@@ -133,8 +135,9 @@ export default function EditProfilClient({ praticien: p }: Props) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ...form,
-        badges: selectedBadges,
-        stack:  selectedSkills,
+        badges:         selectedBadges,
+        certifications: certifications || null,
+        stack:          selectedSkills,
         skills: buildSkillsPayload(),
       }),
     });
@@ -229,6 +232,21 @@ export default function EditProfilClient({ praticien: p }: Props) {
             );
           })}
         </div>
+        {selectedBadges.includes('CERTIFIÉ') && (
+          <div style={{ marginTop: '.75rem' }}>
+            <input
+              className="f-input"
+              type="text"
+              placeholder="Tes certifications, séparées par des virgules (ex: AWS SAA, CKA, OSCP)"
+              value={certifications}
+              onChange={e => setCertifications(e.target.value)}
+              style={{ maxWidth: '100%' }}
+            />
+            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', marginTop: '.35rem' }}>
+              Ex: AWS Solutions Architect, Google Data Engineer, CKA
+            </p>
+          </div>
+        )}
       </div>
 
       <Field label="Bio courte" error={errors.bio}>

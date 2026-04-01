@@ -31,6 +31,7 @@ const BADGES = [
   { value: 'MENTOR',      label: 'Mentor',      desc: "Tu accompagnes d'autres praticiens",      color: 'var(--f-orange)', border: 'rgba(249,115,22,.35)', bg: 'rgba(249,115,22,.08)' },
   { value: 'SPEAKER',     label: 'Speaker',     desc: 'Tu parles en conférences ou meetups',     color: '#a78bfa',          border: 'rgba(167,139,250,.35)', bg: 'rgba(167,139,250,.08)' },
   { value: 'OPEN SOURCE', label: 'Open Source', desc: 'Tu contribues à des projets open source', color: 'var(--f-green)',   border: 'rgba(52,211,153,.35)',  bg: 'rgba(52,211,153,.08)' },
+  { value: 'CERTIFIÉ',    label: 'Certifié',    desc: 'Tu détiens des certifications reconnues',  color: 'var(--f-sky)',     border: 'rgba(56,189,248,.35)',  bg: 'rgba(56,189,248,.08)' },
 ];
 
 const SKILL_GROUPS = [
@@ -138,7 +139,8 @@ export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
     twitter_url: '', youtube_url: '', website_url: '', whatsapp_url: '', email: initialEmail,
   });
   const [activeSocials,  setActiveSocials]  = useState<string[]>([]);
-  const [selectedBadges, setSelectedBadges] = useState<string[]>([]);
+  const [selectedBadges,    setSelectedBadges]    = useState<string[]>([]);
+  const [certifications,    setCertifications]    = useState('');
   // État global plat — chaque skill est unique, peu importe le groupe où il est affiché
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [customSkill, setCustomSkill] = useState('');
@@ -241,7 +243,7 @@ export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type: 'praticien',
-        payload: { ...form, badges: selectedBadges, stack: buildStack(), skills: buildSkillsPayload() },
+        payload: { ...form, badges: selectedBadges, certifications: certifications || null, stack: buildStack(), skills: buildSkillsPayload() },
       }),
     });
     setLoading(false);
@@ -344,6 +346,21 @@ export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
             );
           })}
         </div>
+        {selectedBadges.includes('CERTIFIÉ') && (
+          <div style={{ marginTop: '.75rem' }}>
+            <input
+              className="f-input"
+              type="text"
+              placeholder="Tes certifications, séparées par des virgules (ex: AWS SAA, CKA, OSCP)"
+              value={certifications}
+              onChange={e => setCertifications(e.target.value)}
+              style={{ maxWidth: '100%' }}
+            />
+            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', marginTop: '.35rem' }}>
+              Ex: AWS Solutions Architect, Google Data Engineer, CKA
+            </p>
+          </div>
+        )}
       </div>
 
       <Field label="Bio courte" error={errors.bio}>

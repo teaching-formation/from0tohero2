@@ -58,9 +58,10 @@ export async function POST(req: Request) {
         whatsapp_url:  payload.whatsapp_url  || null,
         open_to_work:  payload.open_to_work  || false,
         user_id:       user?.id || null,
-        badges:        [],
-        photo_url:     null,
-        status:        'approved',
+        badges:         [],
+        certifications: payload.certifications || null,
+        photo_url:      null,
+        status:         'approved',
       });
       if (error) insertError = error.message;
 
