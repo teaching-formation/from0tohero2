@@ -20,6 +20,7 @@ export type Praticien = {
   photo_url?: string
   stack: string[]
   badges: string[]
+  certifications?: string
   skills: { label: string; items: string[] }[]
   linkedin_url?: string
   github_url?: string
