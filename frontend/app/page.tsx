@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
+export const revalidate = 3600; // revalide toutes les heures
+
 export const metadata: Metadata = {
   title: 'from0tohero.dev — Ce qu\'ils ont construit. Pas ce qu\'ils ont promis.',
   description: 'Articles, réalisations et profils de praticiens tech francophones — Data, DevOps, Cloud, IA, Cybersécurité, Dev.',
