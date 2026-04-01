@@ -16,7 +16,6 @@ export default function Navbar() {
       document.documentElement.classList.add('dark');
       setDark(true);
     }
-    // Check session
     const supabase = createClient();
     supabase.auth.getSession().then(({ data }) => {
       setIsLoggedIn(!!data.session);
@@ -27,6 +26,9 @@ export default function Navbar() {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Ferme le menu quand on change de page
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
+
   const toggleDark = () => {
     const next = !dark;
     setDark(next);
@@ -35,29 +37,29 @@ export default function Navbar() {
   };
 
   const links = [
-    { href: '/articles', label: 'Articles' },
-    { href: '/praticiens', label: 'Praticiens' },
+    { href: '/articles',     label: 'Articles' },
+    { href: '/praticiens',   label: 'Praticiens' },
     { href: '/realisations', label: 'Réalisations' },
-    { href: '/evenements', label: 'Événements' },
+    { href: '/evenements',   label: 'Événements' },
   ];
 
   return (
     <nav className="navbar" style={{
       position: 'sticky', top: 0, zIndex: 50,
-      background: 'rgba(255,255,255,0.95)',
+      background: dark ? 'rgba(13,17,23,0.97)' : 'rgba(255,255,255,0.97)',
       borderBottom: '1px solid var(--f-border)',
     }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 6vw', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 
         {/* Logo */}
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', flexShrink: 0 }}>
           <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: '1rem', color: 'var(--f-text-1)', letterSpacing: '-.01em' }}>
             from0tohero<span style={{ color: 'var(--f-orange)' }}>.dev</span>
           </span>
         </Link>
 
         {/* Desktop nav */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '.25rem' }} className="desktop-nav">
+        <div className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '.25rem' }}>
           {links.map(l => (
             <Link key={l.href} href={l.href} style={{
               fontFamily: "'Geist Mono', monospace",
@@ -91,12 +93,75 @@ export default function Navbar() {
           >
             {isLoggedIn ? 'Mon espace' : 'Connexion'}
           </Link>
-
           <button onClick={toggleDark} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--f-text-3)', marginLeft: '.25rem', fontSize: '1rem', lineHeight: 1 }}>
             {dark ? '☀️' : '🌙'}
           </button>
         </div>
+
+        {/* Mobile right — dark toggle + hamburger */}
+        <div className="mobile-nav-right" style={{ display: 'none', alignItems: 'center', gap: '.5rem' }}>
+          <button onClick={toggleDark} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--f-text-3)', fontSize: '1rem', lineHeight: 1, padding: '.25rem' }}>
+            {dark ? '☀️' : '🌙'}
+          </button>
+          <button
+            onClick={() => setMenuOpen(o => !o)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '.4rem', color: 'var(--f-text-1)', display: 'flex', flexDirection: 'column', gap: '5px', justifyContent: 'center' }}
+            aria-label="Menu"
+          >
+            <span style={{ display: 'block', width: 22, height: 2, background: menuOpen ? 'var(--f-text-1)' : 'var(--f-text-1)', borderRadius: 2, transition: 'transform .2s, opacity .2s', transform: menuOpen ? 'translateY(7px) rotate(45deg)' : 'none' }} />
+            <span style={{ display: 'block', width: 22, height: 2, background: 'var(--f-text-1)', borderRadius: 2, transition: 'opacity .2s', opacity: menuOpen ? 0 : 1 }} />
+            <span style={{ display: 'block', width: 22, height: 2, background: 'var(--f-text-1)', borderRadius: 2, transition: 'transform .2s, opacity .2s', transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : 'none' }} />
+          </button>
+        </div>
       </div>
+
+      {/* Mobile menu dropdown */}
+      {menuOpen && (
+        <div className="mobile-menu" style={{
+          position: 'absolute', top: 56, left: 0, right: 0,
+          background: dark ? 'rgba(13,17,23,0.99)' : 'rgba(255,255,255,0.99)',
+          borderBottom: '1px solid var(--f-border)',
+          padding: '1rem 6vw 1.5rem',
+          display: 'flex', flexDirection: 'column', gap: '.25rem',
+          boxShadow: '0 8px 24px rgba(0,0,0,.08)',
+        }}>
+          {links.map(l => (
+            <Link key={l.href} href={l.href} style={{
+              fontFamily: "'Geist Mono', monospace",
+              fontSize: '.82rem',
+              letterSpacing: '.08em',
+              textTransform: 'uppercase',
+              padding: '.8rem .5rem',
+              color: pathname.startsWith(l.href) ? 'var(--f-sky)' : 'var(--f-text-1)',
+              textDecoration: 'none',
+              borderBottom: '1px solid var(--f-border)',
+            }}>
+              {l.label}
+            </Link>
+          ))}
+          <div style={{ display: 'flex', gap: '.75rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+            <Link href="/soumettre" className="btn-f btn-f-primary" style={{ fontSize: '.72rem', padding: '.6rem 1.2rem', flex: 1, justifyContent: 'center' }}>
+              Soumettre
+            </Link>
+            <Link
+              href={isLoggedIn ? '/mon-compte' : '/connexion'}
+              style={{
+                fontFamily: "'Geist Mono', monospace",
+                fontSize: '.72rem',
+                padding: '.6rem 1.2rem',
+                borderRadius: 9,
+                border: '1.5px solid var(--f-border)',
+                color: 'var(--f-text-2)',
+                textDecoration: 'none',
+                flex: 1,
+                textAlign: 'center',
+              }}
+            >
+              {isLoggedIn ? 'Mon espace' : 'Connexion'}
+            </Link>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

@@ -287,6 +287,12 @@ body {
 
 /* ── NAVBAR ── */
 .navbar { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--f-border); box-shadow: var(--f-shadow-sm); }
+.desktop-nav { display: flex !important; }
+.mobile-nav-right { display: none !important; }
+@media (max-width: 768px) {
+  .desktop-nav { display: none !important; }
+  .mobile-nav-right { display: flex !important; }
+}
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 5px; }
