@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import AuthGuard, { getToken } from '@/components/AuthGuard';
 import EditModal from '@/components/EditModal';
+import AddModal  from '@/components/AddModal';
 
 type Row = {
   id: string;
@@ -40,6 +41,7 @@ function PraticiensPage() {
   const [search, setSearch]     = useState('');
   const [editing, setEditing]   = useState<Row | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [adding,  setAdding]    = useState(false);
 
   async function deleteRow(id: string, name: string) {
     if (!window.confirm(`Supprimer "${name}" ? Cette action est irréversible.`)) return;
@@ -69,6 +71,10 @@ function PraticiensPage() {
     setRows(prev => prev.map(r => r.id === updated.id ? { ...r, ...updated } as Row : r));
   }
 
+  function onCreated(row: Record<string, unknown>) {
+    setRows(prev => [row as Row, ...prev]);
+  }
+
   const counts = {
     all:      rows.length,
     approved: rows.filter(r => r.status === 'approved').length,
@@ -87,13 +93,11 @@ function PraticiensPage() {
             <span className="page-title-count">({rows.length})</span>
           </h1>
         </div>
-        <input
-          type="search"
-          placeholder="Rechercher…"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{ width: 220, fontSize: '.72rem' }}
-        />
+        <div style={{ display: 'flex', gap: '.75rem', alignItems: 'center' }}>
+          <input type="search" placeholder="Rechercher…" value={search}
+            onChange={e => setSearch(e.target.value)} style={{ width: 220, fontSize: '.72rem' }} />
+          <button className="btn btn-primary btn-sm" onClick={() => setAdding(true)}>+ Nouveau</button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -182,13 +186,26 @@ function PraticiensPage() {
       )}
 
       {editing && (
-        <EditModal
-          table="praticiens"
-          row={editing}
-          fields={EDIT_FIELDS}
-          onClose={() => setEditing(null)}
-          onSaved={onSaved}
-        />
+        <EditModal table="praticiens" row={editing} fields={EDIT_FIELDS}
+          onClose={() => setEditing(null)} onSaved={onSaved} />
+      )}
+      {adding && (
+        <AddModal table="praticiens"
+          fields={[
+            { key: 'name',         label: 'Nom complet', required: true },
+            { key: 'role',         label: 'Rôle / titre', required: true },
+            { key: 'country',      label: 'Pays' },
+            { key: 'category',     label: 'Catégorie', type: 'select', options: ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'] },
+            { key: 'bio',          label: 'Bio', type: 'textarea' },
+            { key: 'stack',        label: 'Stack (séparé par ,)' },
+            { key: 'linkedin_url', label: 'LinkedIn', type: 'url' },
+            { key: 'github_url',   label: 'GitHub', type: 'url' },
+            { key: 'youtube_url',  label: 'YouTube', type: 'url' },
+            { key: 'website_url',  label: 'Site web', type: 'url' },
+            { key: 'status',       label: 'Statut', type: 'select', options: ['approved','pending','rejected'] },
+          ]}
+          defaults={{ status: 'approved' }}
+          onClose={() => setAdding(false)} onCreated={onCreated} />
       )}
     </div>
   );

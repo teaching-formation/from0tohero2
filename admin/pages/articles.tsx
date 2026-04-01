@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import AuthGuard, { getToken } from '@/components/AuthGuard';
 import EditModal from '@/components/EditModal';
+import AddModal  from '@/components/AddModal';
 
 type Row = {
   id: string;
@@ -51,6 +52,7 @@ function ArticlesPage() {
   const [search, setSearch]     = useState('');
   const [editing, setEditing]   = useState<Row | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [adding,  setAdding]    = useState(false);
 
   async function deleteRow(id: string, title: string) {
     if (!window.confirm(`Supprimer "${title}" ? Cette action est irréversible.`)) return;
@@ -80,6 +82,10 @@ function ArticlesPage() {
     setRows(prev => prev.map(r => r.id === updated.id ? { ...r, ...updated } as Row : r));
   }
 
+  function onCreated(row: Record<string, unknown>) {
+    setRows(prev => [row as Row, ...prev]);
+  }
+
   const counts = {
     all:      rows.length,
     approved: rows.filter(r => r.status === 'approved').length,
@@ -98,13 +104,11 @@ function ArticlesPage() {
             <span className="page-title-count">({rows.length})</span>
           </h1>
         </div>
-        <input
-          type="search"
-          placeholder="Rechercher…"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{ width: 220, fontSize: '.72rem' }}
-        />
+        <div style={{ display: 'flex', gap: '.75rem', alignItems: 'center' }}>
+          <input type="search" placeholder="Rechercher…" value={search}
+            onChange={e => setSearch(e.target.value)} style={{ width: 220, fontSize: '.72rem' }} />
+          <button className="btn btn-primary btn-sm" onClick={() => setAdding(true)}>+ Nouveau</button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -215,13 +219,24 @@ function ArticlesPage() {
       )}
 
       {editing && (
-        <EditModal
-          table="articles"
-          row={editing}
-          fields={EDIT_FIELDS}
-          onClose={() => setEditing(null)}
-          onSaved={onSaved}
-        />
+        <EditModal table="articles" row={editing} fields={EDIT_FIELDS}
+          onClose={() => setEditing(null)} onSaved={onSaved} />
+      )}
+      {adding && (
+        <AddModal table="articles"
+          fields={[
+            { key: 'title',          label: 'Titre', required: true },
+            { key: 'author',         label: 'Auteur', required: true },
+            { key: 'author_country', label: 'Pays auteur' },
+            { key: 'category',       label: 'Catégorie', type: 'select', options: ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'] },
+            { key: 'source',         label: 'Source', type: 'select', options: ['linkedin','medium','devto','substack','blog','youtube','autre'] },
+            { key: 'external_url',   label: 'Lien article', type: 'url', required: true },
+            { key: 'excerpt',        label: 'Résumé', type: 'textarea' },
+            { key: 'date_published', label: 'Date publication', type: 'date' },
+            { key: 'status',         label: 'Statut', type: 'select', options: ['approved','pending','rejected'] },
+          ]}
+          defaults={{ status: 'approved' }}
+          onClose={() => setAdding(false)} onCreated={onCreated} />
       )}
     </div>
   );
