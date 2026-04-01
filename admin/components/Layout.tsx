@@ -44,9 +44,30 @@ export default function Layout({ children }: Props) {
     <>
       {/* Header */}
       <div className="sidebar-header">
-        <span className="sidebar-logo">
-          from0tohero<span className="sidebar-logo-accent">.</span>
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '.55rem', marginBottom: '.3rem' }}>
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            width: 28, height: 28, borderRadius: 6,
+            background: '#0d1117',
+            border: '1.5px solid rgba(249,115,22,.4)',
+            flexShrink: 0,
+          }}>
+            <span style={{
+              fontFamily: "'Geist Mono', 'Courier New', monospace",
+              fontWeight: 700,
+              fontSize: '.65rem',
+              color: '#f97316',
+              letterSpacing: '-.03em',
+              lineHeight: 1,
+              userSelect: 'none',
+            }}>
+              &gt;_
+            </span>
+          </span>
+          <span className="sidebar-logo">
+            from0tohero<span className="sidebar-logo-accent">.</span>
+          </span>
+        </div>
         <span className="sidebar-tag">// admin console</span>
       </div>
 
