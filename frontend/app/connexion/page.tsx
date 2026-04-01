@@ -9,13 +9,10 @@ function ConnexionForm() {
   const hasError     = searchParams.get('error') === 'auth';
 
   const supabase = createClient();
-  const [email,    setEmail]    = useState('');
-  const [password, setPassword] = useState('');
-  const [mode,     setMode]     = useState<'password' | 'magic' | 'reset'>('password');
-  const [sent,     setSent]     = useState(false);
-  const [loading,  setLoading]  = useState(false);
-  const [error,    setError]    = useState('');
-  const [showPwd,  setShowPwd]  = useState(false);
+  const [email,   setEmail]   = useState('');
+  const [sent,    setSent]    = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error,   setError]   = useState('');
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
@@ -26,16 +23,6 @@ function ConnexionForm() {
       options: { redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(next)}` },
     });
     if (error) { setError(error.message); setLoading(false); }
-  }
-
-  async function handlePassword(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email.trim() || !password.trim()) return;
-    setLoading(true); setError('');
-    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    setLoading(false);
-    if (error) { setError('Email ou mot de passe incorrect.'); return; }
-    window.location.href = next;
   }
 
   async function handleMagicLink(e: React.FormEvent) {
@@ -51,25 +38,13 @@ function ConnexionForm() {
     setSent(true);
   }
 
-  async function handleReset(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email.trim()) return;
-    setLoading(true); setError('');
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${siteUrl}/auth/callback?next=/mon-compte/edit`,
-    });
-    setLoading(false);
-    if (error) { setError(error.message); return; }
-    setSent(true);
-  }
-
   if (sent) {
     return (
       <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-green)', marginBottom: '.75rem' }}>✓ Email envoyé !</p>
+        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-green)', marginBottom: '.75rem' }}>✓ Lien envoyé !</p>
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-text-3)', lineHeight: 1.7 }}>
           Vérifie ta boîte mail <strong style={{ color: 'var(--f-text-1)' }}>{email}</strong>.<br />
-          {mode === 'reset' ? 'Clique sur le lien pour réinitialiser ton mot de passe.' : 'Clique sur le lien pour accéder à ton espace.'}
+          Clique sur le lien pour accéder à ton espace.
         </p>
       </div>
     );
@@ -102,61 +77,14 @@ function ConnexionForm() {
         <div style={{ flex: 1, height: 1, background: 'var(--f-border)' }} />
       </div>
 
-      {/* Tabs mode */}
-      <div style={{ display: 'flex', gap: '.4rem', background: 'var(--f-bg)', border: '1px solid var(--f-border)', borderRadius: 8, padding: 3 }}>
-        {(['password', 'magic'] as const).map(m => (
-          <button key={m} type="button" onClick={() => { setMode(m); setError(''); }}
-            style={{ flex: 1, fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', letterSpacing: '.06em', textTransform: 'uppercase', padding: '.45rem', borderRadius: 6, border: 'none', cursor: 'pointer', transition: 'all .15s', background: mode === m ? 'var(--f-card)' : 'transparent', color: mode === m ? 'var(--f-text-1)' : 'var(--f-text-3)', boxShadow: mode === m ? 'var(--f-shadow-sm)' : 'none' }}>
-            {m === 'password' ? 'Mot de passe' : 'Lien magique'}
-          </button>
-        ))}
-      </div>
-
-      {/* Email + mot de passe */}
-      {mode === 'password' && (
-        <form onSubmit={handlePassword} style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
-          <input className="f-input" type="email" placeholder="ton@email.com" value={email} onChange={e => setEmail(e.target.value)} style={{ maxWidth: '100%' }} />
-          <div style={{ position: 'relative' }}>
-            <input className="f-input" type={showPwd ? 'text' : 'password'} placeholder="Mot de passe" value={password} onChange={e => setPassword(e.target.value)} style={{ maxWidth: '100%', paddingRight: '2.5rem' }} />
-            <button type="button" onClick={() => setShowPwd(v => !v)} style={{ position: 'absolute', right: '.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--f-text-3)', fontSize: '.75rem', fontFamily: "'Geist Mono', monospace" }}>
-              {showPwd ? 'cacher' : 'voir'}
-            </button>
-          </div>
-          {error && <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171', margin: 0 }}>{error}</p>}
-          <button type="submit" className="btn-f btn-f-primary" disabled={loading || !email.trim() || !password.trim()} style={{ width: '100%', justifyContent: 'center' }}>
-            {loading ? 'Connexion…' : 'Se connecter →'}
-          </button>
-          <button type="button" onClick={() => { setMode('reset'); setError(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', textAlign: 'center', padding: 0 }}>
-            Mot de passe oublié ?
-          </button>
-        </form>
-      )}
-
-      {/* Magic link */}
-      {mode === 'magic' && (
-        <form onSubmit={handleMagicLink} style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
-          <input className="f-input" type="email" placeholder="ton@email.com" value={email} onChange={e => setEmail(e.target.value)} style={{ maxWidth: '100%' }} />
-          {error && <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171', margin: 0 }}>{error}</p>}
-          <button type="submit" className="btn-f btn-f-primary" disabled={loading || !email.trim()} style={{ width: '100%', justifyContent: 'center' }}>
-            {loading ? 'Envoi…' : 'Recevoir un lien de connexion →'}
-          </button>
-        </form>
-      )}
-
-      {/* Reset password */}
-      {mode === 'reset' && (
-        <form onSubmit={handleReset} style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
-          <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', color: 'var(--f-text-3)', margin: 0 }}>Entre ton email pour recevoir un lien de réinitialisation.</p>
-          <input className="f-input" type="email" placeholder="ton@email.com" value={email} onChange={e => setEmail(e.target.value)} style={{ maxWidth: '100%' }} />
-          {error && <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171', margin: 0 }}>{error}</p>}
-          <button type="submit" className="btn-f btn-f-primary" disabled={loading || !email.trim()} style={{ width: '100%', justifyContent: 'center' }}>
-            {loading ? 'Envoi…' : 'Réinitialiser le mot de passe →'}
-          </button>
-          <button type="button" onClick={() => { setMode('password'); setError(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', textAlign: 'center', padding: 0 }}>
-            ← Retour
-          </button>
-        </form>
-      )}
+      {/* Magic Link */}
+      <form onSubmit={handleMagicLink} style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+        <input className="f-input" type="email" placeholder="ton@email.com" value={email} onChange={e => setEmail(e.target.value)} style={{ maxWidth: '100%' }} />
+        {error && <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171', margin: 0 }}>{error}</p>}
+        <button type="submit" className="btn-f btn-f-primary" disabled={loading || !email.trim()} style={{ width: '100%', justifyContent: 'center' }}>
+          {loading ? 'Envoi…' : 'Recevoir un lien de connexion →'}
+        </button>
+      </form>
 
     </div>
   );
