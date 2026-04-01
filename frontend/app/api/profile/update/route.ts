@@ -6,7 +6,6 @@ const ALLOWED_FIELDS = [
   'categories', 'stack', 'skills', 'badges',
   'linkedin_url', 'github_url', 'youtube_url',
   'website_url', 'twitter_url', 'whatsapp_url',
-  'open_to_work',
 ];
 
 export async function POST(req: Request) {

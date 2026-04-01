@@ -151,13 +151,11 @@ export default function PraticiensPage() {
                     {p.stack.length > 6 && <span className="f-tag">+{p.stack.length - 6}</span>}
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)' }}>{p.city}</span>
-                    {p.open_to_work
-                      ? <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-green)', display: 'inline-flex', alignItems: 'center', gap: '.35rem' }}><span style={{ width: 6, height: 6, background: 'var(--f-green)', borderRadius: '50%', display: 'inline-block' }}></span>disponible</span>
-                      : <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-border-2)' }}>○ non dispo</span>
-                    }
-                  </div>
+                  {p.city && (
+                    <div>
+                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)' }}>{p.city}</span>
+                    </div>
+                  )}
                 </div>
               </Link>
             ))}
