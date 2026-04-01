@@ -3,8 +3,8 @@ import { useState } from 'react';
 
 const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
 const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cyber-Sécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
-const TYPES = ['pipeline','dashboard','api','app','bootcamp','autre'];
-const TYPE_LABELS: Record<string,string> = { pipeline:'Pipeline', dashboard:'Dashboard', api:'API', app:'App Web / Mobile', bootcamp:'Bootcamp', autre:'Autre' };
+const TYPES = ['pipeline','dashboard','api','app','bootcamp','youtube','autre'];
+const TYPE_LABELS: Record<string,string> = { pipeline:'Pipeline', dashboard:'Dashboard', api:'API', app:'App Web / Mobile', bootcamp:'Bootcamp', youtube:'Chaîne YouTube', autre:'Autre' };
 
 type Props = { onSuccess: () => void; username?: string; hideEmail?: boolean; initialEmail?: string };
 

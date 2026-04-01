@@ -111,26 +111,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       if (error) return res.status(500).json({ error: error.message });
 
     } else if (type === 'realisation') {
-      const slug = slugify(payload.title);
-      const { data: praticien } = await supabaseAdmin
-        .from('praticiens').select('id').eq('slug', String(payload.username || '')).maybeSingle();
-      const { error } = await supabaseAdmin.from('realisations').insert({
-        slug,
-        title: payload.title,
-        praticien_id: praticien?.id || null,
-        category: payload.category,
-        type: payload.type,
-        type_label: payload.type === 'autre' ? (payload.type_label || null) : null,
-        stack: Array.isArray(payload.stack)
-          ? payload.stack
-          : String(payload.stack || '').split(',').map((s: string) => s.trim()).filter(Boolean),
-        excerpt: payload.excerpt || null,
-        demo_url: payload.demo_url || null,
-        repo_url: payload.repo_url || null,
-        date_published: payload.date_published || null,
-        status: 'approved',
-      });
-      if (error) return res.status(500).json({ error: error.message });
+
+      // Chaîne YouTube → redirigé dans chaines_youtube
+      if (payload.type === 'youtube') {
+        const { error } = await supabaseAdmin.from('chaines_youtube').insert({
+          name:        payload.title,
+          description: payload.excerpt || null,
+          url:         payload.demo_url || payload.repo_url || null,
+          subs:        null,
+          ordre:       0,
+          active:      true,
+          status:      'pending',
+        });
+        if (error) return res.status(500).json({ error: error.message });
+
+      } else {
+        const slug = slugify(payload.title);
+        const { data: praticien } = await supabaseAdmin
+          .from('praticiens').select('id').eq('slug', String(payload.username || '')).maybeSingle();
+        const { error } = await supabaseAdmin.from('realisations').insert({
+          slug,
+          title: payload.title,
+          praticien_id: praticien?.id || null,
+          category: payload.category,
+          type: payload.type,
+          type_label: payload.type === 'autre' ? (payload.type_label || null) : null,
+          stack: Array.isArray(payload.stack)
+            ? payload.stack
+            : String(payload.stack || '').split(',').map((s: string) => s.trim()).filter(Boolean),
+          excerpt: payload.excerpt || null,
+          demo_url: payload.demo_url || null,
+          repo_url: payload.repo_url || null,
+          date_published: payload.date_published || null,
+          status: 'approved',
+        });
+        if (error) return res.status(500).json({ error: error.message });
+      }
 
     } else if (type === 'evenement') {
       const slug = slugify(payload.title);
