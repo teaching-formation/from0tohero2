@@ -9,8 +9,8 @@ import { BADGE_STYLES } from '@/lib/badges';
 
 const PAGE_SIZE = 12;
 
-const FILTERS = ['all','data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
-const FILTER_LABELS: Record<string,string> = { all:'Tous', data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cybersécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
+const FILTERS = ['all','data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded','autre'];
+const FILTER_LABELS: Record<string,string> = { all:'Tous', data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cybersécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT', autre:'Autre' };
 
 export default function PraticiensPage() {
   const [praticiens, setPraticiens] = useState<Praticien[]>([]);

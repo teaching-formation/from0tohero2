@@ -40,9 +40,9 @@ export default function ArticlesPage() {
         <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(1.9rem,4vw,2.8rem)', fontWeight: 800, color: 'var(--f-text-1)', margin: '.4rem 0 .6rem 0' }}>Ce que les praticiens écrivent</h1>
         <p style={{ color: 'var(--f-text-3)', fontSize: '.88rem', margin: '0 0 2rem 0' }}>Articles publiés sur Medium, LinkedIn, Dev.to — agrégés ici.</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
-          {['all','data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'].map(f => (
+          {['all','data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded','autre'].map(f => (
             <button key={f} className={`filter-pill${activeFilter === f ? ' active' : ''}`} onClick={() => setActiveFilter(f)}>
-              {f === 'all' ? 'Tous' : f === 'fullstack' ? 'Full-Stack' : f === 'embedded' ? 'Embedded / IoT' : f.toUpperCase()}
+              {f === 'all' ? 'Tous' : f === 'fullstack' ? 'Full-Stack' : f === 'embedded' ? 'Embedded / IoT' : f === 'autre' ? 'Autre' : f.toUpperCase()}
             </button>
           ))}
         </div>
