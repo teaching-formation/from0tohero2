@@ -110,10 +110,6 @@ export default function ConnexionPage() {
             <ConnexionForm />
           </Suspense>
         </div>
-        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', textAlign: 'center', marginTop: '1.25rem', lineHeight: 1.7 }}>
-          Pas encore de profil ?{' '}
-          <a href="/soumettre" style={{ color: 'var(--f-sky)', textDecoration: 'none' }}>Créer le mien →</a>
-        </p>
       </div>
     </div>
   );
