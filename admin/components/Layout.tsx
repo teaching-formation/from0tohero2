@@ -105,14 +105,38 @@ export default function Layout({ children }: Props) {
 
   return (
     <div className="layout">
-      {/* Mobile toggle button */}
-      <button
-        className="sidebar-toggle"
-        onClick={() => setOpen(o => !o)}
-        aria-label="Toggle menu"
-      >
-        {open ? '✕' : '☰'}
-      </button>
+      {/* Mobile top bar */}
+      <div className="mobile-topbar">
+        <button
+          className="sidebar-toggle-inline"
+          onClick={() => setOpen(o => !o)}
+          aria-label="Toggle menu"
+        >
+          {open ? '✕' : '☰'}
+        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '.45rem' }}>
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            width: 26, height: 26, borderRadius: 6,
+            background: '#0d1117',
+            border: '1.5px solid rgba(249,115,22,.4)',
+            flexShrink: 0,
+          }}>
+            <span style={{
+              fontFamily: "'Geist Mono', 'Courier New', monospace",
+              fontWeight: 700, fontSize: '.6rem',
+              color: '#f97316', letterSpacing: '-.03em', lineHeight: 1,
+            }}>&gt;_</span>
+          </span>
+          <span style={{
+            fontFamily: "'Geist Mono', monospace",
+            fontWeight: 700, fontSize: '.8rem',
+            color: 'var(--text-1)', letterSpacing: '-.01em',
+          }}>
+            from0tohero<span style={{ color: '#f97316' }}>.</span>
+          </span>
+        </div>
+      </div>
 
       {/* Mobile overlay */}
       <div
