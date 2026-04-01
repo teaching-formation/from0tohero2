@@ -4,38 +4,59 @@ import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 function ConnexionForm() {
-  const searchParams  = useSearchParams();
-  const next          = searchParams.get('next') || '/mon-compte';
-  const hasError      = searchParams.get('error') === 'auth';
+  const searchParams = useSearchParams();
+  const next         = searchParams.get('next') || '/mon-compte';
+  const hasError     = searchParams.get('error') === 'auth';
 
   const supabase = createClient();
-  const [email, setEmail]     = useState('');
-  const [sent, setSent]       = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState('');
+  const [email,    setEmail]    = useState('');
+  const [password, setPassword] = useState('');
+  const [mode,     setMode]     = useState<'password' | 'magic' | 'reset'>('password');
+  const [sent,     setSent]     = useState(false);
+  const [loading,  setLoading]  = useState(false);
+  const [error,    setError]    = useState('');
+  const [showPwd,  setShowPwd]  = useState(false);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
   async function handleGoogle() {
-    setLoading(true);
+    setLoading(true); setError('');
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(next)}`,
-      },
+      options: { redirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(next)}` },
     });
     if (error) { setError(error.message); setLoading(false); }
+  }
+
+  async function handlePassword(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.trim() || !password.trim()) return;
+    setLoading(true); setError('');
+    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+    setLoading(false);
+    if (error) { setError('Email ou mot de passe incorrect.'); return; }
+    window.location.href = next;
   }
 
   async function handleMagicLink(e: React.FormEvent) {
     e.preventDefault();
     if (!email.trim()) return;
-    setLoading(true);
+    setLoading(true); setError('');
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim(),
-      options: {
-        emailRedirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(next)}`,
-      },
+      options: { emailRedirectTo: `${siteUrl}/auth/callback?next=${encodeURIComponent(next)}` },
+    });
+    setLoading(false);
+    if (error) { setError(error.message); return; }
+    setSent(true);
+  }
+
+  async function handleReset(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setLoading(true); setError('');
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${siteUrl}/auth/callback?next=/mon-compte/edit`,
     });
     setLoading(false);
     if (error) { setError(error.message); return; }
@@ -45,12 +66,10 @@ function ConnexionForm() {
   if (sent) {
     return (
       <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-green)', marginBottom: '.75rem' }}>
-          ✓ Lien envoyé !
-        </p>
+        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-green)', marginBottom: '.75rem' }}>✓ Email envoyé !</p>
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-text-3)', lineHeight: 1.7 }}>
           Vérifie ta boîte mail <strong style={{ color: 'var(--f-text-1)' }}>{email}</strong>.<br />
-          Clique sur le lien pour accéder à ton espace.
+          {mode === 'reset' ? 'Clique sur le lien pour réinitialiser ton mot de passe.' : 'Clique sur le lien pour accéder à ton espace.'}
         </p>
       </div>
     );
@@ -66,19 +85,7 @@ function ConnexionForm() {
       )}
 
       {/* Google */}
-      <button
-        type="button"
-        onClick={handleGoogle}
-        disabled={loading}
-        style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.75rem',
-          width: '100%', padding: '.8rem 1.2rem',
-          border: '1.5px solid var(--f-border)', borderRadius: 8,
-          background: 'var(--f-surface)', cursor: 'pointer',
-          fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-text-1)',
-          transition: 'border-color .15s',
-        }}
-      >
+      <button type="button" onClick={handleGoogle} disabled={loading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '.75rem', width: '100%', padding: '.8rem 1.2rem', border: '1.5px solid var(--f-border)', borderRadius: 8, background: 'var(--f-surface)', cursor: 'pointer', fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-text-1)', transition: 'border-color .15s' }}>
         <svg width="18" height="18" viewBox="0 0 24 24">
           <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
           <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -95,28 +102,61 @@ function ConnexionForm() {
         <div style={{ flex: 1, height: 1, background: 'var(--f-border)' }} />
       </div>
 
-      {/* Magic Link */}
-      <form onSubmit={handleMagicLink} style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
-        <input
-          className="f-input"
-          type="email"
-          placeholder="ton@email.com"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          style={{ maxWidth: '100%' }}
-        />
-        {error && (
-          <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171', margin: 0 }}>{error}</p>
-        )}
-        <button
-          type="submit"
-          className="btn-f btn-f-primary"
-          disabled={loading || !email.trim()}
-          style={{ width: '100%', justifyContent: 'center' }}
-        >
-          {loading ? 'Envoi…' : 'Recevoir un lien de connexion →'}
-        </button>
-      </form>
+      {/* Tabs mode */}
+      <div style={{ display: 'flex', gap: '.4rem', background: 'var(--f-bg)', border: '1px solid var(--f-border)', borderRadius: 8, padding: 3 }}>
+        {(['password', 'magic'] as const).map(m => (
+          <button key={m} type="button" onClick={() => { setMode(m); setError(''); }}
+            style={{ flex: 1, fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', letterSpacing: '.06em', textTransform: 'uppercase', padding: '.45rem', borderRadius: 6, border: 'none', cursor: 'pointer', transition: 'all .15s', background: mode === m ? 'var(--f-card)' : 'transparent', color: mode === m ? 'var(--f-text-1)' : 'var(--f-text-3)', boxShadow: mode === m ? 'var(--f-shadow-sm)' : 'none' }}>
+            {m === 'password' ? 'Mot de passe' : 'Lien magique'}
+          </button>
+        ))}
+      </div>
+
+      {/* Email + mot de passe */}
+      {mode === 'password' && (
+        <form onSubmit={handlePassword} style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+          <input className="f-input" type="email" placeholder="ton@email.com" value={email} onChange={e => setEmail(e.target.value)} style={{ maxWidth: '100%' }} />
+          <div style={{ position: 'relative' }}>
+            <input className="f-input" type={showPwd ? 'text' : 'password'} placeholder="Mot de passe" value={password} onChange={e => setPassword(e.target.value)} style={{ maxWidth: '100%', paddingRight: '2.5rem' }} />
+            <button type="button" onClick={() => setShowPwd(v => !v)} style={{ position: 'absolute', right: '.75rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--f-text-3)', fontSize: '.75rem', fontFamily: "'Geist Mono', monospace" }}>
+              {showPwd ? 'cacher' : 'voir'}
+            </button>
+          </div>
+          {error && <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171', margin: 0 }}>{error}</p>}
+          <button type="submit" className="btn-f btn-f-primary" disabled={loading || !email.trim() || !password.trim()} style={{ width: '100%', justifyContent: 'center' }}>
+            {loading ? 'Connexion…' : 'Se connecter →'}
+          </button>
+          <button type="button" onClick={() => { setMode('reset'); setError(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', textAlign: 'center', padding: 0 }}>
+            Mot de passe oublié ?
+          </button>
+        </form>
+      )}
+
+      {/* Magic link */}
+      {mode === 'magic' && (
+        <form onSubmit={handleMagicLink} style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+          <input className="f-input" type="email" placeholder="ton@email.com" value={email} onChange={e => setEmail(e.target.value)} style={{ maxWidth: '100%' }} />
+          {error && <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171', margin: 0 }}>{error}</p>}
+          <button type="submit" className="btn-f btn-f-primary" disabled={loading || !email.trim()} style={{ width: '100%', justifyContent: 'center' }}>
+            {loading ? 'Envoi…' : 'Recevoir un lien de connexion →'}
+          </button>
+        </form>
+      )}
+
+      {/* Reset password */}
+      {mode === 'reset' && (
+        <form onSubmit={handleReset} style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+          <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', color: 'var(--f-text-3)', margin: 0 }}>Entre ton email pour recevoir un lien de réinitialisation.</p>
+          <input className="f-input" type="email" placeholder="ton@email.com" value={email} onChange={e => setEmail(e.target.value)} style={{ maxWidth: '100%' }} />
+          {error && <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171', margin: 0 }}>{error}</p>}
+          <button type="submit" className="btn-f btn-f-primary" disabled={loading || !email.trim()} style={{ width: '100%', justifyContent: 'center' }}>
+            {loading ? 'Envoi…' : 'Réinitialiser le mot de passe →'}
+          </button>
+          <button type="button" onClick={() => { setMode('password'); setError(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', textAlign: 'center', padding: 0 }}>
+            ← Retour
+          </button>
+        </form>
+      )}
 
     </div>
   );
@@ -126,7 +166,6 @@ export default function ConnexionPage() {
   return (
     <div style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
       <div style={{ width: '100%', maxWidth: 420 }}>
-
         <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
           <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--f-orange)', marginBottom: '.75rem' }}>
             // connexion
@@ -138,25 +177,15 @@ export default function ConnexionPage() {
             Gère ton profil, tes réalisations et tes articles.
           </p>
         </div>
-
-        <div style={{
-          background: 'var(--f-surface)',
-          border: '1px solid var(--f-border)',
-          borderRadius: 12,
-          padding: '1.75rem',
-        }}>
+        <div style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 12, padding: '1.75rem' }}>
           <Suspense fallback={null}>
             <ConnexionForm />
           </Suspense>
         </div>
-
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', textAlign: 'center', marginTop: '1.25rem', lineHeight: 1.7 }}>
           Pas encore de profil ?{' '}
-          <a href="/soumettre" style={{ color: 'var(--f-sky)', textDecoration: 'none' }}>
-            Créer le mien →
-          </a>
+          <a href="/soumettre" style={{ color: 'var(--f-sky)', textDecoration: 'none' }}>Créer le mien →</a>
         </p>
-
       </div>
     </div>
   );
