@@ -6,11 +6,11 @@ const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:
 const PLATEFORMES = ['linkedin','medium','devto','substack','blog','youtube','autre'];
 const PLAT_LABELS: Record<string,string> = { linkedin:'LinkedIn', medium:'Medium', devto:'Dev.to', substack:'Substack', blog:'Blog perso', youtube:'YouTube', autre:'Autre' };
 
-type Props = { onSuccess: () => void; username?: string; hideEmail?: boolean; initialEmail?: string };
+type Props = { onSuccess: () => void; username?: string; hideEmail?: boolean; initialEmail?: string; initialCountry?: string };
 
-export default function FormArticle({ onSuccess, username = '', hideEmail = false, initialEmail = '' }: Props) {
+export default function FormArticle({ onSuccess, username = '', hideEmail = false, initialEmail = '', initialCountry = '' }: Props) {
   const [form, setForm] = useState({
-    title: '', username: username, author_country: '', email: initialEmail,
+    title: '', username: username, author_country: initialCountry, email: initialEmail,
     category: '', source: '', source_autre: '', external_url: '',
     date_published: '', excerpt: '',
   });
@@ -81,7 +81,9 @@ export default function FormArticle({ onSuccess, username = '', hideEmail = fals
       </Field>
 
       <Field label="Ton pays" required error={errors.author_country}>
-        <input className="f-input" placeholder="Ex: Sénégal" value={form.author_country} onChange={e => set('author_country', e.target.value)} style={{ maxWidth: '100%' }} />
+        <input className="f-input" placeholder="Ex: Sénégal" value={form.author_country} onChange={e => set('author_country', e.target.value)}
+          readOnly={!!initialCountry}
+          style={{ maxWidth: '100%', ...(initialCountry ? { opacity: .7, cursor: 'not-allowed', background: 'var(--f-surface)' } : {}) }} />
       </Field>
 
       <Field label="Catégorie" required error={errors.category}>

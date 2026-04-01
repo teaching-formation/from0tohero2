@@ -7,13 +7,13 @@ const TYPE_LABELS: Record<string,string> = {
   webinaire:'Webinaire', bootcamp:'Bootcamp', autre:'Autre',
 };
 
-type Props = { onSuccess: () => void; username?: string; hideEmail?: boolean; initialEmail?: string };
+type Props = { onSuccess: () => void; username?: string; hideEmail?: boolean; initialEmail?: string; initialCountry?: string };
 
-export default function FormEvenement({ onSuccess, username = '', hideEmail = false, initialEmail = '' }: Props) {
+export default function FormEvenement({ onSuccess, username = '', hideEmail = false, initialEmail = '', initialCountry = '' }: Props) {
   const [form, setForm] = useState({
     title: '', username: username, email: initialEmail,
     type: '', type_autre: '',
-    pays: '', lieu: '',
+    pays: initialCountry, lieu: '',
     online: false, gratuit: false,
     url: '', date_debut: '', date_fin: '',
     excerpt: '',
@@ -105,7 +105,9 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
       <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
         <Field label="Pays" required error={errors.pays} style={{ flex: 1, minWidth: 180 }}>
           <input className="f-input" placeholder="Ex: Côte d'Ivoire" value={form.pays}
-            onChange={e => set('pays', e.target.value)} style={{ maxWidth: '100%' }} />
+            onChange={e => set('pays', e.target.value)}
+            readOnly={!!initialCountry}
+            style={{ maxWidth: '100%', ...(initialCountry ? { opacity: .7, cursor: 'not-allowed', background: 'var(--f-surface)' } : {}) }} />
         </Field>
         <Field label="Ville / Lieu" style={{ flex: 1, minWidth: 180 }}>
           <input className="f-input" placeholder="Ex: Abidjan, Palais des Sports"
