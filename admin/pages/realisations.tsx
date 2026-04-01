@@ -22,7 +22,7 @@ type Row = {
 const EDIT_FIELDS = [
   { key: 'title',          label: 'Titre' },
   { key: 'category',       label: 'Catégorie', type: 'select' as const, options: ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'] },
-  { key: 'type',           label: 'Type', type: 'select' as const, options: ['pipeline','dashboard','api','app','bootcamp','youtube','podcast','newsletter','blog','autre'] },
+  { key: 'type',           label: 'Type', type: 'select' as const, options: ['pipeline','dashboard','api','app','bootcamp','autre'] },
   { key: 'type_label',     label: 'Type custom (si "autre")' },
   { key: 'stack',          label: 'Stack (séparé par ,)' },
   { key: 'excerpt',        label: 'Description', type: 'textarea' as const },
@@ -230,7 +230,7 @@ function RealisationsPage() {
           fields={[
             { key: 'title',          label: 'Titre', required: true },
             { key: 'category',       label: 'Catégorie', type: 'select', options: ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'] },
-            { key: 'type',           label: 'Type', type: 'select', options: ['pipeline','dashboard','api','app','bootcamp','youtube','podcast','newsletter','blog','autre'] },
+            { key: 'type',           label: 'Type', type: 'select', options: ['pipeline','dashboard','api','app','bootcamp','autre'] },
             { key: 'stack',          label: 'Stack (séparé par ,)' },
             { key: 'excerpt',        label: 'Description', type: 'textarea' },
             { key: 'demo_url',       label: 'Lien Demo', type: 'url' },
