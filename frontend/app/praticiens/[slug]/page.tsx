@@ -85,7 +85,7 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
           <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', flexWrap: 'wrap', marginBottom: '.5rem' }}>
             <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(1.5rem,3.5vw,2rem)', fontWeight: 800, color: 'var(--f-text-1)', margin: 0 }}>{p.name}</h1>
             <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', background: 'var(--f-surface)', padding: '2px 8px', borderRadius: 4 }}>
-              {(() => { const { flag, name } = getCountryDisplay(p.country); return <>{flag ? `${flag} ` : ''}{name || p.country}{p.city ? ` · ${p.city}` : ''}</>; })()}
+              {(() => { const { flag, name } = getCountryDisplay(p.country); return <>{flag ? `${flag} ` : ''}{name || p.country}</>; })()}
             </span>
           </div>
           <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-sky)', margin: '0 0 .35rem 0', letterSpacing: '.04em' }}>{p.role}</p>

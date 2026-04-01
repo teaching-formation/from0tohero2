@@ -133,7 +133,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
             {[
               { label: 'Rôle',         value: p.role },
-              { label: 'Localisation', value: `${p.country}${p.city ? ` · ${p.city}` : ''}` },
+              { label: 'Localisation', value: String(p.country || '') },
               { label: 'Catégorie',    value: Array.isArray(p.categories) ? p.categories.join(', ') : String(p.category || '') },
               { label: 'Stack',        value: Array.isArray(p.stack) ? (p.stack as string[]).slice(0, 6).join(', ') : '' },
             ].map(({ label, value }) => (

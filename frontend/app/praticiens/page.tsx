@@ -57,7 +57,7 @@ export default function PraticiensPage() {
     }
     if (search) {
       const q = search.toLowerCase();
-      return p.name.toLowerCase().includes(q) || p.role.toLowerCase().includes(q) || (p.city ?? '').toLowerCase().includes(q) || p.stack.join(' ').toLowerCase().includes(q);
+      return p.name.toLowerCase().includes(q) || p.role.toLowerCase().includes(q) || p.stack.join(' ').toLowerCase().includes(q);
     }
     return true;
   });
@@ -72,7 +72,7 @@ export default function PraticiensPage() {
           <input
             className="f-input"
             type="text"
-            placeholder="Rechercher par nom, rôle, ville, stack…"
+            placeholder="Rechercher par nom, rôle, stack…"
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{ flex: 1, minWidth: 220 }}
@@ -151,11 +151,6 @@ export default function PraticiensPage() {
                     {p.stack.length > 6 && <span className="f-tag">+{p.stack.length - 6}</span>}
                   </div>
 
-                  {p.city && (
-                    <div>
-                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)' }}>{p.city}</span>
-                    </div>
-                  )}
                 </div>
               </Link>
             ))}
