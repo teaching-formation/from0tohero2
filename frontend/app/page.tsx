@@ -19,7 +19,7 @@ async function getYoutubeChannels() {
   const { data } = await supabase
     .from('chaines_youtube')
     .select('name, description, url, subs')
-    .eq('active', true)
+    .eq('status', 'approved')
     .order('ordre', { ascending: true });
   return data ?? [];
 }

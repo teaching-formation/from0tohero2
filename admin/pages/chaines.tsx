@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import AuthGuard, { getToken } from '@/components/AuthGuard';
 import EditModal from '@/components/EditModal';
 
-type Chaine = {
+type Row = {
   id: string;
   name: string;
   description?: string;
   url: string;
   subs?: string;
   ordre: number;
-  active: boolean;
+  status: string;
   created_at: string;
   [key: string]: unknown;
 };
@@ -19,45 +19,33 @@ const EDIT_FIELDS = [
   { key: 'description', label: 'Description (tags séparés par ·)' },
   { key: 'url',         label: 'URL YouTube', type: 'url' as const },
   { key: 'subs',        label: 'Abonnés / info (ex: 100k+ abonnés)' },
-  { key: 'ordre',       label: 'Ordre d\'affichage (1 = premier)' },
+  { key: 'ordre',       label: "Ordre d'affichage (1 = premier)" },
+  { key: 'status',      label: 'Statut', type: 'select' as const, options: ['pending', 'approved', 'rejected'] },
 ];
+
+const STATUS_FILTERS = ['all', 'approved', 'pending', 'rejected'];
+const STATUS_LABEL: Record<string, string> = { all: 'Toutes', approved: 'Approuvées', pending: 'En attente', rejected: 'Rejetées' };
+const STATUS_CLASS: Record<string, string> = { approved: 'active-green', pending: 'active-orange', rejected: 'active-red', all: 'active-sky' };
 
 const EMPTY_FORM = { name: '', description: '', url: '', subs: '', ordre: '0' };
 
-const FILTERS = ['all', 'approved', 'rejected'] as const;
-const FILTER_LABEL = { all: 'Toutes', approved: 'Approuvées', rejected: 'Rejetées' };
-const FILTER_CLASS = { all: 'active-sky', approved: 'active-green', rejected: 'active-red' };
-
 function ChainesPage() {
-  const [rows,     setRows]     = useState<Chaine[]>([]);
+  const [rows,     setRows]     = useState<Row[]>([]);
   const [loading,  setLoading]  = useState(true);
-  const [filter,   setFilter]   = useState<typeof FILTERS[number]>('all');
-  const [editing,  setEditing]  = useState<Chaine | null>(null);
+  const [filter,   setFilter]   = useState('all');
+  const [search,   setSearch]   = useState('');
+  const [editing,  setEditing]  = useState<Row | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [updating, setUpdating] = useState<string | null>(null);
   const [form,     setForm]     = useState(EMPTY_FORM);
   const [saving,   setSaving]   = useState(false);
   const [formErr,  setFormErr]  = useState('');
 
   useEffect(() => {
-    fetch('/api/content?table=chaines_youtube', {
-      headers: { Authorization: `Bearer ${getToken()}` },
-    })
+    fetch('/api/content?table=chaines_youtube', { headers: { Authorization: `Bearer ${getToken()}` } })
       .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setRows(data.sort((a, b) => a.ordre - b.ordre)); setLoading(false); })
+      .then(data => { if (Array.isArray(data)) setRows(data); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
-
-  async function setStatus(row: Chaine, approved: boolean) {
-    setUpdating(row.id);
-    const r = await fetch('/api/edit', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
-      body: JSON.stringify({ table: 'chaines_youtube', id: row.id, data: { active: approved } }),
-    });
-    if (r.ok) setRows(prev => prev.map(c => c.id === row.id ? { ...c, active: approved } : c));
-    setUpdating(null);
-  }
 
   async function deleteRow(id: string, name: string) {
     if (!window.confirm(`Supprimer "${name}" ? Cette action est irréversible.`)) return;
@@ -84,28 +72,24 @@ function ChainesPage() {
     });
     const data = await r.json();
     if (!r.ok) { setFormErr(data.error || 'Erreur'); setSaving(false); return; }
-    setRows(prev => [...prev, data].sort((a, b) => a.ordre - b.ordre));
+    setRows(prev => [...prev, { ...data, status: 'pending' }]);
     setForm(EMPTY_FORM);
     setSaving(false);
   }
 
   function onSaved(updated: Record<string, unknown>) {
-    setRows(prev =>
-      prev.map(c => c.id === updated.id ? { ...c, ...updated } as Chaine : c)
-          .sort((a, b) => a.ordre - b.ordre)
-    );
+    setRows(prev => prev.map(r => r.id === updated.id ? { ...r, ...updated } as Row : r));
   }
 
-  const filtered = rows.filter(c => {
-    if (filter === 'approved') return c.active;
-    if (filter === 'rejected') return !c.active;
-    return true;
-  });
+  const filtered = rows
+    .filter(r => filter === 'all' || r.status === filter)
+    .filter(r => !search || r.name.toLowerCase().includes(search.toLowerCase()));
 
   const counts = {
     all:      rows.length,
-    approved: rows.filter(c => c.active).length,
-    rejected: rows.filter(c => !c.active).length,
+    approved: rows.filter(r => r.status === 'approved').length,
+    pending:  rows.filter(r => r.status === 'pending').length,
+    rejected: rows.filter(r => r.status === 'rejected').length,
   };
 
   return (
@@ -119,18 +103,27 @@ function ChainesPage() {
             <span className="page-title-count">({rows.length})</span>
           </h1>
         </div>
+        <input
+          type="search"
+          placeholder="Rechercher…"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ width: 220, fontSize: '.72rem' }}
+        />
       </div>
 
       {/* Filters */}
       <div className="filter-row">
-        {FILTERS.map(f => (
+        {STATUS_FILTERS.map(f => (
           <button
             key={f}
-            className={`filter-pill${filter === f ? ` ${FILTER_CLASS[f]}` : ''}`}
+            className={`filter-pill${filter === f ? ` ${STATUS_CLASS[f]}` : ''}`}
             onClick={() => setFilter(f)}
           >
-            {FILTER_LABEL[f]}
-            <span style={{ marginLeft: '.3rem', opacity: .65 }}>({counts[f]})</span>
+            {STATUS_LABEL[f]}
+            <span style={{ marginLeft: '.3rem', opacity: .65 }}>
+              ({counts[f as keyof typeof counts]})
+            </span>
           </button>
         ))}
       </div>
@@ -171,45 +164,40 @@ function ChainesPage() {
           <table>
             <thead>
               <tr>
-                {['#', 'Nom', 'Description', 'Abonnés', 'Statut', ''].map(h => (
+                {['Nom', 'Description', 'Abonnés', 'Ordre', 'Statut', ''].map(h => (
                   <th key={h}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {filtered.map(c => (
-                <tr key={c.id} style={{ opacity: c.active ? 1 : 0.5 }}>
-                  <td><span className="td-faint">{c.ordre}</span></td>
+              {filtered.map(r => (
+                <tr key={r.id}>
                   <td>
-                    <a href={c.url} target="_blank" rel="noreferrer" className="td-primary"
+                    <a href={r.url} target="_blank" rel="noreferrer" className="td-primary"
                       style={{ color: 'var(--sky)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '.4rem' }}>
                       <span style={{ color: '#ff0000' }}>▶</span>
-                      {c.name}
+                      {r.name}
                     </a>
                   </td>
-                  <td><span className="td-faint">{c.description || '—'}</span></td>
-                  <td><span className="td-mono">{c.subs || '—'}</span></td>
+                  <td style={{ maxWidth: 260 }}>
+                    <span className="td-faint">{r.description || '—'}</span>
+                  </td>
                   <td>
-                    <span className={`badge badge-${c.active ? 'approved' : 'rejected'}`}>
-                      {c.active ? 'approuvée' : 'rejetée'}
-                    </span>
+                    <span className="td-mono">{r.subs || '—'}</span>
+                  </td>
+                  <td>
+                    <span className="td-faint">{r.ordre}</span>
+                  </td>
+                  <td>
+                    <span className={`badge badge-${r.status}`}>{r.status}</span>
                   </td>
                   <td style={{ whiteSpace: 'nowrap' }}>
-                    {!c.active ? (
-                      <button className="btn btn-sm" style={{ color: 'var(--green)', borderColor: 'var(--green)', marginRight: '.4rem' }}
-                        disabled={updating === c.id} onClick={() => setStatus(c, true)}>
-                        {updating === c.id ? '…' : '✓ Approuver'}
-                      </button>
-                    ) : (
-                      <button className="btn btn-sm" style={{ color: 'var(--red)', borderColor: 'var(--red)', marginRight: '.4rem' }}
-                        disabled={updating === c.id} onClick={() => setStatus(c, false)}>
-                        {updating === c.id ? '…' : '✕ Rejeter'}
-                      </button>
-                    )}
-                    <button className="btn btn-ghost btn-sm" onClick={() => setEditing(c)}>✎</button>
+                    <button className="btn btn-ghost btn-sm" onClick={() => setEditing(r)}>
+                      ✎ Modifier
+                    </button>
                     <button className="btn btn-danger btn-sm" style={{ marginLeft: '.4rem' }}
-                      disabled={deleting === c.id} onClick={() => deleteRow(c.id, c.name)}>
-                      {deleting === c.id ? '…' : '✕'}
+                      disabled={deleting === r.id} onClick={() => deleteRow(r.id, r.name)}>
+                      {deleting === r.id ? '…' : '✕'}
                     </button>
                   </td>
                 </tr>
@@ -218,7 +206,7 @@ function ChainesPage() {
           </table>
           {filtered.length === 0 && (
             <div className="table-empty">
-              {filter !== 'all' ? `Aucune chaîne "${FILTER_LABEL[filter]}"` : 'Aucune chaîne. Ajoutez-en une ci-dessus.'}
+              {search ? `Aucun résultat pour "${search}"` : `Aucune chaîne pour ce filtre.`}
             </div>
           )}
         </div>
