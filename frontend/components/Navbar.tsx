@@ -52,8 +52,29 @@ export default function Navbar() {
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 6vw', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 
         {/* Logo */}
-        <Link href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', flexShrink: 0 }}>
-          <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: '1rem', color: 'var(--f-text-1)', letterSpacing: '-.01em' }}>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '.55rem', textDecoration: 'none', flexShrink: 0 }}>
+          {/* Terminal icon mark */}
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            width: 30, height: 30, borderRadius: 7,
+            background: '#0d1117',
+            border: '1.5px solid rgba(249,115,22,.4)',
+            flexShrink: 0,
+          }}>
+            <span style={{
+              fontFamily: "'Geist Mono', 'Courier New', monospace",
+              fontWeight: 700,
+              fontSize: '.72rem',
+              color: '#f97316',
+              letterSpacing: '-.03em',
+              lineHeight: 1,
+              userSelect: 'none',
+            }}>
+              &gt;_
+            </span>
+          </span>
+          {/* Wordmark */}
+          <span style={{ fontFamily: "'Geist Mono', monospace", fontWeight: 700, fontSize: '.9rem', color: 'var(--f-text-1)', letterSpacing: '-.02em' }}>
             from0tohero<span style={{ color: 'var(--f-orange)' }}>.dev</span>
           </span>
         </Link>

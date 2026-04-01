@@ -56,7 +56,6 @@ export async function POST(req: Request) {
         website_url:   payload.website_url   || null,
         twitter_url:   payload.twitter_url   || null,
         whatsapp_url:  payload.whatsapp_url  || null,
-        open_to_work:  payload.open_to_work  || false,
         user_id:       user?.id || null,
         badges:         [],
         certifications: payload.certifications || null,

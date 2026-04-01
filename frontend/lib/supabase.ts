@@ -28,7 +28,6 @@ export type Praticien = {
   website_url?: string
   twitter_url?: string
   whatsapp_url?: string
-  open_to_work: boolean
   status: 'pending' | 'approved' | 'rejected'
   created_at: string
   updated_at: string
@@ -80,6 +79,7 @@ export type Article = {
   praticien_id?: string
   category: 'data' | 'devops' | 'cloud' | 'ia' | 'cyber' | 'frontend' | 'backend' | 'fullstack' | 'mobile' | 'web3' | 'embedded'
   source: 'medium' | 'linkedin' | 'devto' | 'substack' | 'blog' | 'youtube' | 'autre'
+  source_label?: string
   external_url: string
   excerpt?: string
   date_published?: string

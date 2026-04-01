@@ -82,7 +82,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         website_url: payload.website_url || null,
         twitter_url: payload.twitter_url || null,
         whatsapp_url: payload.whatsapp_url || null,
-        open_to_work: payload.open_to_work || false,
         badges: Array.isArray(payload.badges) ? payload.badges : [],
         skills: Array.isArray(payload.skills) ? payload.skills : [],
         photo_url: payload.photo_url || null,

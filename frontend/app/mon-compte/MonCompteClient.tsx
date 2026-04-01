@@ -38,7 +38,21 @@ export default function MonCompteClient({ user, praticien, articles, realisation
   const initialTab: Tab = (['profil','articles','realisations','evenements'] as Tab[]).includes(rawTab as Tab)
     ? (rawTab as Tab)
     : 'profil';
-  const [tab, setTab] = useState<Tab>(initialTab);
+  const [tab, setTab]         = useState<Tab>(initialTab);
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  async function deleteContent(table: 'articles' | 'realisations' | 'evenements', id: string, label: string) {
+    if (!window.confirm(`Supprimer "${label}" ? Cette action est irréversible.`)) return;
+    setDeleting(id);
+    const r = await fetch('/api/delete-content', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ table, id }),
+    });
+    setDeleting(null);
+    if (!r.ok) { alert('Erreur lors de la suppression.'); return; }
+    router.refresh();
+  }
 
   async function handleSignOut() {
     await supabase.auth.signOut();
@@ -184,9 +198,19 @@ export default function MonCompteClient({ user, praticien, articles, realisation
                   {SOURCE_LABEL[String(a.source)] || String(a.source)} · {String(a.date_published || '—')}
                 </p>
               </div>
-              <a href={`/mon-compte/article/${String(a.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem' }}>
-                ✎ Modifier
-              </a>
+              <div style={{ display: 'flex', gap: '.5rem', flexShrink: 0 }}>
+                <a href={`/mon-compte/article/${String(a.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem' }}>
+                  ✎ Modifier
+                </a>
+                <button
+                  onClick={() => deleteContent('articles', String(a.id), String(a.title))}
+                  disabled={deleting === String(a.id)}
+                  className="btn-f btn-f-danger"
+                  style={{ fontSize: '.68rem' }}
+                >
+                  {deleting === String(a.id) ? '…' : '✕'}
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -214,9 +238,19 @@ export default function MonCompteClient({ user, praticien, articles, realisation
                   {TYPE_LABEL[String(r.type)] || String(r.type)} · {Array.isArray(r.stack) ? (r.stack as string[]).slice(0, 3).join(', ') : ''}
                 </p>
               </div>
-              <a href={`/mon-compte/realisation/${String(r.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem' }}>
-                ✎ Modifier
-              </a>
+              <div style={{ display: 'flex', gap: '.5rem', flexShrink: 0 }}>
+                <a href={`/mon-compte/realisation/${String(r.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem' }}>
+                  ✎ Modifier
+                </a>
+                <button
+                  onClick={() => deleteContent('realisations', String(r.id), String(r.title))}
+                  disabled={deleting === String(r.id)}
+                  className="btn-f btn-f-danger"
+                  style={{ fontSize: '.68rem' }}
+                >
+                  {deleting === String(r.id) ? '…' : '✕'}
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -244,9 +278,19 @@ export default function MonCompteClient({ user, praticien, articles, realisation
                   {ev.type_label ? String(ev.type_label) : (EVTYPE_LABEL[String(ev.type)] || String(ev.type))} · {String(ev.date_debut || '—')} {ev.online ? '· En ligne' : (ev.pays ? `· ${String(ev.pays)}` : '')}
                 </p>
               </div>
-              <a href={`/mon-compte/evenement/${String(ev.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem' }}>
-                ✎ Modifier
-              </a>
+              <div style={{ display: 'flex', gap: '.5rem', flexShrink: 0 }}>
+                <a href={`/mon-compte/evenement/${String(ev.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem' }}>
+                  ✎ Modifier
+                </a>
+                <button
+                  onClick={() => deleteContent('evenements', String(ev.id), String(ev.title))}
+                  disabled={deleting === String(ev.id)}
+                  className="btn-f btn-f-danger"
+                  style={{ fontSize: '.68rem' }}
+                >
+                  {deleting === String(ev.id) ? '…' : '✕'}
+                </button>
+              </div>
             </div>
           ))}
         </div>

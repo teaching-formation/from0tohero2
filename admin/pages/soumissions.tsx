@@ -68,6 +68,7 @@ function SoumissionsPage() {
   const [expanded, setExpanded]   = useState<string | null>(null);
   const [acting, setActing]       = useState<string | null>(null);
   const [actError, setActError]   = useState<string | null>(null);
+  const [deleting, setDeleting]   = useState<string | null>(null);
   const [note, setNote]           = useState('');
   const [loading, setLoading]     = useState(true);
   const [confirm, setConfirm]     = useState<ConfirmState>(null);
@@ -81,6 +82,19 @@ function SoumissionsPage() {
       })
       .catch(() => setLoading(false));
   }, []);
+
+  async function deleteSoumission(id: string) {
+    if (!window.confirm('Supprimer définitivement cette soumission ?')) return;
+    setDeleting(id);
+    const r = await fetch('/api/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
+      body: JSON.stringify({ table: 'soumissions', id }),
+    });
+    if (!r.ok) { setDeleting(null); alert('Erreur lors de la suppression.'); return; }
+    setAll(prev => prev.filter(s => s.id !== id));
+    setDeleting(null);
+  }
 
   async function act(action: 'approve' | 'reject', s: Soumission) {
     setConfirm(null);
@@ -280,6 +294,15 @@ function SoumissionsPage() {
                         {s.status === 'approved' ? 'Approuvée' : 'Rejetée'}
                       </span>
                     )}
+                    <button
+                      className="btn btn-danger btn-sm"
+                      disabled={deleting === s.id}
+                      title="Supprimer la soumission"
+                      onClick={e => { e.stopPropagation(); deleteSoumission(s.id); }}
+                      style={{ opacity: .7 }}
+                    >
+                      {deleting === s.id ? '…' : '🗑'}
+                    </button>
 
                     <button
                       className="btn-icon"

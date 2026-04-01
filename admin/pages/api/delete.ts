@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { supabaseAdmin } from '@/lib/supabase';
 
-const ALLOWED_TABLES = ['praticiens', 'articles', 'realisations', 'evenements', 'chaines_youtube'];
+const ALLOWED_TABLES = ['praticiens', 'articles', 'realisations', 'evenements', 'chaines_youtube', 'soumissions'];
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end();

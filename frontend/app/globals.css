@@ -144,6 +144,9 @@ body {
 .btn-f-secondary:hover { border-color: var(--f-sky); color: var(--f-sky) !important; background: var(--f-sky-bg); transform: translateY(-1px); }
 .btn-f-sky { background: var(--f-sky); color: #ffffff !important; box-shadow: var(--f-shadow-sky); }
 .btn-f-sky:hover { filter: brightness(1.1); transform: translateY(-2px); color: #ffffff !important; }
+.btn-f-danger { background: transparent; color: #f87171 !important; border: 1.5px solid rgba(248,113,113,.35); }
+.btn-f-danger:hover { background: rgba(248,113,113,.1); border-color: #f87171; transform: translateY(-1px); }
+.btn-f-danger:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 
 /* ── CARDS ── */
 .f-card {
