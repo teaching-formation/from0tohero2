@@ -9,8 +9,8 @@ import { BADGE_STYLES } from '@/lib/badges';
 
 const PAGE_SIZE = 12;
 
-const FILTERS = ['all','open','data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
-const FILTER_LABELS: Record<string,string> = { all:'Tous', open:'● Disponibles', data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cybersécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
+const FILTERS = ['all','data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
+const FILTER_LABELS: Record<string,string> = { all:'Tous', data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cybersécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
 
 export default function PraticiensPage() {
   const [praticiens, setPraticiens] = useState<Praticien[]>([]);
@@ -46,8 +46,7 @@ export default function PraticiensPage() {
   ).sort((a, b) => a.label.localeCompare(b.label, 'fr'));
 
   const filtered = praticiens.filter(p => {
-    if (activeFilter === 'open' && !p.open_to_work) return false;
-    if (activeFilter !== 'all' && activeFilter !== 'open') {
+    if (activeFilter !== 'all') {
       const cats: string[] = (p as any).categories ?? (p.category ? [p.category] : []);
       if (!cats.includes(activeFilter)) return false;
     }
