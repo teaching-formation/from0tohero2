@@ -124,7 +124,7 @@ export default function EvenementsPage() {
 
       {/* ── Grille ── */}
       {loading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1.25rem' }}>
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="f-card" style={{ height: 200, background: 'var(--f-card)', borderRadius: 12 }} />
           ))}
@@ -138,7 +138,7 @@ export default function EvenementsPage() {
         </div>
       ) : (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1.25rem' }}>
             {filtered.slice(0, visible).map((e, i) => {
               const types: string[] = (e as any).types?.length ? (e as any).types : [e.type];
               const primaryType = types[0] || 'autre';

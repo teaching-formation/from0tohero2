@@ -147,7 +147,7 @@ export default function PraticiensPage() {
 
       {/* ── Grille ── */}
       {loading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1.25rem' }}>
           {Array.from({ length: 6 }).map((_, i) => <SkeletonPraticienCard key={i} />)}
         </div>
       ) : filtered.length === 0 ? (
@@ -159,7 +159,7 @@ export default function PraticiensPage() {
         </div>
       ) : (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1.25rem' }}>
             {filtered.slice(0, visible).map((p, i) => {
               const cats: string[] = (p as any).categories ?? (p.category ? [p.category] : []);
               const primaryCat = cats[0] || 'autre';
@@ -183,6 +183,7 @@ export default function PraticiensPage() {
                       willChange: 'transform',
                     }}
                     onMouseMove={e => {
+                      if (window.matchMedia('(hover: none)').matches) return;
                       const r = e.currentTarget.getBoundingClientRect();
                       const x = (e.clientX - r.left) / r.width - 0.5;
                       const y = (e.clientY - r.top) / r.height - 0.5;
@@ -190,6 +191,7 @@ export default function PraticiensPage() {
                       e.currentTarget.style.transform = `perspective(900px) rotateY(${x * 10}deg) rotateX(${-y * 8}deg) scale3d(1.02,1.02,1.02)`;
                     }}
                     onMouseLeave={e => {
+                      if (window.matchMedia('(hover: none)').matches) return;
                       e.currentTarget.style.transition = 'transform 0.55s cubic-bezier(.4,0,.2,1), box-shadow 0.2s';
                       e.currentTarget.style.transform = 'perspective(900px) rotateY(0deg) rotateX(0deg) scale3d(1,1,1)';
                     }}

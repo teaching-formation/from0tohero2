@@ -644,13 +644,19 @@ a:focus-visible {
 @media (max-width: 768px) {
   .community-cta { padding: 2rem 1.5rem; }
   .step-num-bg { font-size: 4rem; }
+  /* Stats : 2 colonnes sur tablette/mobile */
   .stats-strip { grid-template-columns: repeat(2, 1fr) !important; }
-  footer > div:first-child > div { grid-template-columns: 1fr !important; gap: 2rem !important; }
-}
-@media (max-width: 480px) {
-  .stats-strip { grid-template-columns: repeat(2, 1fr) !important; }
+  /* Footer : 1 colonne */
+  footer > div:first-child { grid-template-columns: 1fr !important; gap: 2rem !important; }
+  /* Mon espace header : empile avatar + texte */
+  .moncompte-header { flex-direction: column !important; align-items: flex-start !important; }
 }
 
-@media (max-width: 640px) {
-  .stats-strip { flex-direction: column !important; gap: 1.25rem !important; }
+@media (max-width: 480px) {
+  /* Stats : 2×2 conservé (assez large) */
+  .stats-strip { grid-template-columns: repeat(2, 1fr) !important; }
+  /* Mon espace padding réduit */
+  .moncompte-wrap { padding: 1.5rem 1rem !important; }
+  /* Tabs : texte plus petit sur très petit écran */
+  .moncompte-tabs button { font-size: .65rem !important; padding: .5rem .65rem !important; }
 }

@@ -89,7 +89,7 @@ export default function ArticlesPage() {
 
       {/* ── Grille ── */}
       {loading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1.25rem' }}>
           {Array.from({ length: 6 }).map((_, i) => <SkeletonArticleCard key={i} />)}
         </div>
       ) : filtered.length === 0 ? (
@@ -101,7 +101,7 @@ export default function ArticlesPage() {
         </div>
       ) : (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1.25rem' }}>
             {filtered.slice(0, visible).map(a => {
               const catColor = CAT_COLOR[a.category] || 'var(--f-text-3)';
               const srcKey = (a.source || '').toLowerCase();

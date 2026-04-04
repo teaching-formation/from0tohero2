@@ -93,10 +93,10 @@ export default function MonCompteClient({ user, praticien, articles, realisation
 
   // ── Dashboard ───────────────────────────────────────────────────────────
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '2.5rem 1.5rem' }}>
+    <div className="moncompte-wrap" style={{ maxWidth: 900, margin: '0 auto', padding: '2.5rem 1.5rem' }}>
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
+      <div className="moncompte-header" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <Avatar
             name={String(p.name)}
@@ -123,7 +123,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '.5rem', borderBottom: '1px solid var(--f-border)', marginBottom: '2rem' }}>
+      <div className="moncompte-tabs" style={{ display: 'flex', gap: '.5rem', borderBottom: '1px solid var(--f-border)', marginBottom: '2rem', overflowX: 'auto' }}>
         {([
           { key: 'profil',       label: 'Mon profil' },
           { key: 'articles',     label: `Articles (${articles.length})` },
