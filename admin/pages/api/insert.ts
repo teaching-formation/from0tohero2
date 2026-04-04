@@ -68,11 +68,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       bio:            data.bio || null,
       stack,
       badges:         [],
+      certifications: data.certifications || null,
       linkedin_url:   data.linkedin_url || null,
       github_url:     data.github_url || null,
       youtube_url:    data.youtube_url || null,
       website_url:    data.website_url || null,
       twitter_url:    data.twitter_url || null,
+      whatsapp_url:   data.whatsapp_url || null,
       photo_url:      data.photo_url || null,
       status:         data.status || 'approved',
     }).select().single();

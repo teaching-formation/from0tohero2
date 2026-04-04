@@ -41,9 +41,11 @@ const EDIT_FIELDS = [
   { key: 'type_label', label: 'Type précisé (si Autre)' },
   { key: 'pays',       label: 'Pays', type: 'select' as const, options: PAYS },
   { key: 'lieu',       label: 'Lieu' },
+  { key: 'online',     label: 'En ligne (true/false)' },
   { key: 'url',        label: 'Lien', type: 'url' as const },
   { key: 'date_debut', label: 'Date début', type: 'date' as const },
   { key: 'date_fin',   label: 'Date fin',   type: 'date' as const },
+  { key: 'gratuit',    label: 'Gratuit (true/false)' },
   { key: 'excerpt',    label: 'Description', type: 'textarea' as const },
   { key: 'status',     label: 'Statut', type: 'select' as const, options: ['pending','approved','rejected'] },
 ];

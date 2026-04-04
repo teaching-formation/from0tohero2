@@ -42,10 +42,15 @@ const EDIT_FIELDS = [
   { key: 'category',       label: 'Catégorie', type: 'select' as const, options: CAT_OPTIONS },
   { key: 'category_label', label: 'Catégorie précisée (si Autre)' },
   { key: 'bio',            label: 'Bio', type: 'textarea' as const },
+  { key: 'certifications', label: 'Certifications' },
   { key: 'stack',          label: 'Stack (séparé par ,)' },
   { key: 'badges',         label: 'Badges (séparé par ,)', type: 'array' as const },
   { key: 'linkedin_url',   label: 'LinkedIn', type: 'url' as const },
   { key: 'github_url',     label: 'GitHub', type: 'url' as const },
+  { key: 'twitter_url',    label: 'Twitter / X', type: 'url' as const },
+  { key: 'youtube_url',    label: 'YouTube', type: 'url' as const },
+  { key: 'website_url',    label: 'Site web', type: 'url' as const },
+  { key: 'whatsapp_url',   label: 'WhatsApp', type: 'url' as const },
   { key: 'status',         label: 'Statut', type: 'select' as const, options: ['pending','approved','rejected'] },
 ];
 

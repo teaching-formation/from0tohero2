@@ -77,6 +77,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         stack: Array.isArray(payload.stack)
           ? payload.stack
           : String(payload.stack || '').split(',').map((s: string) => s.trim()).filter(Boolean),
+        certifications: payload.certifications || null,
         linkedin_url: payload.linkedin_url || null,
         github_url: payload.github_url || null,
         youtube_url: payload.youtube_url || null,
