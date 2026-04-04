@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&family=Geist+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600;700&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -59,9 +59,25 @@ body {
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  text-rendering: optimizeLegibility;
   min-height: 100vh;
-  line-height: 1.5;
+  line-height: 1.6;
 }
+
+/* ─── Background dot-grid ────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,.045) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(ellipse 100% 100% at 50% 0%, black 40%, transparent 100%);
+}
+
+.layout { position: relative; z-index: 1; }
 
 /* ─── Scrollbar ─────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -101,7 +117,7 @@ body {
 .sidebar {
   width: var(--sidebar-w);
   flex-shrink: 0;
-  background: var(--surface);
+  background: linear-gradient(180deg, #0f0f14 0%, #0c0c10 100%);
   border-right: 1px solid var(--border);
   padding: 0;
   display: flex;
@@ -119,6 +135,15 @@ body {
   padding: 1.35rem 1.15rem .9rem;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  position: relative;
+}
+.sidebar-header::before {
+  content: '';
+  position: absolute;
+  top: -20px; left: 10px;
+  width: 80px; height: 60px;
+  background: radial-gradient(circle, rgba(249,115,22,.18) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .sidebar-logo {
@@ -232,9 +257,10 @@ body {
   min-width: 0;
   padding: 0;
   overflow-x: hidden;
-  background: var(--bg);
+  background: transparent;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 /* ─── Top header bar ─────────────────────────────────────── */
@@ -349,9 +375,10 @@ body {
   font-size: 1.45rem;
   font-weight: 800;
   color: var(--text-1);
-  letter-spacing: -.025em;
+  letter-spacing: -.03em;
   line-height: 1.1;
   margin: 0;
+  font-feature-settings: 'ss01' 1;
 }
 .page-title-count {
   font-family: 'Geist Mono', monospace;
