@@ -177,39 +177,67 @@ export default async function Home() {
       {/* ── STATS ────────────────────────────────────────────────── */}
       <section style={{ background: 'var(--f-surface)', padding: '4rem 6vw', borderTop: '1px solid var(--f-border)', borderBottom: '1px solid var(--f-border)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <ScrollReveal>
-          <div className="stats-strip" style={{ display: 'flex', flexWrap: 'wrap', gap: '3rem' }}>
-            {statItems.map((s, i) => (
-              <div key={s.l} className="stat-item" style={{
-                paddingLeft: '1.25rem',
-                position: 'relative',
-              }}>
-                <div style={{
-                  position: 'absolute', left: 0, top: '5%', bottom: '5%',
-                  width: 3, borderRadius: 99,
-                  background: `var(${STAT_ACCENT[i] || '--f-sky'})`,
-                  opacity: .7,
-                }} />
-                <p style={{
-                  fontFamily: "'Syne', sans-serif",
-                  fontSize: '2.8rem',
-                  fontWeight: 800,
-                  lineHeight: 1,
-                  color: `var(${STAT_ACCENT[i] || '--f-sky'})`,
-                  margin: 0,
-                }}>{s.n}</p>
-                <p style={{
-                  fontFamily: "'Geist Mono', monospace",
-                  fontSize: '.62rem',
-                  letterSpacing: '.12em',
-                  textTransform: 'uppercase',
-                  color: 'var(--f-text-3)',
-                  margin: '.4rem 0 0 0',
-                }}>{s.l}</p>
-              </div>
-            ))}
-          </div>
-        </ScrollReveal>
+          <ScrollReveal>
+            <div className="stats-strip" style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(4, 1fr)',
+              gap: '1px',
+              background: 'var(--f-border)',
+              borderRadius: 16,
+              overflow: 'hidden',
+              border: '1px solid var(--f-border)',
+            }}>
+              {statItems.map((s, i) => (
+                <div key={s.l} style={{
+                  background: 'var(--f-surface)',
+                  padding: '2.5rem 2rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '.6rem',
+                  textAlign: 'center',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}>
+                  {/* Accent top bar */}
+                  <div style={{
+                    position: 'absolute', top: 0, left: '20%', right: '20%',
+                    height: 2, borderRadius: '0 0 4px 4px',
+                    background: `var(${STAT_ACCENT[i] || '--f-sky'})`,
+                    opacity: .8,
+                  }} />
+                  {/* Icon */}
+                  <span style={{
+                    fontFamily: "'Geist Mono', monospace",
+                    fontSize: '1.1rem',
+                    color: `var(${STAT_ACCENT[i] || '--f-sky'})`,
+                    opacity: .6,
+                    lineHeight: 1,
+                  }}>{s.icon}</span>
+                  {/* Number */}
+                  <p style={{
+                    fontFamily: "'Syne', sans-serif",
+                    fontSize: 'clamp(2.2rem, 4vw, 3.2rem)',
+                    fontWeight: 800,
+                    lineHeight: 1,
+                    color: `var(${STAT_ACCENT[i] || '--f-sky'})`,
+                    margin: 0,
+                    letterSpacing: '-.03em',
+                  }}>{s.n}</p>
+                  {/* Label */}
+                  <p style={{
+                    fontFamily: "'Geist Mono', monospace",
+                    fontSize: '.6rem',
+                    letterSpacing: '.14em',
+                    textTransform: 'uppercase',
+                    color: 'var(--f-text-3)',
+                    margin: 0,
+                  }}>{s.l}</p>
+                </div>
+              ))}
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 

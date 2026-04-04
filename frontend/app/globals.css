@@ -609,7 +609,10 @@ a:focus-visible {
 @media (max-width: 768px) {
   .community-cta { padding: 2rem 1.5rem; }
   .step-num-bg { font-size: 4rem; }
-  .stats-strip { gap: 1.5rem !important; }
+  .stats-strip { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 480px) {
+  .stats-strip { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
 @media (max-width: 640px) {
