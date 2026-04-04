@@ -230,7 +230,8 @@ function RealisationsPage() {
           fields={[
             { key: 'title',          label: 'Titre', required: true },
             { key: 'category',       label: 'Catégorie', type: 'select', options: ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'] },
-            { key: 'type',           label: 'Type', type: 'select', options: ['pipeline','dashboard','api','app','bootcamp','autre'] },
+            { key: 'type',           label: 'Type', type: 'select', options: ['pipeline','dashboard','api','app','bootcamp','youtube','autre'] },
+            { key: 'type_label',     label: 'Type précisé (si Autre)' },
             { key: 'stack',          label: 'Stack (séparé par ,)' },
             { key: 'excerpt',        label: 'Description', type: 'textarea' },
             { key: 'demo_url',       label: 'Lien Demo', type: 'url' },

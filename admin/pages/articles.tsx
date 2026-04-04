@@ -231,6 +231,7 @@ function ArticlesPage() {
             { key: 'author_country', label: 'Pays auteur' },
             { key: 'category',       label: 'Catégorie', type: 'select', options: ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'] },
             { key: 'source',         label: 'Source', type: 'select', options: ['linkedin','medium','devto','substack','blog','youtube','autre'] },
+            { key: 'source_label',   label: 'Source précisée (si Autre)' },
             { key: 'external_url',   label: 'Lien article', type: 'url', required: true },
             { key: 'excerpt',        label: 'Résumé', type: 'textarea' },
             { key: 'date_published', label: 'Date publication', type: 'date' },
