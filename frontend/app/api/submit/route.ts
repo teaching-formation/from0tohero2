@@ -60,7 +60,7 @@ export async function POST(req: Request) {
         badges:         [],
         certifications: payload.certifications || null,
         category_label: cats.includes('autre') ? (payload.category_label || null) : null,
-        photo_url:      null,
+        photo_url:      payload.photo_url || null,
         status:         'approved',
       });
       if (error) insertError = error.message;
