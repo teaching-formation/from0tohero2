@@ -7,6 +7,20 @@ const TYPE_LABELS: Record<string,string> = {
   webinaire:'Webinaire', bootcamp:'Bootcamp', autre:'Autre',
 };
 
+const PAYS_AFRIQUE = [
+  'Afrique du Sud','Algérie','Angola','Bénin','Botswana','Burkina Faso','Burundi',
+  'Cabo Verde','Cameroun','Comores','Congo (Brazzaville)','Congo (RDC)',"Côte d'Ivoire",
+  'Djibouti','Égypte','Érythrée','Eswatini','Éthiopie','Gabon','Gambie','Ghana',
+  'Guinée','Guinée-Bissau','Guinée équatoriale','Kenya','Lesotho','Liberia','Libye',
+  'Madagascar','Malawi','Mali','Maroc','Maurice','Mauritanie','Mozambique','Namibie',
+  'Niger','Nigeria','Ouganda','Rwanda','São Tomé-et-Príncipe','Sénégal','Seychelles',
+  'Sierra Leone','Somalie','Soudan','Soudan du Sud','Tanzanie','Tchad','Togo','Tunisie',
+  'Zambie','Zimbabwe',
+  '─── Diaspora ───',
+  'France','Belgique','Canada','États-Unis','Royaume-Uni','Suisse','Allemagne',
+  'Italie','Espagne','Portugal','Pays-Bas','Suède','Norvège','Autre',
+];
+
 type Props = { onSuccess: () => void; username?: string; hideEmail?: boolean; initialEmail?: string; initialCountry?: string };
 
 export default function FormEvenement({ onSuccess, username = '', hideEmail = false, initialEmail = '', initialCountry = '' }: Props) {
@@ -104,10 +118,14 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
 
       <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
         <Field label="Pays" required error={errors.pays} style={{ flex: 1, minWidth: 180 }}>
-          <input className="f-input" placeholder="Ex: Côte d'Ivoire" value={form.pays}
-            onChange={e => set('pays', e.target.value)}
-            readOnly={!!initialCountry}
-            style={{ maxWidth: '100%', ...(initialCountry ? { opacity: .7, cursor: 'not-allowed', background: 'var(--f-surface)' } : {}) }} />
+          <select className="f-input" value={form.pays} onChange={e => set('pays', e.target.value)} style={{ maxWidth: '100%', cursor: 'pointer' }}>
+            <option value="">— Sélectionne un pays —</option>
+            {PAYS_AFRIQUE.map(p => (
+              p.startsWith('─')
+                ? <option key={p} disabled style={{ color: 'var(--f-text-3)', fontStyle: 'italic' }}>{p}</option>
+                : <option key={p} value={p}>{p}</option>
+            ))}
+          </select>
         </Field>
         <Field label="Ville / Lieu" style={{ flex: 1, minWidth: 180 }}>
           <input className="f-input" placeholder="Ex: Abidjan, Palais des Sports"
