@@ -38,6 +38,7 @@ type Row = {
 const EDIT_FIELDS = [
   { key: 'title',      label: 'Titre' },
   { key: 'type',       label: 'Type', type: 'select' as const, options: ['conference','meetup','hackathon','webinaire','bootcamp','autre'] },
+  { key: 'type_label', label: 'Type précisé (si Autre)' },
   { key: 'pays',       label: 'Pays', type: 'select' as const, options: PAYS },
   { key: 'lieu',       label: 'Lieu' },
   { key: 'url',        label: 'Lien', type: 'url' as const },
@@ -265,8 +266,9 @@ function EvenementsPage() {
           table="evenements"
           fields={[
             { key: 'title',      label: 'Titre',       required: true },
-            { key: 'type',       label: 'Type',        type: 'select', options: ['conference','meetup','hackathon','webinaire','bootcamp','autre'] },
-            { key: 'pays',       label: 'Pays', type: 'select', options: PAYS },
+            { key: 'type',       label: 'Type',                    type: 'select', options: ['conference','meetup','hackathon','webinaire','bootcamp','autre'] },
+            { key: 'type_label', label: 'Type précisé (si Autre)' },
+            { key: 'pays',       label: 'Pays',                    type: 'select', options: PAYS },
             { key: 'lieu',       label: 'Lieu' },
             { key: 'url',        label: 'Lien',        type: 'url' },
             { key: 'date_debut', label: 'Date début',  type: 'date', required: true },
