@@ -169,7 +169,7 @@ export default function PraticiensPage() {
 
               return (
                 <Link key={p.slug} href={`/praticiens/${p.slug}`} className="f-card-link"
-                  style={{ animation: `cardReveal 0.45s cubic-bezier(.4,0,.2,1) ${Math.min(i, 11) * 45}ms both` }}
+                  style={{ animation: `cardReveal 0.45s cubic-bezier(.4,0,.2,1) ${Math.min(i, 11) * 45}ms both`, display: 'flex', height: '100%' }}
                 >
                   <article
                     className="f-card f-card-hover praticien-card"
@@ -181,6 +181,7 @@ export default function PraticiensPage() {
                       position: 'relative',
                       overflow: 'hidden',
                       willChange: 'transform',
+                      flex: 1,
                     }}
                     onMouseMove={e => {
                       if (window.matchMedia('(hover: none)').matches) return;
@@ -275,12 +276,14 @@ export default function PraticiensPage() {
                         WebkitLineClamp: 3,
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
-                        flex: 1,
                       }}>{p.bio}</p>
                     )}
 
+                    {/* Spacer — pousse stack + footer vers le bas */}
+                    <div style={{ flex: 1 }} />
+
                     {/* Stack */}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.3rem', marginTop: 'auto' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.3rem' }}>
                       {p.stack.slice(0, 5).map(s => (
                         <span key={s} className="f-tag">{s}</span>
                       ))}
