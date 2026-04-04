@@ -24,8 +24,8 @@ const PAYS_AFRIQUE = [
   'Italie','Espagne','Portugal','Pays-Bas','Suède','Norvège','Autre',
 ];
 
-const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
-const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cyber-Sécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
+const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded','autre'];
+const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cyber-Sécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT', autre:'Autre' };
 
 const BADGES = [
   { value: 'MENTOR',      label: 'Mentor',      desc: "Tu accompagnes d'autres praticiens",      color: 'var(--f-orange)', border: 'rgba(249,115,22,.35)', bg: 'rgba(249,115,22,.08)' },
@@ -141,6 +141,7 @@ export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
   const [activeSocials,  setActiveSocials]  = useState<string[]>([]);
   const [selectedBadges,    setSelectedBadges]    = useState<string[]>([]);
   const [certifications,    setCertifications]    = useState('');
+  const [categoryAutre,     setCategoryAutre]     = useState('');
   // État global plat — chaque skill est unique, peu importe le groupe où il est affiché
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [customSkill, setCustomSkill] = useState('');
@@ -243,7 +244,14 @@ export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type: 'praticien',
-        payload: { ...form, badges: selectedBadges, certifications: certifications || null, stack: buildStack(), skills: buildSkillsPayload() },
+        payload: {
+            ...form,
+            badges: selectedBadges,
+            certifications: certifications || null,
+            stack: buildStack(),
+            skills: buildSkillsPayload(),
+            category_label: (form.categories as string[]).includes('autre') ? (categoryAutre || null) : null,
+          },
       }),
     });
     setLoading(false);
@@ -318,6 +326,15 @@ export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
             </button>
           ))}
         </div>
+        {(form.categories as string[]).includes('autre') && (
+          <input
+            className="f-input"
+            placeholder="Précise ta catégorie (ex: QA, Product, FinTech…)"
+            value={categoryAutre}
+            onChange={e => setCategoryAutre(e.target.value)}
+            style={{ maxWidth: '100%', marginTop: '.5rem' }}
+          />
+        )}
       </Field>
 
       {/* Badges */}

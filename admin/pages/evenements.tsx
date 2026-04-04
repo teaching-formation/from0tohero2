@@ -37,7 +37,7 @@ type Row = {
 
 const EDIT_FIELDS = [
   { key: 'title',      label: 'Titre' },
-  { key: 'type',       label: 'Type', type: 'select' as const, options: ['conference','meetup','hackathon','webinaire','bootcamp','autre'] },
+  { key: 'types',      label: 'Types (séparés par ,)', type: 'array' as const },
   { key: 'type_label', label: 'Type précisé (si Autre)' },
   { key: 'pays',       label: 'Pays', type: 'select' as const, options: PAYS },
   { key: 'lieu',       label: 'Lieu' },
@@ -192,9 +192,16 @@ function EvenementsPage() {
                     )}
                   </td>
                   <td>
-                    <span className="badge badge-violet">
-                      {EVENT_TYPE_LABEL[r.type] || r.type}
-                    </span>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.25rem' }}>
+                      {((r.types as string[] | undefined)?.length
+                        ? (r.types as string[])
+                        : [r.type]
+                      ).map((t: string) => (
+                        <span key={t} className="badge badge-violet">
+                          {EVENT_TYPE_LABEL[t] || t}
+                        </span>
+                      ))}
+                    </div>
                   </td>
                   <td>
                     <div className="td-mono">
@@ -266,7 +273,7 @@ function EvenementsPage() {
           table="evenements"
           fields={[
             { key: 'title',      label: 'Titre',       required: true },
-            { key: 'type',       label: 'Type',                    type: 'select', options: ['conference','meetup','hackathon','webinaire','bootcamp','autre'] },
+            { key: 'types',      label: 'Types (séparés par ,)',   type: 'array' },
             { key: 'type_label', label: 'Type précisé (si Autre)' },
             { key: 'pays',       label: 'Pays',                    type: 'select', options: PAYS },
             { key: 'lieu',       label: 'Lieu' },

@@ -59,20 +59,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       : (data.stack || []);
     const { data: row, error } = await supabaseAdmin.from('praticiens').insert({
       slug,
-      name:         data.name,
-      role:         data.role || null,
-      country:      data.country || null,
-      category:     data.category || 'data',
-      categories:   [data.category || 'data'],
-      bio:          data.bio || null,
+      name:           data.name,
+      role:           data.role || null,
+      country:        data.country || null,
+      category:       data.category || 'data',
+      category_label: data.category === 'autre' ? (data.category_label || null) : null,
+      categories:     [data.category || 'data'],
+      bio:            data.bio || null,
       stack,
-      badges:       [],
-      linkedin_url: data.linkedin_url || null,
-      github_url:   data.github_url || null,
-      youtube_url:  data.youtube_url || null,
-      website_url:  data.website_url || null,
-      twitter_url:  data.twitter_url || null,
-      status:       data.status || 'approved',
+      badges:         [],
+      linkedin_url:   data.linkedin_url || null,
+      github_url:     data.github_url || null,
+      youtube_url:    data.youtube_url || null,
+      website_url:    data.website_url || null,
+      twitter_url:    data.twitter_url || null,
+      status:         data.status || 'approved',
     }).select().single();
     if (error) return res.status(500).json({ error: error.message });
     return res.json(row);
@@ -80,11 +81,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (table === 'evenements') {
     const slug = slugify(data.title || '');
+    const evTypes: string[] = Array.isArray(data.types) && data.types.length > 0
+      ? data.types
+      : [data.type || 'autre'];
+    const evType = evTypes[0] || 'autre';
     const { data: row, error } = await supabaseAdmin.from('evenements').insert({
       slug,
       title:      data.title,
-      type:       data.type || 'autre',
-      type_label: data.type === 'autre' ? (data.type_label || null) : null,
+      type:       evType,
+      types:      evTypes,
+      type_label: evTypes.includes('autre') ? (data.type_label || null) : null,
       pays:       data.pays || null,
       lieu:       data.lieu || null,
       online:     data.online === true || data.online === 'true' || false,

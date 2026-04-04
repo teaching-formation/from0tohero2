@@ -26,7 +26,7 @@ type Props = { onSuccess: () => void; username?: string; hideEmail?: boolean; in
 export default function FormEvenement({ onSuccess, username = '', hideEmail = false, initialEmail = '', initialCountry = '' }: Props) {
   const [form, setForm] = useState({
     title: '', username: username, email: initialEmail,
-    type: '', type_autre: '',
+    types: [] as string[], type_autre: '',
     pays: initialCountry, lieu: '',
     online: false, gratuit: false,
     url: '', date_debut: '', date_fin: '',
@@ -40,17 +40,25 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
     if (errors[key]) setErrors(e => ({ ...e, [key]: '' }));
   }
 
+  function toggleType(t: string) {
+    setForm(f => ({
+      ...f,
+      types: f.types.includes(t) ? f.types.filter(x => x !== t) : [...f.types, t],
+    }));
+    if (errors.types) setErrors(e => ({ ...e, types: '' }));
+  }
+
   function isValidUrl(s: string) {
     try { const u = new URL(s); return u.protocol === 'http:' || u.protocol === 'https:'; } catch { return false; }
   }
 
   function validate() {
     const e: Record<string, string> = {};
-    if (!form.title.trim())    e.title    = 'Champ requis';
-    if (!form.username.trim()) e.username = 'Champ requis';
-    if (!form.type)            e.type     = 'Sélectionne un type';
-    if (form.type === 'autre' && !form.type_autre.trim()) e.type_autre = 'Précise le type';
-    if (!form.pays.trim())     e.pays     = 'Champ requis';
+    if (!form.title.trim())       e.title    = 'Champ requis';
+    if (!form.username.trim())    e.username = 'Champ requis';
+    if (form.types.length === 0)  e.types    = 'Sélectionne au moins un type';
+    if (form.types.includes('autre') && !form.type_autre.trim()) e.type_autre = 'Précise le type';
+    if (!form.pays.trim())        e.pays     = 'Champ requis';
     if (!form.url.trim())      e.url      = 'Champ requis';
     else if (!isValidUrl(form.url)) e.url = 'URL invalide';
     if (!form.date_debut)      e.date_debut = 'Champ requis';
@@ -74,7 +82,8 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
         type: 'evenement',
         payload: {
           ...form,
-          type_label: form.type === 'autre' ? form.type_autre : TYPE_LABELS[form.type],
+          type:       form.types[0] || 'autre',
+          type_label: form.types.includes('autre') ? form.type_autre : null,
         },
       }),
     });
@@ -100,15 +109,15 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
           style={{ maxWidth: '100%', opacity: .6, cursor: 'not-allowed', background: 'var(--f-surface)' }} />
       </Field>
 
-      <Field label="Type d'événement" required error={errors.type}>
+      <Field label="Type(s) d'événement" required error={errors.types}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
           {TYPES.map(t => (
-            <button key={t} type="button" className={`filter-pill${form.type === t ? ' active' : ''}`} onClick={() => set('type', t)}>
+            <button key={t} type="button" className={`filter-pill${form.types.includes(t) ? ' active' : ''}`} onClick={() => toggleType(t)}>
               {TYPE_LABELS[t]}
             </button>
           ))}
         </div>
-        {form.type === 'autre' && (
+        {form.types.includes('autre') && (
           <input className="f-input" placeholder="Précise le type d'événement"
             value={form.type_autre} onChange={e => set('type_autre', e.target.value)}
             style={{ maxWidth: '100%', marginTop: '.75rem' }} />

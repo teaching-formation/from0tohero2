@@ -60,6 +60,89 @@ body {
   --f-shadow-org:   0 4px 16px rgba(251,146,60,.25);
 }
 
+/* ── DARK MODE — système (complément de .dark) ── */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --f-bg:           #0d1117;
+    --f-surface:      #161b22;
+    --f-card:         #1c2333;
+    --f-border:       #30363d;
+    --f-border-2:     #3d444d;
+    --f-text-1:       #f0f6fc;
+    --f-text-2:       #b0bac4;
+    --f-text-3:       #8b949e;
+    --f-sky:          #38bdf8;
+    --f-sky-bg:       rgba(56,189,248,.10);
+    --f-sky-border:   rgba(56,189,248,.25);
+    --f-orange:       #fb923c;
+    --f-green:        #34d399;
+    --f-green-bg:     rgba(52,211,153,.1);
+    --f-green-border: rgba(52,211,153,.3);
+    --f-dot:          #21262d;
+    --f-shadow-sm:    0 1px 3px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.2);
+    --f-shadow-md:    0 4px 16px rgba(0,0,0,.3);
+    --f-shadow-sky:   0 8px 28px rgba(56,189,248,.12);
+    --f-shadow-org:   0 4px 16px rgba(251,146,60,.25);
+  }
+}
+
+/* ── SÉLECTION ── */
+::selection {
+  background: var(--f-sky);
+  color: #ffffff;
+}
+
+/* ── FOCUS ACCESSIBILITY (WCAG 2.1 AA) ── */
+*:focus { outline: none; }
+
+*:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(14,165,233,.45);
+  border-radius: 6px;
+}
+.dark *:focus-visible {
+  box-shadow: 0 0 0 3px rgba(56,189,248,.5);
+}
+
+a:focus-visible {
+  box-shadow: 0 0 0 3px rgba(14,165,233,.45);
+  border-radius: 4px;
+  text-decoration: underline;
+}
+
+.btn-f:focus-visible {
+  box-shadow: 0 0 0 3px rgba(249,115,22,.45);
+  border-radius: 9px;
+}
+
+.f-input:focus-visible {
+  box-shadow: 0 0 0 3px var(--f-sky-bg);
+  border-color: var(--f-sky);
+}
+
+/* ── REDUCED MOTION ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* ── PRINT ── */
+@media print {
+  body { background: white !important; color: black !important; font-size: 12pt; }
+  .navbar, footer, .btn-f { display: none !important; }
+  .f-card {
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+  a { color: black !important; text-decoration: underline; }
+  a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .8em; color: #6b7280; }
+}
+
 /* ── HERO DOT GRID ── */
 .hero-dot-bg { position: relative; }
 .hero-dot-bg::before {
@@ -373,4 +456,151 @@ body {
 
   /* Tables admin → masquer colonnes secondaires */
   .col-secondary { display: none !important; }
+}
+
+/* ══════════════════════════════════════════════════
+   PREMIUM — AMÉLIORATIONS VISUELLES
+══════════════════════════════════════════════════ */
+
+/* ── Card hover premium — gradient border glow ── */
+.f-card-hover {
+  position: relative;
+}
+.f-card-hover::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, rgba(249,115,22,.0) 0%, rgba(14,165,233,.0) 100%);
+  transition: background 0.3s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+  z-index: -1;
+}
+.f-card-hover:hover::after {
+  background: linear-gradient(135deg, rgba(249,115,22,.18) 0%, rgba(14,165,233,.1) 100%);
+}
+
+/* ── Card category stripe ── */
+.praticien-card {
+  position: relative;
+  overflow: hidden;
+}
+.praticien-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  border-radius: 12px 12px 0 0;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.praticien-card:hover::before {
+  opacity: 1;
+}
+
+/* ── Section label premium ── */
+.f-label {
+  font-family: 'Geist Mono', monospace;
+  font-size: .68rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--f-orange);
+  display: block;
+}
+
+/* ── Gradient hero orb animation ── */
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(2%, -3%) scale(1.04); }
+  66% { transform: translate(-2%, 2%) scale(.97); }
+}
+.hero-orb { animation: orbFloat 18s ease-in-out infinite; }
+.hero-orb-2 { animation: orbFloat 22s ease-in-out infinite reverse; }
+
+/* ── Step cards ── */
+.step-card {
+  position: relative;
+  background: var(--f-card);
+  border: 1.5px solid var(--f-border);
+  border-radius: 14px;
+  padding: 2rem 1.75rem;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  overflow: hidden;
+}
+.step-card:hover {
+  border-color: var(--f-orange);
+  box-shadow: 0 8px 32px rgba(249,115,22,.12);
+  transform: translateY(-4px);
+}
+.step-num-bg {
+  position: absolute;
+  bottom: -1rem;
+  right: 1rem;
+  font-family: 'Syne', sans-serif;
+  font-size: 6rem;
+  font-weight: 800;
+  color: var(--f-border);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  transition: color 0.2s;
+}
+.step-card:hover .step-num-bg {
+  color: rgba(249,115,22,.12);
+}
+
+/* ── Community CTA premium ── */
+.community-cta {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(249,115,22,.06) 0%, rgba(14,165,233,.04) 100%);
+  border: 1.5px solid var(--f-border);
+  border-left: 4px solid var(--f-orange);
+  border-radius: 18px;
+  padding: 3.5rem;
+}
+
+/* ── Stat items ── */
+.stat-item {
+  padding-left: 1.25rem;
+  position: relative;
+}
+.stat-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: .1em; bottom: .1em;
+  width: 3px;
+  border-radius: 99px;
+}
+
+/* ── Arrow link hover ── */
+.arrow-link {
+  font-family: 'Geist Mono', monospace;
+  font-size: .72rem;
+  color: var(--f-sky);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  transition: gap 0.15s;
+}
+.arrow-link:hover { gap: .6rem; }
+
+/* ── Section divider avec gradient ── */
+.f-hr-gradient {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--f-border) 30%, var(--f-border) 70%, transparent);
+  margin: 0;
+}
+
+/* ── Mobile responsive additions ── */
+@media (max-width: 768px) {
+  .community-cta { padding: 2rem 1.5rem; }
+  .step-num-bg { font-size: 4rem; }
+  .stats-strip { gap: 1.5rem !important; }
+}
+
+@media (max-width: 640px) {
+  .stats-strip { flex-direction: column !important; gap: 1.25rem !important; }
 }

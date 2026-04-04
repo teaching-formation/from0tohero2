@@ -12,7 +12,8 @@ export type Praticien = {
   slug: string
   name: string
   role: string
-  category: 'data' | 'devops' | 'cloud' | 'ia' | 'cyber' | 'frontend' | 'backend' | 'fullstack' | 'mobile' | 'web3' | 'embedded'
+  category: 'data' | 'devops' | 'cloud' | 'ia' | 'cyber' | 'frontend' | 'backend' | 'fullstack' | 'mobile' | 'web3' | 'embedded' | 'autre'
+  category_label?: string
   categories: string[]
   country: string
   city?: string
@@ -56,6 +57,7 @@ export type Evenement = {
   slug: string
   title: string
   type: 'conference' | 'meetup' | 'hackathon' | 'webinaire' | 'bootcamp' | 'autre'
+  types: string[]
   type_label?: string
   lieu?: string
   pays?: string

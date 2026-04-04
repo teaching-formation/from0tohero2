@@ -71,6 +71,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         country: payload.pays,
         city: payload.ville,
         category: primaryCat,
+        category_label: cats.includes('autre') ? (payload.category_label || null) : null,
         categories: cats,
         bio: payload.bio || null,
         stack: Array.isArray(payload.stack)
@@ -133,14 +134,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     } else if (type === 'evenement') {
       const slug = slugify(payload.title);
-      const evType = payload.type === 'autre' ? 'autre' : payload.type;
+      const evTypes: string[] = Array.isArray(payload.types) && payload.types.length > 0
+        ? payload.types
+        : [payload.type || 'autre'];
+      const evType = evTypes[0] || 'autre';
       const { data: praticienEvt } = await supabaseAdmin
         .from('praticiens').select('id').eq('slug', String(payload.username || '')).maybeSingle();
       const { error } = await supabaseAdmin.from('evenements').insert({
         slug,
         title:        payload.title,
         type:         evType,
-        type_label:   payload.type === 'autre' ? (payload.type_autre || null) : null,
+        types:        evTypes,
+        type_label:   evTypes.includes('autre') ? (payload.type_label || payload.type_autre || null) : null,
         lieu:         payload.lieu    || null,
         pays:         payload.pays    || null,
         online:       payload.online  || false,

@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import ScrollReveal from '@/components/ScrollReveal';
 
-export const revalidate = 60; // revalide toutes les 60 secondes
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'from0tohero.dev — Ce qu\'ils ont construit. Pas ce qu\'ils ont promis.',
@@ -59,101 +60,264 @@ async function getLastArticles() {
   return data ?? [];
 }
 
+const STAT_ACCENT = ['--f-sky', '--f-orange', '--f-green', '#a78bfa'];
+
 export default async function Home() {
-  const [stats, lastArticles, youtubeChannels, bootcamps] = await Promise.all([getStats(), getLastArticles(), getYoutubeChannels(), getBootcamps()]);
+  const [stats, lastArticles, youtubeChannels, bootcamps] = await Promise.all([
+    getStats(), getLastArticles(), getYoutubeChannels(), getBootcamps(),
+  ]);
+
+  const statItems = [
+    { n: stats.praticiens,   l: 'Praticiens',   icon: '◈' },
+    { n: stats.realisations, l: 'Réalisations',  icon: '⬡' },
+    { n: stats.evenements,   l: 'Événements',    icon: '◎' },
+    { n: stats.articles,     l: 'Articles',      icon: '◧' },
+  ];
 
   return (
     <>
-      {/* HERO */}
-      <section className="hero-dot-bg" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 6vw', maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ marginBottom: '1.75rem' }}>
-          <span className="badge-live"><span className="dot"></span>from0tohero.dev</span>
+      {/* ── HERO ─────────────────────────────────────────────────── */}
+      <section className="hero-dot-bg" style={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        padding: '0 6vw',
+        maxWidth: 1200,
+        margin: '0 auto',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* Orbs décoratifs */}
+        <div className="hero-orb" style={{
+          position: 'absolute', top: '15%', right: '-8%',
+          width: 520, height: 520, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(249,115,22,.07) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+        <div className="hero-orb-2" style={{
+          position: 'absolute', bottom: '10%', left: '-12%',
+          width: 640, height: 640, borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(14,165,233,.06) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+
+        {/* Badge live */}
+        <div style={{ marginBottom: '2rem', position: 'relative', zIndex: 1 }}>
+          <span className="badge-live"><span className="dot" />&thinsp;from0tohero.dev</span>
         </div>
-        <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(2.4rem,6vw,5.5rem)', fontWeight: 800, lineHeight: 1.08, color: 'var(--f-text-1)', margin: '0 0 1.5rem 0' }}>
-          Ce qu'ils ont <span style={{ color: 'var(--f-sky)' }}>construit.</span><br />
-          Pas ce qu'ils ont <span style={{ color: 'var(--f-orange)' }}>promis.</span>
+
+        {/* Headline */}
+        <h1 style={{
+          fontFamily: "'Syne', sans-serif",
+          fontSize: 'clamp(2.6rem, 7vw, 6rem)',
+          fontWeight: 800,
+          lineHeight: 1.06,
+          color: 'var(--f-text-1)',
+          margin: '0 0 1.75rem 0',
+          letterSpacing: '-.03em',
+          position: 'relative', zIndex: 1,
+          maxWidth: 820,
+        }}>
+          Ce qu&apos;ils ont{' '}
+          <span style={{
+            background: 'linear-gradient(135deg, var(--f-sky) 0%, #7dd3fc 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}>construit.</span>
+          <br />
+          Pas ce qu&apos;ils ont{' '}
+          <span style={{
+            background: 'linear-gradient(135deg, var(--f-orange) 0%, #fb923c 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}>promis.</span>
         </h1>
-        <p style={{ fontSize: '1.08rem', color: 'var(--f-text-2)', maxWidth: 480, lineHeight: 1.9, marginBottom: '3rem' }}>
-          Articles, réalisations et profils de praticiens tech —<br />
-          Data, DevOps, Cloud, IA, Cybersécurité, Dev.
+
+        {/* Sous-titre */}
+        <p style={{
+          fontSize: '1.12rem',
+          color: 'var(--f-text-2)',
+          maxWidth: 500,
+          lineHeight: 1.85,
+          marginBottom: '3rem',
+          position: 'relative', zIndex: 1,
+        }}>
+          Profils, réalisations et ressources de praticiens tech
+          <br />francophones — Data, DevOps, Cloud, IA, Cyber, Dev.
         </p>
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <Link href="/praticiens" className="btn-f btn-f-primary">Voir les praticiens →</Link>
-          <Link href="/soumettre" className="btn-f btn-f-secondary">Soumettre mon profil</Link>
+
+        {/* CTAs */}
+        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
+          <Link href="/praticiens" className="btn-f btn-f-primary">
+            Voir les praticiens →
+          </Link>
+          <Link href="/soumettre" className="btn-f btn-f-secondary">
+            Soumettre mon profil
+          </Link>
+        </div>
+
+        {/* Scroll hint */}
+        <div style={{
+          position: 'absolute', bottom: '2.5rem', left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '.4rem',
+          opacity: .35,
+        }}>
+          <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--f-text-3)' }}>scroll</span>
+          <div style={{
+            width: 1, height: 36,
+            background: 'linear-gradient(to bottom, var(--f-text-3), transparent)',
+          }} />
         </div>
       </section>
 
-      <hr className="f-hr" />
+      <hr className="f-hr-gradient" />
 
-      {/* STATS */}
-      <section style={{ padding: '3.5rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4rem' }}>
-          {[
-            [stats.praticiens,   'Praticiens'],
-            [stats.realisations, 'Réalisations'],
-            [stats.evenements,   'Événements'],
-            [stats.articles,     'Articles'],
-          ].map(([n, l]) => (
-            <div key={String(l)}>
-              <p className="stat-num">{n}</p>
-              <p className="stat-label">{l}</p>
-            </div>
-          ))}
-        </div>
+      {/* ── STATS ────────────────────────────────────────────────── */}
+      <section style={{ padding: '4rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
+        <ScrollReveal>
+          <div className="stats-strip" style={{ display: 'flex', flexWrap: 'wrap', gap: '3rem' }}>
+            {statItems.map((s, i) => (
+              <div key={s.l} className="stat-item" style={{
+                paddingLeft: '1.25rem',
+                position: 'relative',
+              }}>
+                <div style={{
+                  position: 'absolute', left: 0, top: '5%', bottom: '5%',
+                  width: 3, borderRadius: 99,
+                  background: `var(${STAT_ACCENT[i] || '--f-sky'})`,
+                  opacity: .7,
+                }} />
+                <p style={{
+                  fontFamily: "'Syne', sans-serif",
+                  fontSize: '2.8rem',
+                  fontWeight: 800,
+                  lineHeight: 1,
+                  color: `var(${STAT_ACCENT[i] || '--f-sky'})`,
+                  margin: 0,
+                }}>{s.n}</p>
+                <p style={{
+                  fontFamily: "'Geist Mono', monospace",
+                  fontSize: '.62rem',
+                  letterSpacing: '.12em',
+                  textTransform: 'uppercase',
+                  color: 'var(--f-text-3)',
+                  margin: '.4rem 0 0 0',
+                }}>{s.l}</p>
+              </div>
+            ))}
+          </div>
+        </ScrollReveal>
       </section>
 
-      <hr className="f-hr" />
+      <hr className="f-hr-gradient" />
 
-      {/* COMMENT ÇA MARCHE */}
-      <section style={{ padding: '5.5rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
-        <span className="f-label" style={{ marginBottom: '.5rem' }}>// comment ça marche</span>
-        <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(1.7rem,3vw,2.4rem)', fontWeight: 800, color: 'var(--f-text-1)', margin: '.4rem 0 3rem 0' }}>
-          Figurer sur from0tohero.dev en 3 étapes.
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1.25rem' }}>
+      {/* ── COMMENT ÇA MARCHE ────────────────────────────────────── */}
+      <section style={{ padding: '6rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
+        <ScrollReveal>
+          <span className="f-label" style={{ marginBottom: '.6rem' }}>// comment ça marche</span>
+          <h2 style={{
+            fontFamily: "'Syne', sans-serif",
+            fontSize: 'clamp(1.75rem, 3.5vw, 2.6rem)',
+            fontWeight: 800,
+            color: 'var(--f-text-1)',
+            margin: '.4rem 0 3.5rem 0',
+            letterSpacing: '-.025em',
+            lineHeight: 1.15,
+          }}>
+            Figurer sur from0tohero.dev<br />
+            <span style={{ color: 'var(--f-text-3)', fontWeight: 700, fontSize: '80%' }}>en 3 étapes.</span>
+          </h2>
+        </ScrollReveal>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '1.25rem' }}>
           {[
             { num: '01', title: 'Crée ton profil', desc: "Nom, rôle, stack, bio et liens. C'est l'étape fondatrice — elle ancre tout le reste sur la plateforme.", sub: '⏱ ~2 minutes', done: false },
             { num: '02', title: 'Soumets une réalisation, un article ou un événement', desc: "Pipeline, dashboard, API, bootcamp, article Medium ou LinkedIn, conférence, meetup — ce que tu as vraiment construit ou organisé.", sub: 'Optionnel · illimité', done: false },
             { num: '03', title: 'Publication instantanée', desc: "Ton profil, tes réalisations et tes événements apparaissent sur la plateforme. Visibles par des milliers de praticiens et recruteurs.", sub: '✓ Publication instantanée', done: true },
-          ].map(s => (
-            <div key={s.num} className="f-card" style={{ cursor: 'default' }}>
-              <div className={`step-num${s.done ? ' done' : ''}`}>{s.num}</div>
-              <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .6rem 0' }}>{s.title}</h3>
-              <p style={{ fontSize: '.85rem', color: 'var(--f-text-2)', lineHeight: 1.75, margin: '0 0 1.25rem 0' }}>{s.desc}</p>
-              <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: s.done ? 'var(--f-green)' : 'var(--f-text-3)' }}>{s.sub}</span>
-            </div>
+          ].map((s, i) => (
+            <ScrollReveal key={s.num} delay={i * 120}>
+              <div className="step-card">
+                <div className={`step-num${s.done ? ' done' : ''}`}>{s.num}</div>
+                <h3 style={{
+                  fontFamily: "'Syne', sans-serif",
+                  fontSize: '1.02rem',
+                  fontWeight: 800,
+                  color: 'var(--f-text-1)',
+                  margin: '0 0 .75rem 0',
+                  letterSpacing: '-.01em',
+                  lineHeight: 1.3,
+                }}>{s.title}</h3>
+                <p style={{
+                  fontSize: '.86rem',
+                  color: 'var(--f-text-2)',
+                  lineHeight: 1.8,
+                  margin: '0 0 1.5rem 0',
+                }}>{s.desc}</p>
+                <span style={{
+                  fontFamily: "'Geist Mono', monospace",
+                  fontSize: '.63rem',
+                  letterSpacing: '.08em',
+                  color: s.done ? 'var(--f-green)' : 'var(--f-text-3)',
+                }}>{s.sub}</span>
+                {/* Ghost number */}
+                <div className="step-num-bg">{s.num}</div>
+              </div>
+            </ScrollReveal>
           ))}
         </div>
       </section>
 
-      <hr className="f-hr" />
+      <hr className="f-hr-gradient" />
 
-      {/* RESSOURCES */}
-      <section style={{ padding: '5.5rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
-        <span className="f-label" style={{ marginBottom: '.5rem' }}>// ressources</span>
-        <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(1.7rem,3vw,2.4rem)', fontWeight: 800, color: 'var(--f-text-1)', margin: '.4rem 0 3rem 0' }}>Apprendre par la pratique</h2>
+      {/* ── RESSOURCES ───────────────────────────────────────────── */}
+      <section style={{ padding: '6rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
+        <ScrollReveal>
+          <span className="f-label" style={{ marginBottom: '.6rem' }}>// ressources</span>
+          <h2 style={{
+            fontFamily: "'Syne', sans-serif",
+            fontSize: 'clamp(1.75rem, 3.5vw, 2.6rem)',
+            fontWeight: 800,
+            color: 'var(--f-text-1)',
+            margin: '.4rem 0 3.5rem 0',
+            letterSpacing: '-.025em',
+            lineHeight: 1.15,
+          }}>
+            Apprendre par la pratique.
+          </h2>
+        </ScrollReveal>
 
         {/* Bootcamps */}
         {bootcamps.length > 0 && (
           <>
-            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1rem' }}>🎓 Bootcamps</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '1rem', marginBottom: '3rem' }}>
-              {bootcamps.map(b => {
+            <ScrollReveal>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '.6rem' }}>
+                <span style={{ display: 'inline-block', width: 18, height: 1.5, background: 'var(--f-orange)', borderRadius: 2 }} />
+                Bootcamps
+              </p>
+            </ScrollReveal>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '1rem', marginBottom: '3.5rem' }}>
+              {bootcamps.map((b, i) => {
                 const isLive = !!b.demo_url;
                 const href   = b.demo_url || b.repo_url || '#';
                 const stack  = Array.isArray(b.stack) ? b.stack.join(' · ') : '';
                 return (
-                  <a key={b.title} href={href} className="f-card-link" target="_blank" rel="noreferrer">
-                    <div className={`f-card${isLive ? ' f-card-hover' : ''}`} style={!isLive ? { opacity: .65 } : {}}>
-                      {isLive
-                        ? <span className="badge-live" style={{ marginBottom: '1rem' }}><span className="dot"></span>live</span>
-                        : <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', display: 'block', marginBottom: '1rem' }}>○ coming soon</span>
-                      }
-                      <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .4rem 0' }}>{b.title}</h3>
-                      {stack && <p style={{ fontSize: '.8rem', color: 'var(--f-text-2)', margin: '0 0 1rem 0', lineHeight: 1.6 }}>{stack}</p>}
-                      {b.excerpt && <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>{b.excerpt}</span>}
-                    </div>
-                  </a>
+                  <ScrollReveal key={b.title} delay={i * 80}>
+                    <a href={href} className="f-card-link" target="_blank" rel="noreferrer" style={{ display: 'block', height: '100%' }}>
+                      <div className={`f-card f-card-hover${isLive ? '' : ''}`} style={{ height: '100%', opacity: isLive ? 1 : .65 }}>
+                        {isLive
+                          ? <span className="badge-live" style={{ marginBottom: '1.25rem' }}><span className="dot" />live</span>
+                          : <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--f-text-3)', display: 'block', marginBottom: '1.25rem' }}>○ coming soon</span>
+                        }
+                        <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 800, color: 'var(--f-text-1)', margin: '0 0 .5rem 0', letterSpacing: '-.01em' }}>{b.title}</h3>
+                        {stack && <p style={{ fontSize: '.8rem', color: 'var(--f-text-2)', margin: '0 0 1rem 0', lineHeight: 1.6 }}>{stack}</p>}
+                        {b.excerpt && <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', lineHeight: 1.6 }}>{b.excerpt}</span>}
+                      </div>
+                    </a>
+                  </ScrollReveal>
                 );
               })}
             </div>
@@ -161,64 +325,101 @@ export default async function Home() {
         )}
 
         {/* Chaînes YouTube */}
-        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1rem' }}>▶ Chaînes YouTube francophones</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '1rem', marginBottom: '3rem' }}>
-          {youtubeChannels.map(ch => (
-            <a key={ch.name} href={ch.url} className="f-card-link" target="_blank" rel="noreferrer">
-              <div className="f-card f-card-hover" style={{ padding: '1.1rem 1.25rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem', marginBottom: '.75rem' }}>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: '50%', background: 'rgba(239,68,68,.12)', color: '#ef4444', fontSize: '.75rem', flexShrink: 0 }}>▶</span>
-                  <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: '.9rem', color: 'var(--f-text-1)' }}>{ch.name}</span>
+        <ScrollReveal>
+          <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '.6rem' }}>
+            <span style={{ display: 'inline-block', width: 18, height: 1.5, background: '#ef4444', borderRadius: 2 }} />
+            Chaînes YouTube francophones
+          </p>
+        </ScrollReveal>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '1rem', marginBottom: '3.5rem' }}>
+          {youtubeChannels.map((ch, i) => (
+            <ScrollReveal key={ch.name} delay={i * 60}>
+              <a href={ch.url} className="f-card-link" target="_blank" rel="noreferrer" style={{ display: 'block', height: '100%' }}>
+                <div className="f-card f-card-hover" style={{ padding: '1.25rem', height: '100%' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '.65rem', marginBottom: '.85rem' }}>
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                      width: 30, height: 30, borderRadius: '50%',
+                      background: 'rgba(239,68,68,.12)', color: '#ef4444', fontSize: '.75rem', flexShrink: 0,
+                    }}>▶</span>
+                    <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: '.9rem', color: 'var(--f-text-1)', letterSpacing: '-.01em' }}>{ch.name}</span>
+                  </div>
+                  <p style={{ fontSize: '.78rem', color: 'var(--f-text-2)', lineHeight: 1.65, margin: '0 0 .85rem 0' }}>{ch.description}</p>
+                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)' }}>{ch.subs}</span>
                 </div>
-                <p style={{ fontSize: '.78rem', color: 'var(--f-text-2)', lineHeight: 1.55, margin: '0 0 .75rem 0' }}>{ch.description}</p>
-                <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)' }}>{ch.subs}</span>
-              </div>
-            </a>
+              </a>
+            </ScrollReveal>
           ))}
         </div>
 
         {/* Articles récents */}
         {lastArticles.length > 0 && (
           <>
-            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1rem' }}>✍ Articles récents</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-              {lastArticles.map(a => (
-                <a key={a.slug} href={a.external_url} className="f-card-link" target="_blank" rel="noreferrer">
-                  <div className="f-card f-card-hover" style={{ padding: '1.1rem 1.25rem' }}>
-                    <div style={{ display: 'flex', gap: '.5rem', marginBottom: '.75rem', flexWrap: 'wrap' }}>
-                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--f-sky)', border: '1px solid var(--f-sky-border)', background: 'var(--f-sky-bg)', padding: '2px 7px', borderRadius: 2 }}>{a.category}</span>
-                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 7px', borderRadius: 2 }}>{a.source}</span>
+            <ScrollReveal>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '.6rem' }}>
+                <span style={{ display: 'inline-block', width: 18, height: 1.5, background: 'var(--f-sky)', borderRadius: 2 }} />
+                Articles récents
+              </p>
+            </ScrollReveal>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
+              {lastArticles.map((a, i) => (
+                <ScrollReveal key={a.slug} delay={i * 80}>
+                  <a href={a.external_url} className="f-card-link" target="_blank" rel="noreferrer" style={{ display: 'block', height: '100%' }}>
+                    <div className="f-card f-card-hover" style={{ padding: '1.25rem', height: '100%', display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+                      <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap' }}>
+                        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-sky)', border: '1px solid var(--f-sky-border)', background: 'var(--f-sky-bg)', padding: '2px 8px', borderRadius: 4 }}>{a.category}</span>
+                        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 8px', borderRadius: 4 }}>{a.source}</span>
+                      </div>
+                      <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '.94rem', fontWeight: 800, color: 'var(--f-text-1)', margin: 0, lineHeight: 1.4, letterSpacing: '-.01em', flex: 1 }}>{a.title}</h3>
+                      {a.excerpt && (
+                        <p style={{ fontSize: '.78rem', color: 'var(--f-text-2)', lineHeight: 1.65, margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{a.excerpt}</p>
+                      )}
+                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)' }}>
+                        {a.author}{a.author_country ? ` · ${a.author_country}` : ''}
+                      </span>
                     </div>
-                    <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '.92rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0', lineHeight: 1.35 }}>{a.title}</h3>
-                    <p style={{ fontSize: '.78rem', color: 'var(--f-text-2)', lineHeight: 1.55, margin: '0 0 .75rem 0', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{a.excerpt}</p>
-                    <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)' }}>{a.author} {a.author_country && `· ${a.author_country}`}</span>
-                  </div>
-                </a>
+                  </a>
+                </ScrollReveal>
               ))}
             </div>
-            <Link href="/articles" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-sky)', textDecoration: 'none' }}>
-              Voir tous les articles →
-            </Link>
+            <ScrollReveal>
+              <Link href="/articles" className="arrow-link">
+                Voir tous les articles <span>→</span>
+              </Link>
+            </ScrollReveal>
           </>
         )}
       </section>
 
-      <hr className="f-hr" />
+      <hr className="f-hr-gradient" />
 
-      {/* COMMUNAUTÉ */}
-      <section style={{ padding: '5.5rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
-        <div className="community-strip" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '2rem', flexWrap: 'wrap' }}>
-          <div style={{ maxWidth: 560 }}>
-            <span className="f-label" style={{ marginBottom: '.6rem' }}>// la communauté</span>
-            <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 800, color: 'var(--f-text-1)', margin: '.4rem 0 .8rem 0', lineHeight: 1.15 }}>
-              Une communauté de praticiens tech francophones qui construisent.
-            </h2>
-            <p style={{ fontSize: '.9rem', color: 'var(--f-text-2)', lineHeight: 1.8, margin: 0 }}>
-              Une communauté construite autour de ceux qui font — pas de ceux qui parlent.
-            </p>
+      {/* ── COMMUNAUTÉ CTA ───────────────────────────────────────── */}
+      <section style={{ padding: '6rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
+        <ScrollReveal>
+          <div className="community-cta" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '2rem', flexWrap: 'wrap' }}>
+            <div style={{ maxWidth: 580 }}>
+              <span className="f-label" style={{ marginBottom: '.75rem' }}>// la communauté</span>
+              <h2 style={{
+                fontFamily: "'Syne', sans-serif",
+                fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
+                fontWeight: 800,
+                color: 'var(--f-text-1)',
+                margin: '.4rem 0 1rem 0',
+                lineHeight: 1.2,
+                letterSpacing: '-.025em',
+              }}>
+                Une communauté de praticiens<br />
+                tech francophones qui construisent.
+              </h2>
+              <p style={{ fontSize: '.92rem', color: 'var(--f-text-2)', lineHeight: 1.85, margin: 0 }}>
+                Construite autour de ceux qui font — pas de ceux qui parlent.
+              </p>
+            </div>
+            <Link href="/praticiens" className="btn-f btn-f-primary" style={{ flexShrink: 0, fontSize: '.78rem' }}>
+              Voir la communauté →
+            </Link>
           </div>
-          <Link href="/praticiens" className="btn-f btn-f-primary" style={{ flexShrink: 0 }}>Voir la communauté →</Link>
-        </div>
+        </ScrollReveal>
       </section>
     </>
   );

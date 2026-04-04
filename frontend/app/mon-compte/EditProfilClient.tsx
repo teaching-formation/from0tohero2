@@ -17,8 +17,8 @@ const PAYS_AFRIQUE = [
   'Italie','Espagne','Portugal','Pays-Bas','Suède','Norvège','Autre',
 ];
 
-const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
-const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cyber-Sécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
+const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded','autre'];
+const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cyber-Sécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT', autre:'Autre' };
 
 const BADGES = [
   { value: 'MENTOR',      label: 'Mentor',      desc: 'Tu accompagnes d\'autres praticiens',     color: 'var(--f-orange)', border: 'rgba(249,115,22,.35)', bg: 'rgba(249,115,22,.08)' },
@@ -80,6 +80,7 @@ export default function EditProfilClient({ praticien: p }: Props) {
   });
   const [selectedBadges,  setSelectedBadges]  = useState<string[]>(initBadges);
   const [certifications,  setCertifications]  = useState(String(p.certifications || ''));
+  const [categoryAutre,   setCategoryAutre]   = useState(String(p.category_label || ''));
   const [selectedSkills, setSelectedSkills] = useState<string[]>(initStack);
   const [customSkill,    setCustomSkill]    = useState('');
   const [activeSocials,  setActiveSocials]  = useState<string[]>(
@@ -138,7 +139,8 @@ export default function EditProfilClient({ praticien: p }: Props) {
         badges:         selectedBadges,
         certifications: certifications || null,
         stack:          selectedSkills,
-        skills: buildSkillsPayload(),
+        skills:         buildSkillsPayload(),
+        category_label: form.categories.includes('autre') ? (categoryAutre || null) : null,
       }),
     });
     setLoading(false);
@@ -204,6 +206,15 @@ export default function EditProfilClient({ praticien: p }: Props) {
             </button>
           ))}
         </div>
+        {form.categories.includes('autre') && (
+          <input
+            className="f-input"
+            placeholder="Précise ta catégorie (ex: QA, Product, FinTech…)"
+            value={categoryAutre}
+            onChange={e => setCategoryAutre(e.target.value)}
+            style={{ maxWidth: '100%', marginTop: '.5rem' }}
+          />
+        )}
       </Field>
 
       {/* Badges */}

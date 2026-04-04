@@ -10,17 +10,27 @@ import { BADGE_STYLES } from '@/lib/badges';
 const PAGE_SIZE = 12;
 
 const FILTERS = ['all','data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded','autre'];
-const FILTER_LABELS: Record<string,string> = { all:'Tous', data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cybersécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT', autre:'Autre' };
+const FILTER_LABELS: Record<string,string> = {
+  all:'Tous', data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA',
+  cyber:'Cybersécurité', frontend:'Frontend', backend:'Backend',
+  fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT', autre:'Autre',
+};
+
+const CAT_COLORS: Record<string, string> = {
+  data: 'var(--f-sky)', devops: '#a78bfa', cloud: 'var(--f-sky)',
+  ia: 'var(--f-orange)', cyber: '#f87171', frontend: 'var(--f-green)',
+  backend: '#a78bfa', fullstack: 'var(--f-orange)', mobile: 'var(--f-green)',
+  web3: '#a78bfa', embedded: 'var(--f-sky)', autre: 'var(--f-text-3)',
+};
 
 export default function PraticiensPage() {
   const [praticiens, setPraticiens] = useState<Praticien[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]       = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
   const [activeCountry, setActiveCountry] = useState('all');
-  const [search, setSearch] = useState('');
-  const [visible, setVisible] = useState(PAGE_SIZE);
+  const [search, setSearch]         = useState('');
+  const [visible, setVisible]       = useState(PAGE_SIZE);
 
-  // Reset pagination quand filtre ou recherche change
   useEffect(() => { setVisible(PAGE_SIZE); }, [activeFilter, activeCountry, search]);
 
   useEffect(() => {
@@ -32,7 +42,6 @@ export default function PraticiensPage() {
       .then(({ data }) => { setPraticiens(data ?? []); setLoading(false); });
   }, []);
 
-  // Liste des pays présents, triés par nom normalisé
   const countries = Array.from(
     new Map(
       praticiens
@@ -57,17 +66,37 @@ export default function PraticiensPage() {
     }
     if (search) {
       const q = search.toLowerCase();
-      return p.name.toLowerCase().includes(q) || p.role.toLowerCase().includes(q) || p.stack.join(' ').toLowerCase().includes(q);
+      return (
+        p.name.toLowerCase().includes(q) ||
+        p.role.toLowerCase().includes(q) ||
+        p.stack.join(' ').toLowerCase().includes(q)
+      );
     }
     return true;
   });
 
   return (
-    <div style={{ padding: '4rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
-      <div style={{ marginBottom: '2.5rem' }}>
-        <span className="f-label" style={{ marginBottom: '.5rem' }}>// praticiens</span>
-        <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(1.9rem,4vw,2.8rem)', fontWeight: 800, color: 'var(--f-text-1)', margin: '.4rem 0 .6rem 0' }}>Les gens qui construisent</h1>
-        <p style={{ color: 'var(--f-text-3)', fontSize: '.88rem', margin: '0 0 2rem 0' }}>Profils de praticiens tech — Data, DevOps, Cloud, IA, Cybersécurité, Frontend, Backend, Mobile, Web3 et plus.</p>
+    <div style={{ padding: '4.5rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
+
+      {/* ── Header ── */}
+      <div style={{ marginBottom: '3rem' }}>
+        <span className="f-label" style={{ marginBottom: '.6rem' }}>// praticiens</span>
+        <h1 style={{
+          fontFamily: "'Syne', sans-serif",
+          fontSize: 'clamp(2rem, 4.5vw, 3rem)',
+          fontWeight: 800,
+          color: 'var(--f-text-1)',
+          margin: '.4rem 0 .75rem 0',
+          letterSpacing: '-.03em',
+          lineHeight: 1.1,
+        }}>
+          Les gens qui construisent
+        </h1>
+        <p style={{ color: 'var(--f-text-3)', fontSize: '.88rem', margin: '0 0 2.25rem 0', lineHeight: 1.7 }}>
+          Data · DevOps · Cloud · IA · Cybersécurité · Frontend · Backend · Mobile · Web3
+        </p>
+
+        {/* Recherche + pays */}
         <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
           <input
             className="f-input"
@@ -101,69 +130,200 @@ export default function PraticiensPage() {
             ))}
           </select>
         </div>
+
+        {/* Filtres catégorie */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
           {FILTERS.map(f => (
-            <button key={f} className={`filter-pill${activeFilter === f ? ' active' : ''}`} onClick={() => setActiveFilter(f)}>{FILTER_LABELS[f]}</button>
+            <button
+              key={f}
+              className={`filter-pill${activeFilter === f ? ' active' : ''}`}
+              onClick={() => setActiveFilter(f)}
+            >
+              {FILTER_LABELS[f]}
+            </button>
           ))}
         </div>
       </div>
 
+      {/* ── Grille ── */}
       {loading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(290px,1fr))', gap: '1.25rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
           {Array.from({ length: 6 }).map((_, i) => <SkeletonPraticienCard key={i} />)}
         </div>
       ) : filtered.length === 0 ? (
-        <p style={{ color: 'var(--f-text-3)', fontFamily: "'Geist Mono', monospace", fontSize: '.85rem', marginTop: '2rem' }}>Aucun praticien dans cette catégorie.</p>
+        <div style={{
+          textAlign: 'center', padding: '5rem 0',
+          fontFamily: "'Geist Mono', monospace", fontSize: '.85rem', color: 'var(--f-text-3)',
+        }}>
+          Aucun praticien dans cette catégorie.
+        </div>
       ) : (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(290px,1fr))', gap: '1.25rem' }}>
-            {filtered.slice(0, visible).map(p => (
-              <Link key={p.slug} href={`/praticiens/${p.slug}`} className="f-card-link">
-                <div className="f-card f-card-hover" style={{ display: 'flex', flexDirection: 'column', gap: '.85rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '.85rem' }}>
-                      <Avatar name={p.name} photoUrl={p.photo_url} size={52} radius={10} fontSize=".78rem" />
-                      <div>
-                        <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '.98rem', fontWeight: 700, color: 'var(--f-text-1)', margin: 0 }}>{p.name}</p>
-                        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', color: 'var(--f-sky)', margin: '.15rem 0 0 0' }}>{p.role}</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
+            {filtered.slice(0, visible).map(p => {
+              const cats: string[] = (p as any).categories ?? (p.category ? [p.category] : []);
+              const primaryCat = cats[0] || 'autre';
+              const catColor = CAT_COLORS[primaryCat] || 'var(--f-text-3)';
+              const { flag, name: countryName } = getCountryDisplay(p.country);
+              const countryDisplay = flag || countryName || p.country;
+
+              return (
+                <Link key={p.slug} href={`/praticiens/${p.slug}`} className="f-card-link">
+                  <article className="f-card f-card-hover praticien-card" style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1rem',
+                    padding: '1.5rem',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}>
+                    {/* Bande couleur catégorie */}
+                    <div style={{
+                      position: 'absolute',
+                      top: 0, left: 0, right: 0,
+                      height: 3,
+                      background: `linear-gradient(90deg, ${catColor}, transparent)`,
+                      borderRadius: '12px 12px 0 0',
+                      opacity: .8,
+                    }} />
+
+                    {/* Header : avatar + nom + pays */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '.75rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '.9rem' }}>
+                        <Avatar name={p.name} photoUrl={p.photo_url} size={48} radius={10} fontSize=".75rem" />
+                        <div>
+                          <p style={{
+                            fontFamily: "'Syne', sans-serif",
+                            fontSize: '1rem',
+                            fontWeight: 800,
+                            color: 'var(--f-text-1)',
+                            margin: 0,
+                            letterSpacing: '-.01em',
+                            lineHeight: 1.2,
+                          }}>{p.name}</p>
+                          <p style={{
+                            fontFamily: "'Geist Mono', monospace",
+                            fontSize: '.67rem',
+                            color: catColor,
+                            margin: '.2rem 0 0 0',
+                            lineHeight: 1.3,
+                            opacity: .9,
+                          }}>{p.role}</p>
+                        </div>
                       </div>
-                    </div>
-                    {(() => { const { flag, name } = getCountryDisplay(p.country); const display = flag || name || p.country; return (
-                      <span title={name || p.country} style={{ fontSize: flag ? '1.1rem' : '.72rem', flexShrink: 0, fontFamily: flag ? 'inherit' : "'Geist Mono', monospace", color: flag ? 'inherit' : 'var(--f-text-3)' }}>
-                        {display}
+                      <span title={countryName || p.country} style={{
+                        fontSize: flag ? '1.15rem' : '.7rem',
+                        flexShrink: 0,
+                        fontFamily: flag ? 'inherit' : "'Geist Mono', monospace",
+                        color: flag ? 'inherit' : 'var(--f-text-3)',
+                        marginTop: '.1rem',
+                      }}>
+                        {countryDisplay}
                       </span>
-                    ); })()}
-                  </div>
-
-                  {p.badges?.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem' }}>
-                      {p.badges.map(b => {
-                        const c = BADGE_STYLES[b] || { color: 'var(--f-text-3)', border: 'var(--f-border)', bg: 'var(--f-surface)' };
-                        return <span key={b} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.08em', color: c.color, border: `1px solid ${c.border}`, background: c.bg, padding: '2px 8px', borderRadius: 4 }}>{b}</span>;
-                      })}
                     </div>
-                  )}
 
-                  <p style={{ fontSize: '.83rem', color: 'var(--f-text-2)', lineHeight: 1.7, margin: 0 }}>{p.bio}</p>
+                    {/* Badges */}
+                    {p.badges?.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.3rem' }}>
+                        {p.badges.map(b => {
+                          const c = BADGE_STYLES[b] || { color: 'var(--f-text-3)', border: 'var(--f-border)', bg: 'var(--f-surface)' };
+                          return (
+                            <span key={b} style={{
+                              fontFamily: "'Geist Mono', monospace",
+                              fontSize: '.56rem',
+                              letterSpacing: '.1em',
+                              color: c.color,
+                              border: `1px solid ${c.border}`,
+                              background: c.bg,
+                              padding: '2px 9px',
+                              borderRadius: 99,
+                              fontWeight: 600,
+                              textTransform: 'uppercase',
+                            }}>{b}</span>
+                          );
+                        })}
+                      </div>
+                    )}
 
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem' }}>
-                    {p.stack.slice(0, 6).map(s => <span key={s} className="f-tag">{s}</span>)}
-                    {p.stack.length > 6 && <span className="f-tag">+{p.stack.length - 6}</span>}
-                  </div>
+                    {/* Bio */}
+                    {p.bio && (
+                      <p style={{
+                        fontSize: '.83rem',
+                        color: 'var(--f-text-2)',
+                        lineHeight: 1.75,
+                        margin: 0,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        flex: 1,
+                      }}>{p.bio}</p>
+                    )}
 
-                </div>
-              </Link>
-            ))}
+                    {/* Stack */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.3rem', marginTop: 'auto' }}>
+                      {p.stack.slice(0, 5).map(s => (
+                        <span key={s} className="f-tag">{s}</span>
+                      ))}
+                      {p.stack.length > 5 && (
+                        <span className="f-tag" style={{ color: 'var(--f-text-3)' }}>+{p.stack.length - 5}</span>
+                      )}
+                    </div>
+
+                    {/* Footer catégorie */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      paddingTop: '.75rem',
+                      borderTop: '1px solid var(--f-border)',
+                      marginTop: '.25rem',
+                    }}>
+                      <div style={{ display: 'flex', gap: '.3rem', flexWrap: 'wrap' }}>
+                        {cats.slice(0, 3).map(cat => (
+                          <span key={cat} style={{
+                            fontFamily: "'Geist Mono', monospace",
+                            fontSize: '.56rem',
+                            letterSpacing: '.08em',
+                            textTransform: 'uppercase',
+                            color: CAT_COLORS[cat] || 'var(--f-text-3)',
+                            opacity: .8,
+                          }}>{cat}</span>
+                        ))}
+                        {cats.length > 3 && (
+                          <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.56rem', color: 'var(--f-text-3)' }}>+{cats.length - 3}</span>
+                        )}
+                      </div>
+                      <span style={{
+                        fontFamily: "'Geist Mono', monospace",
+                        fontSize: '.62rem',
+                        color: catColor,
+                        opacity: .7,
+                        letterSpacing: '.04em',
+                      }}>voir →</span>
+                    </div>
+                  </article>
+                </Link>
+              );
+            })}
           </div>
 
           {visible < filtered.length && (
-            <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
+            <div style={{ textAlign: 'center', marginTop: '3rem' }}>
               <button className="btn-f btn-f-secondary" onClick={() => setVisible(v => v + PAGE_SIZE)}>
                 Charger plus ({filtered.length - visible} restants) →
               </button>
             </div>
           )}
-          <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', textAlign: 'center', marginTop: '1rem' }}>
+
+          <p style={{
+            fontFamily: "'Geist Mono', monospace",
+            fontSize: '.63rem',
+            color: 'var(--f-text-3)',
+            textAlign: 'center',
+            marginTop: '1.25rem',
+            letterSpacing: '.06em',
+          }}>
             {Math.min(visible, filtered.length)} / {filtered.length} praticiens
           </p>
         </>
@@ -171,4 +331,3 @@ export default function PraticiensPage() {
     </div>
   );
 }
-

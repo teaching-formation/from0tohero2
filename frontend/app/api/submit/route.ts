@@ -56,9 +56,10 @@ export async function POST(req: Request) {
         website_url:   payload.website_url   || null,
         twitter_url:   payload.twitter_url   || null,
         whatsapp_url:  payload.whatsapp_url  || null,
-        user_id:       user?.id || null,
+        user_id:        user?.id || null,
         badges:         [],
         certifications: payload.certifications || null,
+        category_label: cats.includes('autre') ? (payload.category_label || null) : null,
         photo_url:      null,
         status:         'approved',
       });
@@ -132,11 +133,16 @@ export async function POST(req: Request) {
         .from('praticiens').select('id')
         .eq('slug', String(payload.username || '')).maybeSingle();
 
+      const evTypes: string[] = Array.isArray(payload.types) && payload.types.length > 0
+        ? payload.types
+        : [payload.type || 'autre'];
+      const evType = evTypes[0] || 'autre';
       const { error } = await supabaseAdmin.from('evenements').insert({
         slug,
         title:        payload.title,
-        type:         payload.type,
-        type_label:   payload.type === 'autre' ? (payload.type_autre || null) : null,
+        type:         evType,
+        types:        evTypes,
+        type_label:   evTypes.includes('autre') ? (payload.type_label || payload.type_autre || null) : null,
         lieu:         payload.lieu    || null,
         pays:         payload.pays    || null,
         online:       payload.online  || false,

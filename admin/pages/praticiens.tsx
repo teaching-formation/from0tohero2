@@ -3,6 +3,23 @@ import AuthGuard, { getToken } from '@/components/AuthGuard';
 import EditModal from '@/components/EditModal';
 import AddModal  from '@/components/AddModal';
 
+const PAYS = [
+  'Afrique du Sud','Algérie','Angola','Bénin','Botswana','Burkina Faso','Burundi',
+  'Cabo Verde','Cameroun','Comores','Congo (Brazzaville)','Congo (RDC)',
+  "Côte d'Ivoire",'Djibouti','Égypte','Érythrée','Eswatini','Éthiopie',
+  'Gabon','Gambie','Ghana','Guinée','Guinée-Bissau','Guinée équatoriale',
+  'Kenya','Lesotho','Liberia','Libye','Madagascar','Malawi','Mali','Maroc',
+  'Maurice','Mauritanie','Mozambique','Namibie','Niger','Nigeria','Ouganda',
+  'Rwanda','São Tomé-et-Príncipe','Sénégal','Seychelles','Sierra Leone',
+  'Somalie','Soudan','Soudan du Sud','Tanzanie','Tchad','Togo','Tunisie',
+  'Zambie','Zimbabwe',
+  '─── Diaspora ───',
+  'France','Belgique','Canada','États-Unis','Royaume-Uni','Suisse','Allemagne',
+  'Italie','Espagne','Portugal','Pays-Bas','Suède','Norvège','Autre',
+];
+
+const CAT_OPTIONS = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded','autre'];
+
 type Row = {
   id: string;
   slug: string;
@@ -17,17 +34,18 @@ type Row = {
 };
 
 const EDIT_FIELDS = [
-  { key: 'name',         label: 'Nom complet' },
-  { key: 'role',         label: 'Rôle / titre' },
-  { key: 'country',      label: 'Pays' },
-  { key: 'city',         label: 'Ville' },
-  { key: 'category',     label: 'Catégorie', type: 'select' as const, options: ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'] },
-  { key: 'bio',          label: 'Bio', type: 'textarea' as const },
-  { key: 'stack',        label: 'Stack (séparé par ,)' },
-  { key: 'badges',       label: 'Badges (séparé par ,)', type: 'array' as const },
-  { key: 'linkedin_url', label: 'LinkedIn', type: 'url' as const },
-  { key: 'github_url',   label: 'GitHub', type: 'url' as const },
-  { key: 'status',       label: 'Statut', type: 'select' as const, options: ['pending','approved','rejected'] },
+  { key: 'name',           label: 'Nom complet' },
+  { key: 'role',           label: 'Rôle / titre' },
+  { key: 'country',        label: 'Pays', type: 'select' as const, options: PAYS },
+  { key: 'city',           label: 'Ville' },
+  { key: 'category',       label: 'Catégorie', type: 'select' as const, options: CAT_OPTIONS },
+  { key: 'category_label', label: 'Catégorie précisée (si Autre)' },
+  { key: 'bio',            label: 'Bio', type: 'textarea' as const },
+  { key: 'stack',          label: 'Stack (séparé par ,)' },
+  { key: 'badges',         label: 'Badges (séparé par ,)', type: 'array' as const },
+  { key: 'linkedin_url',   label: 'LinkedIn', type: 'url' as const },
+  { key: 'github_url',     label: 'GitHub', type: 'url' as const },
+  { key: 'status',         label: 'Statut', type: 'select' as const, options: ['pending','approved','rejected'] },
 ];
 
 const STATUS_FILTERS = ['all', 'approved', 'pending', 'rejected'];
@@ -192,17 +210,18 @@ function PraticiensPage() {
       {adding && (
         <AddModal table="praticiens"
           fields={[
-            { key: 'name',         label: 'Nom complet', required: true },
-            { key: 'role',         label: 'Rôle / titre', required: true },
-            { key: 'country',      label: 'Pays' },
-            { key: 'category',     label: 'Catégorie', type: 'select', options: ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'] },
-            { key: 'bio',          label: 'Bio', type: 'textarea' },
-            { key: 'stack',        label: 'Stack (séparé par ,)' },
-            { key: 'linkedin_url', label: 'LinkedIn', type: 'url' },
-            { key: 'github_url',   label: 'GitHub', type: 'url' },
-            { key: 'youtube_url',  label: 'YouTube', type: 'url' },
-            { key: 'website_url',  label: 'Site web', type: 'url' },
-            { key: 'status',       label: 'Statut', type: 'select', options: ['approved','pending','rejected'] },
+            { key: 'name',           label: 'Nom complet', required: true },
+            { key: 'role',           label: 'Rôle / titre', required: true },
+            { key: 'country',        label: 'Pays', type: 'select', options: PAYS },
+            { key: 'category',       label: 'Catégorie', type: 'select', options: CAT_OPTIONS },
+            { key: 'category_label', label: 'Catégorie précisée (si Autre)' },
+            { key: 'bio',            label: 'Bio', type: 'textarea' },
+            { key: 'stack',          label: 'Stack (séparé par ,)' },
+            { key: 'linkedin_url',   label: 'LinkedIn', type: 'url' },
+            { key: 'github_url',     label: 'GitHub', type: 'url' },
+            { key: 'youtube_url',    label: 'YouTube', type: 'url' },
+            { key: 'website_url',    label: 'Site web', type: 'url' },
+            { key: 'status',         label: 'Statut', type: 'select', options: ['approved','pending','rejected'] },
           ]}
           defaults={{ status: 'approved' }}
           onClose={() => setAdding(false)} onCreated={onCreated} />
