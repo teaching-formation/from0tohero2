@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 
 const PAYS_AFRIQUE = [
@@ -90,6 +90,25 @@ export default function EditProfilClient({ praticien: p }: Props) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  // ── Photo de profil ──
+  const [photoFile,    setPhotoFile]    = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(String(p.photo_url || '') || null);
+  const [photoError,   setPhotoError]   = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { setPhotoError('Max 2 Mo.'); return; }
+    if (!['image/jpeg','image/png','image/webp'].includes(file.type)) {
+      setPhotoError('Format : JPG, PNG ou WebP.'); return;
+    }
+    setPhotoError('');
+    if (photoPreview && photoPreview.startsWith('blob:')) URL.revokeObjectURL(photoPreview);
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  }
+
   function set(key: string, val: string | string[]) {
     setForm(f => ({ ...f, [key]: val }));
     if (errors[key]) setErrors(e => ({ ...e, [key]: '' }));
@@ -131,6 +150,23 @@ export default function EditProfilClient({ praticien: p }: Props) {
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setLoading(true);
 
+    // ── Upload photo si un nouveau fichier a été choisi ──
+    let finalPhotoUrl: string | null = photoPreview && !photoPreview.startsWith('blob:') ? photoPreview : (p.photo_url ? String(p.photo_url) : null);
+    if (photoFile) {
+      const fd = new FormData();
+      fd.append('file', photoFile);
+      fd.append('username', String(p.slug || p.id || Date.now()));
+      const upRes = await fetch('/api/upload-avatar', { method: 'POST', body: fd });
+      if (!upRes.ok) {
+        const { error } = await upRes.json().catch(() => ({ error: 'Erreur upload' }));
+        setPhotoError(error || "Erreur lors de l'upload.");
+        setLoading(false);
+        return;
+      }
+      const { url } = await upRes.json();
+      finalPhotoUrl = url;
+    }
+
     const res = await fetch('/api/profile/update', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -141,6 +177,7 @@ export default function EditProfilClient({ praticien: p }: Props) {
         stack:          selectedSkills,
         skills:         buildSkillsPayload(),
         category_label: form.categories.includes('autre') ? (categoryAutre || null) : null,
+        photo_url:      finalPhotoUrl,
       }),
     });
     setLoading(false);
@@ -164,8 +201,63 @@ export default function EditProfilClient({ praticien: p }: Props) {
     );
   }
 
+  const initials = form.name.trim()
+    ? form.name.trim().split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
+    : '?';
+
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+      {/* ── Photo de profil ── */}
+      <div>
+        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-2)', margin: '0 0 .85rem 0', letterSpacing: '.04em' }}>
+          Photo de profil <span style={{ color: 'var(--f-text-3)' }}>(optionnel)</span>
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            title="Choisir une photo"
+            style={{
+              width: 72, height: 72, borderRadius: 14, flexShrink: 0,
+              background: photoPreview ? 'transparent' : 'var(--f-sky-bg)',
+              border: photoPreview ? '2px solid var(--f-sky)' : '2px dashed var(--f-border)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', overflow: 'hidden',
+              transition: 'border-color .2s, box-shadow .2s',
+              position: 'relative',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--f-sky)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--f-sky-bg)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = photoPreview ? 'var(--f-sky)' : 'var(--f-border)'; e.currentTarget.style.boxShadow = 'none'; }}
+          >
+            {photoPreview ? (
+              <img src={photoPreview} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: '1.3rem', color: 'var(--f-sky)', userSelect: 'none' }}>
+                {initials}
+              </span>
+            )}
+          </div>
+          <div>
+            <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center', marginBottom: '.45rem' }}>
+              <button type="button" onClick={() => fileInputRef.current?.click()} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem', padding: '.4rem .9rem' }}>
+                {photoPreview ? 'Changer la photo' : 'Choisir une photo'}
+              </button>
+              {photoPreview && (
+                <button type="button"
+                  onClick={() => { setPhotoFile(null); if (photoPreview?.startsWith('blob:')) URL.revokeObjectURL(photoPreview); setPhotoPreview(null); setPhotoError(''); }}
+                  style={{ background: 'none', border: 'none', color: 'var(--f-text-3)', fontSize: '.68rem', cursor: 'pointer', fontFamily: "'Geist Mono', monospace" }}>
+                  Retirer
+                </button>
+              )}
+            </div>
+            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', margin: 0 }}>
+              JPG · PNG · WebP &nbsp;·&nbsp; max 2 Mo
+            </p>
+            {photoError && <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.63rem', color: '#f87171', margin: '.3rem 0 0' }}>{photoError}</p>}
+          </div>
+        </div>
+        <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} onChange={handlePhotoChange} />
+      </div>
 
       <Field label="Nom complet" required error={errors.name}>
         <input className="f-input" value={form.name} onChange={e => set('name', e.target.value)} style={{ maxWidth: '100%' }} />
