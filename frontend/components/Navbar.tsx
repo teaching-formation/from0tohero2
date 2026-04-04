@@ -37,9 +37,9 @@ export default function Navbar() {
   };
 
   const links = [
-    { href: '/articles',     label: 'Articles' },
     { href: '/praticiens',   label: 'Praticiens' },
     { href: '/realisations', label: 'Réalisations' },
+    { href: '/articles',     label: 'Articles' },
     { href: '/evenements',   label: 'Événements' },
   ];
 
