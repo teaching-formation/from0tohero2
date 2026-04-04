@@ -73,6 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       youtube_url:    data.youtube_url || null,
       website_url:    data.website_url || null,
       twitter_url:    data.twitter_url || null,
+      photo_url:      data.photo_url || null,
       status:         data.status || 'approved',
     }).select().single();
     if (error) return res.status(500).json({ error: error.message });

@@ -159,7 +159,7 @@ function PraticiensPage() {
                       {/* Avatar : photo ou initiales */}
                       {r.photo_url ? (
                         <img
-                          src={r.photo_url}
+                          src={String(r.photo_url)}
                           alt={r.name}
                           style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border)' }}
                         />
@@ -232,6 +232,7 @@ function PraticiensPage() {
           fields={[
             { key: 'name',           label: 'Nom complet', required: true },
             { key: 'role',           label: 'Rôle / titre', required: true },
+            { key: 'photo_url',      label: 'Photo URL', type: 'url' as const },
             { key: 'country',        label: 'Pays', type: 'select', options: PAYS },
             { key: 'category',       label: 'Catégorie', type: 'select', options: CAT_OPTIONS },
             { key: 'category_label', label: 'Catégorie précisée (si Autre)' },
