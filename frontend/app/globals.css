@@ -13,8 +13,8 @@ body {
 
 /* ── CSS Variables — Light ── */
 :root {
-  --f-bg:           #ffffff;
-  --f-surface:      #f8fafc;
+  --f-bg:           #f1f5f9;
+  --f-surface:      #ffffff;
   --f-card:         #ffffff;
   --f-border:       #e2e8f0;
   --f-border-2:     #cbd5e1;
@@ -28,7 +28,7 @@ body {
   --f-green:        #10b981;
   --f-green-bg:     rgba(16,185,129,.1);
   --f-green-border: rgba(16,185,129,.3);
-  --f-dot:          #cbd5e1;
+  --f-dot:          #94a3b8;
   --f-shadow-sm:    0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
   --f-shadow-md:    0 4px 16px rgba(0,0,0,.08);
   --f-shadow-sky:   0 8px 28px rgba(14,165,233,.15);
@@ -53,7 +53,7 @@ body {
   --f-green:        #34d399;
   --f-green-bg:     rgba(52,211,153,.1);
   --f-green-border: rgba(52,211,153,.3);
-  --f-dot:          #21262d;
+  --f-dot:          #2d3748;
   --f-shadow-sm:    0 1px 3px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.2);
   --f-shadow-md:    0 4px 16px rgba(0,0,0,.3);
   --f-shadow-sky:   0 8px 28px rgba(56,189,248,.12);
@@ -78,7 +78,7 @@ body {
     --f-green:        #34d399;
     --f-green-bg:     rgba(52,211,153,.1);
     --f-green-border: rgba(52,211,153,.3);
-    --f-dot:          #21262d;
+    --f-dot:          #2d3748;
     --f-shadow-sm:    0 1px 3px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.2);
     --f-shadow-md:    0 4px 16px rgba(0,0,0,.3);
     --f-shadow-sky:   0 8px 28px rgba(56,189,248,.12);
@@ -151,10 +151,11 @@ a:focus-visible {
   inset: 0;
   background-image: radial-gradient(circle, var(--f-dot) 1px, transparent 1px);
   background-size: 28px 28px;
-  opacity: .5;
+  opacity: .55;
   pointer-events: none;
   z-index: 0;
 }
+.dark .hero-dot-bg::before { opacity: .7; }
 .hero-dot-bg > * { position: relative; z-index: 1; }
 
 /* ── GRADIENT TEXT ── */

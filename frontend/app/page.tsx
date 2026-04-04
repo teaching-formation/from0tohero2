@@ -92,13 +92,13 @@ export default async function Home() {
         <div className="hero-orb" style={{
           position: 'absolute', top: '15%', right: '-8%',
           width: 520, height: 520, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(249,115,22,.07) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(249,115,22,.13) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />
         <div className="hero-orb-2" style={{
           position: 'absolute', bottom: '10%', left: '-12%',
           width: 640, height: 640, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(14,165,233,.06) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(14,165,233,.11) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />
 
@@ -174,10 +174,9 @@ export default async function Home() {
         </div>
       </section>
 
-      <hr className="f-hr-gradient" />
-
       {/* ── STATS ────────────────────────────────────────────────── */}
-      <section style={{ padding: '4rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
+      <section style={{ background: 'var(--f-surface)', padding: '4rem 6vw', borderTop: '1px solid var(--f-border)', borderBottom: '1px solid var(--f-border)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <ScrollReveal>
           <div className="stats-strip" style={{ display: 'flex', flexWrap: 'wrap', gap: '3rem' }}>
             {statItems.map((s, i) => (
@@ -211,9 +210,8 @@ export default async function Home() {
             ))}
           </div>
         </ScrollReveal>
+        </div>
       </section>
-
-      <hr className="f-hr-gradient" />
 
       {/* ── COMMENT ÇA MARCHE ────────────────────────────────────── */}
       <section style={{ padding: '6rem 6vw', maxWidth: 1200, margin: '0 auto', overflow: 'hidden' }}>
@@ -271,10 +269,9 @@ export default async function Home() {
         </div>
       </section>
 
-      <hr className="f-hr-gradient" />
-
       {/* ── RESSOURCES ───────────────────────────────────────────── */}
-      <section style={{ padding: '6rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
+      <section style={{ background: 'var(--f-surface)', padding: '6rem 6vw', borderTop: '1px solid var(--f-border)', borderBottom: '1px solid var(--f-border)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <ScrollReveal>
           <span className="f-label" style={{ marginBottom: '.6rem' }}>// ressources</span>
           <h2 style={{
@@ -389,12 +386,12 @@ export default async function Home() {
             </ScrollReveal>
           </>
         )}
+        </div>
       </section>
 
-      <hr className="f-hr-gradient" />
-
       {/* ── COMMUNAUTÉ CTA ───────────────────────────────────────── */}
-      <section style={{ padding: '6rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
+      <section style={{ padding: '6rem 6vw' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <ScrollReveal>
           <div className="community-cta" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '2rem', flexWrap: 'wrap' }}>
             <div style={{ maxWidth: 580 }}>
@@ -420,6 +417,7 @@ export default async function Home() {
             </Link>
           </div>
         </ScrollReveal>
+        </div>
       </section>
     </>
   );
