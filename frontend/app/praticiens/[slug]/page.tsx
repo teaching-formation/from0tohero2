@@ -14,6 +14,23 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
   const [realisations, setRealisations] = useState<Realisation[]>([]);
   const [loading, setLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
+  const [contactLoading, setContactLoading] = useState(false);
+
+  async function handleContact() {
+    if (!p) return;
+    setContactLoading(true);
+    try {
+      const res = await fetch(`/api/praticien-email?slug=${p.slug}`);
+      const { email, error } = await res.json();
+      if (email) {
+        window.location.href = `mailto:${email}?subject=Contact depuis from0tohero.dev`;
+      } else {
+        alert(error || 'Impossible de récupérer le contact.');
+      }
+    } finally {
+      setContactLoading(false);
+    }
+  }
 
   useEffect(() => {
     async function load() {
@@ -156,6 +173,19 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
               );
             })()}
           </div>
+
+          {/* Bouton contact — affiché seulement si le praticien a un compte et que ce n'est pas le propriétaire */}
+          {p.user_id && !isOwner && (
+            <button
+              onClick={handleContact}
+              disabled={contactLoading}
+              className="btn-f btn-f-primary"
+              style={{ marginTop: '1.25rem', fontSize: '.78rem', display: 'inline-flex', alignItems: 'center', gap: '.45rem' }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              {contactLoading ? 'Chargement…' : 'Contacter'}
+            </button>
+          )}
         </div>
       </div>
 
