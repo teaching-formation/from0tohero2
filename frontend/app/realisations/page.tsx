@@ -14,16 +14,41 @@ type RealisationWithPraticien = {
   praticiens: { name: string; slug: string } | null;
 };
 
-const TYPE_LABELS: Record<string,string> = { pipeline:'Pipeline', dashboard:'Dashboard', api:'API', bootcamp:'Bootcamp', youtube:'YouTube', app:'App', cours:'Cours', podcast:'Podcast', newsletter:'Newsletter', blog:'Blog', autre:'Autre' };
-const CAT_COLORS: Record<string,{color:string,bg:string,border:string}> = {
-  data:   { color:'#60a5fa', bg:'#60a5fa0d', border:'#60a5fa22' },
-  devops: { color:'#34d399', bg:'#34d3990d', border:'#34d39922' },
-  cloud:  { color:'#a78bfa', bg:'#a78bfa0d', border:'#a78bfa22' },
-  ia:     { color:'#f97316', bg:'#f973160d', border:'#f9731622' },
-  cyber:  { color:'#ff4560', bg:'#ff45600d', border:'#ff456022' },
-  mlops:  { color:'#fb923c', bg:'#fb923c0d', border:'#fb923c22' },
-  dev:    { color:'#f472b6', bg:'#f472b60d', border:'#f472b622' },
-  autre:  { color:'#475569', bg:'#4755690d', border:'#47556922' },
+const TYPE_LABELS: Record<string, string> = {
+  pipeline: 'Pipeline', dashboard: 'Dashboard', api: 'API',
+  bootcamp: 'Bootcamp', youtube: 'YouTube', app: 'App',
+  cours: 'Cours', podcast: 'Podcast', newsletter: 'Newsletter',
+  blog: 'Blog', autre: 'Autre',
+};
+
+const TYPE_ICONS: Record<string, string> = {
+  pipeline: '⬡', dashboard: '◧', api: '◈', bootcamp: '◎',
+  youtube: '▷', app: '⬟', cours: '◉', podcast: '◌',
+  newsletter: '◫', blog: '◪', autre: '◦',
+};
+
+const CAT_COLOR: Record<string, string> = {
+  data: 'var(--f-sky)',
+  devops: '#a78bfa',
+  cloud: 'var(--f-sky)',
+  ia: 'var(--f-orange)',
+  cyber: '#f87171',
+  frontend: 'var(--f-green)',
+  backend: '#a78bfa',
+  fullstack: 'var(--f-orange)',
+  mobile: 'var(--f-green)',
+  web3: '#a78bfa',
+  embedded: 'var(--f-sky)',
+  mlops: '#fb923c',
+  dev: '#f472b6',
+  autre: 'var(--f-text-3)',
+};
+
+const CAT_LABEL: Record<string, string> = {
+  data: 'Data', devops: 'DevOps', cloud: 'Cloud', ia: 'IA',
+  cyber: 'Cybersécurité', frontend: 'Frontend', backend: 'Backend',
+  fullstack: 'Full-Stack', mobile: 'Mobile', web3: 'Web3',
+  embedded: 'Embedded / IoT', mlops: 'MLOps', dev: 'Dev', autre: 'Autre',
 };
 
 export default function RealisationsPage() {
@@ -41,7 +66,10 @@ export default function RealisationsPage() {
       .select('*, praticiens(name, slug)')
       .eq('status', 'approved')
       .order('created_at', { ascending: false })
-      .then(({ data }) => { setRealisations((data as RealisationWithPraticien[]) ?? []); setLoading(false); });
+      .then(({ data }) => {
+        setRealisations((data as RealisationWithPraticien[]) ?? []);
+        setLoading(false);
+      });
   }, []);
 
   const filtered = realisations.filter(r => {
@@ -51,72 +79,278 @@ export default function RealisationsPage() {
   });
 
   return (
-    <div style={{ padding: '3rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
-      <div style={{ marginBottom: '2.5rem' }}>
-        <span className="f-label" style={{ marginBottom: '0.5rem' }}>// réalisations</span>
-        <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(1.8rem,4vw,2.8rem)', fontWeight: 800, color: 'var(--f-text-1)', margin: '0 0 0.5rem 0' }}>Ce que les praticiens construisent</h1>
-        <p style={{ color: 'var(--f-text-3)', fontSize: '0.9rem', margin: '0 0 2rem 0' }}>Pipelines, dashboards, APIs, bootcamps, chaînes YT — du concret.</p>
+    <div style={{ padding: '4.5rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
 
+      {/* ── Header ── */}
+      <div style={{ marginBottom: '3rem' }}>
+        <span className="f-label" style={{ marginBottom: '.6rem' }}>// réalisations</span>
+        <h1 style={{
+          fontFamily: "'Syne', sans-serif",
+          fontSize: 'clamp(2rem, 4.5vw, 3rem)',
+          fontWeight: 800,
+          color: 'var(--f-text-1)',
+          margin: '.4rem 0 .75rem 0',
+          letterSpacing: '-.03em',
+          lineHeight: 1.1,
+        }}>
+          Ce que les praticiens construisent
+        </h1>
+        <p style={{ color: 'var(--f-text-3)', fontSize: '.88rem', margin: '0 0 2.25rem 0', lineHeight: 1.7 }}>
+          Pipelines · Dashboards · APIs · Bootcamps · Chaînes YT — du concret, pas des promesses.
+        </p>
+
+        {/* Filtres type */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem', marginBottom: '.75rem' }}>
-          {['all','pipeline','dashboard','api','bootcamp','youtube','app','cours','autre'].map(t => (
-            <button key={t} className={`filter-pill${activeType === t ? ' active' : ''}`} onClick={() => setActiveType(t)}>
-              {t === 'all' ? 'Tous' : TYPE_LABELS[t] || t}
+          {['all', 'pipeline', 'dashboard', 'api', 'bootcamp', 'youtube', 'app', 'cours', 'autre'].map(t => (
+            <button
+              key={t}
+              className={`filter-pill${activeType === t ? ' active' : ''}`}
+              onClick={() => setActiveType(t)}
+            >
+              {t === 'all' ? 'Tous les types' : `${TYPE_ICONS[t] || ''} ${TYPE_LABELS[t] || t}`}
             </button>
           ))}
         </div>
+
+        {/* Filtres catégorie */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
-          {['all','data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded','autre'].map(c => (
-            <button key={c} className={`filter-pill${activeCat === c ? ' active' : ''}`} onClick={() => setActiveCat(c)}>
-              {c === 'all' ? 'Toutes catégories' : c === 'fullstack' ? 'Full-Stack' : c === 'embedded' ? 'Embedded / IoT' : c.toUpperCase()}
+          {['all', 'data', 'devops', 'cloud', 'ia', 'cyber', 'frontend', 'backend', 'fullstack', 'mobile', 'web3', 'embedded', 'autre'].map(c => (
+            <button
+              key={c}
+              className={`filter-pill${activeCat === c ? ' active' : ''}`}
+              onClick={() => setActiveCat(c)}
+            >
+              {c === 'all' ? 'Toutes catégories' : CAT_LABEL[c] || c}
             </button>
           ))}
         </div>
       </div>
 
+      {/* ── Grille ── */}
       {loading ? (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
           {Array.from({ length: 6 }).map((_, i) => <SkeletonArticleCard key={i} />)}
         </div>
       ) : filtered.length === 0 ? (
-        <p style={{ color: 'var(--f-text-3)', fontFamily: "'Geist Mono', monospace", fontSize: '0.85rem', marginTop: '2rem' }}>Aucune réalisation pour ces filtres.</p>
+        <div style={{
+          textAlign: 'center', padding: '5rem 0',
+          fontFamily: "'Geist Mono', monospace", fontSize: '.85rem', color: 'var(--f-text-3)',
+        }}>
+          Aucune réalisation pour ces filtres.
+        </div>
       ) : (
         <>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
-          {filtered.slice(0, visible).map(r => {
-            const c = CAT_COLORS[r.category] || CAT_COLORS.data;
-            return (
-              <div key={r.slug} style={{ background: 'var(--f-card)', border: '1px solid var(--f-border)', borderRadius: 6, padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', transition: 'border-color 0.2s', cursor: 'default' }}
-                onMouseOver={e => (e.currentTarget.style.borderColor = 'var(--f-sky)')}
-                onMouseOut={e => (e.currentTarget.style.borderColor = 'var(--f-border)')}>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: c.color, border: `1px solid ${c.border}`, background: c.bg, padding: '2px 8px', borderRadius: 2 }}>{r.category.toUpperCase()}</span>
-                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '0.65rem', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 8px', borderRadius: 2 }}>{TYPE_LABELS[r.type] || r.type}</span>
-                </div>
-                <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: 0 }}>{r.title}</h3>
-                {r.praticiens && (
-                  <Link href={`/praticiens/${r.praticiens.slug}`} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '0.72rem', color: 'var(--f-sky)', textDecoration: 'none' }}>
-                    {r.praticiens.name}
-                  </Link>
-                )}
-                <p style={{ fontSize: '0.85rem', color: 'var(--f-text-2)', lineHeight: 1.6, margin: 0, flex: 1 }}>{r.excerpt}</p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                  {r.stack.map(s => <span key={s} className="f-tag">{s}</span>)}
-                </div>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.25rem' }}>
-                  {r.demo_url && <a href={r.demo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '0.68rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '3px 10px', borderRadius: 2, textDecoration: 'none' }}>Demo →</a>}
-                  {r.repo_url && <a href={r.repo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '0.68rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '3px 10px', borderRadius: 2, textDecoration: 'none' }}>Repo →</a>}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        {visible < filtered.length && (
-          <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
-            <button className="btn-f btn-f-secondary" onClick={() => setVisible(v => v + PAGE_SIZE)}>
-              Charger plus ({filtered.length - visible} restants) →
-            </button>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
+            {filtered.slice(0, visible).map(r => {
+              const catColor = CAT_COLOR[r.category] || 'var(--f-text-3)';
+              const typeIcon = TYPE_ICONS[r.type] || '◦';
+              const typeLabel = TYPE_LABELS[r.type] || r.type;
+
+              return (
+                <article
+                  key={r.slug}
+                  className="f-card f-card-hover realisation-card"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '.9rem',
+                    padding: '1.5rem',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {/* Bande couleur catégorie */}
+                  <div style={{
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0,
+                    height: 3,
+                    background: `linear-gradient(90deg, ${catColor}, transparent)`,
+                    borderRadius: '12px 12px 0 0',
+                    opacity: .8,
+                  }} />
+
+                  {/* Badges type + catégorie */}
+                  <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap', marginTop: '.25rem' }}>
+                    <span style={{
+                      fontFamily: "'Geist Mono', monospace",
+                      fontSize: '.58rem',
+                      letterSpacing: '.09em',
+                      textTransform: 'uppercase',
+                      color: catColor,
+                      border: `1px solid ${catColor}33`,
+                      background: `${catColor}0d`,
+                      padding: '3px 9px',
+                      borderRadius: 99,
+                      fontWeight: 600,
+                    }}>{CAT_LABEL[r.category] || r.category}</span>
+                    <span style={{
+                      fontFamily: "'Geist Mono', monospace",
+                      fontSize: '.58rem',
+                      letterSpacing: '.09em',
+                      textTransform: 'uppercase',
+                      color: 'var(--f-text-3)',
+                      border: '1px solid var(--f-border)',
+                      padding: '3px 9px',
+                      borderRadius: 99,
+                      fontWeight: 600,
+                    }}>{typeIcon} {typeLabel}</span>
+                  </div>
+
+                  {/* Titre */}
+                  <h3 style={{
+                    fontFamily: "'Syne', sans-serif",
+                    fontSize: '1.02rem',
+                    fontWeight: 800,
+                    color: 'var(--f-text-1)',
+                    margin: 0,
+                    letterSpacing: '-.015em',
+                    lineHeight: 1.3,
+                  }}>{r.title}</h3>
+
+                  {/* Auteur */}
+                  {r.praticiens && (
+                    <Link
+                      href={`/praticiens/${r.praticiens.slug}`}
+                      style={{
+                        fontFamily: "'Geist Mono', monospace",
+                        fontSize: '.7rem',
+                        color: catColor,
+                        textDecoration: 'none',
+                        opacity: .85,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '.3rem',
+                      }}
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <span style={{ opacity: .6 }}>by</span> {r.praticiens.name}
+                    </Link>
+                  )}
+
+                  {/* Excerpt */}
+                  {r.excerpt && (
+                    <p style={{
+                      fontSize: '.83rem',
+                      color: 'var(--f-text-2)',
+                      lineHeight: 1.75,
+                      margin: 0,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      flex: 1,
+                    }}>{r.excerpt}</p>
+                  )}
+
+                  {/* Stack */}
+                  {r.stack?.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.3rem', marginTop: 'auto' }}>
+                      {r.stack.slice(0, 5).map(s => (
+                        <span key={s} className="f-tag">{s}</span>
+                      ))}
+                      {r.stack.length > 5 && (
+                        <span className="f-tag" style={{ color: 'var(--f-text-3)' }}>+{r.stack.length - 5}</span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Footer : liens + flèche */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingTop: '.75rem',
+                    borderTop: '1px solid var(--f-border)',
+                    marginTop: '.25rem',
+                  }}>
+                    <div style={{ display: 'flex', gap: '.5rem' }}>
+                      {r.demo_url && (
+                        <a
+                          href={r.demo_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          style={{
+                            fontFamily: "'Geist Mono', monospace",
+                            fontSize: '.62rem',
+                            color: catColor,
+                            border: `1px solid ${catColor}44`,
+                            background: `${catColor}0a`,
+                            padding: '3px 10px',
+                            borderRadius: 99,
+                            textDecoration: 'none',
+                            transition: 'opacity .15s',
+                          }}
+                        >
+                          Demo →
+                        </a>
+                      )}
+                      {r.repo_url && (
+                        <a
+                          href={r.repo_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          style={{
+                            fontFamily: "'Geist Mono', monospace",
+                            fontSize: '.62rem',
+                            color: 'var(--f-text-3)',
+                            border: '1px solid var(--f-border)',
+                            padding: '3px 10px',
+                            borderRadius: 99,
+                            textDecoration: 'none',
+                            transition: 'opacity .15s',
+                          }}
+                        >
+                          Repo →
+                        </a>
+                      )}
+                    </div>
+                    {/* Ghost type icon */}
+                    <span style={{
+                      fontFamily: "'Geist Mono', monospace",
+                      fontSize: '.62rem',
+                      color: catColor,
+                      opacity: .7,
+                      letterSpacing: '.04em',
+                    }}>voir →</span>
+                  </div>
+
+                  {/* Ghost icon décoratif */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '-0.5rem',
+                    right: '1rem',
+                    fontSize: '4.5rem',
+                    fontFamily: "'Geist Mono', monospace",
+                    color: `${catColor}10`,
+                    pointerEvents: 'none',
+                    userSelect: 'none',
+                    lineHeight: 1,
+                  }}>{typeIcon}</div>
+                </article>
+              );
+            })}
           </div>
-        )}
+
+          {visible < filtered.length && (
+            <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+              <button className="btn-f btn-f-secondary" onClick={() => setVisible(v => v + PAGE_SIZE)}>
+                Charger plus ({filtered.length - visible} restants) →
+              </button>
+            </div>
+          )}
+
+          <p style={{
+            fontFamily: "'Geist Mono', monospace",
+            fontSize: '.63rem',
+            color: 'var(--f-text-3)',
+            textAlign: 'center',
+            marginTop: '1.25rem',
+            letterSpacing: '.06em',
+          }}>
+            {Math.min(visible, filtered.length)} / {filtered.length} réalisations
+          </p>
         </>
       )}
     </div>

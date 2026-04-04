@@ -216,7 +216,7 @@ export default async function Home() {
       <hr className="f-hr-gradient" />
 
       {/* ── COMMENT ÇA MARCHE ────────────────────────────────────── */}
-      <section style={{ padding: '6rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
+      <section style={{ padding: '6rem 6vw', maxWidth: 1200, margin: '0 auto', overflow: 'hidden' }}>
         <ScrollReveal>
           <span className="f-label" style={{ marginBottom: '.6rem' }}>// comment ça marche</span>
           <h2 style={{
@@ -239,8 +239,8 @@ export default async function Home() {
             { num: '02', title: 'Soumets une réalisation, un article ou un événement', desc: "Pipeline, dashboard, API, bootcamp, article Medium ou LinkedIn, conférence, meetup — ce que tu as vraiment construit ou organisé.", sub: 'Optionnel · illimité', done: false },
             { num: '03', title: 'Publication instantanée', desc: "Ton profil, tes réalisations et tes événements apparaissent sur la plateforme. Visibles par des milliers de praticiens et recruteurs.", sub: '✓ Publication instantanée', done: true },
           ].map((s, i) => (
-            <ScrollReveal key={s.num} delay={i * 120}>
-              <div className="step-card">
+            <ScrollReveal key={s.num} delay={i * 120} style={{ height: '100%' }}>
+              <div className="step-card" style={{ height: '100%' }}>
                 <div className={`step-num${s.done ? ' done' : ''}`}>{s.num}</div>
                 <h3 style={{
                   fontFamily: "'Syne', sans-serif",

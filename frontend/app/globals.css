@@ -594,6 +594,16 @@ a:focus-visible {
   margin: 0;
 }
 
+/* ── Realisation cards ── */
+.realisation-card {
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+.realisation-card:hover {
+  border-color: var(--f-border) !important;
+}
+
 /* ── Mobile responsive additions ── */
 @media (max-width: 768px) {
   .community-cta { padding: 2rem 1.5rem; }
