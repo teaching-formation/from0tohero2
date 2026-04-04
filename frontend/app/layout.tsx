@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import CursorGlow from '@/components/CursorGlow';
 
 export const metadata: Metadata = {
   title: 'from0tohero.dev',
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         }} />
       </head>
       <body style={{ margin: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--f-bg)' }}>
+        <CursorGlow />
         <Navbar />
         <main style={{ flex: 1 }}>
           {children}

@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import ScrollReveal from '@/components/ScrollReveal';
+import TypeWriter from '@/components/TypeWriter';
+import CountUp from '@/components/CountUp';
 
 export const revalidate = 60;
 
@@ -120,12 +122,7 @@ export default async function Home() {
           maxWidth: 820,
         }}>
           Ce qu&apos;ils ont{' '}
-          <span style={{
-            background: 'linear-gradient(135deg, var(--f-sky) 0%, #7dd3fc 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-          }}>construit.</span>
+          <TypeWriter text="construit." speed={75} startDelay={400} />
           <br />
           Pas ce qu&apos;ils ont{' '}
           <span style={{
@@ -224,7 +221,7 @@ export default async function Home() {
                     color: `var(${STAT_ACCENT[i] || '--f-sky'})`,
                     margin: 0,
                     letterSpacing: '-.03em',
-                  }}>{s.n}</p>
+                  }}><CountUp target={s.n} /></p>
                   {/* Label */}
                   <p style={{
                     fontFamily: "'Geist Mono', monospace",

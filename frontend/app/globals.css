@@ -156,7 +156,36 @@ a:focus-visible {
   z-index: 0;
 }
 .dark .hero-dot-bg::before { opacity: .7; }
+
+/* ── HERO NOISE TEXTURE ── */
+.hero-dot-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+}
+.dark .hero-dot-bg::after { opacity: 0.045; }
 .hero-dot-bg > * { position: relative; z-index: 1; }
+
+/* ── TYPEWRITER CURSOR ── */
+.tw-cursor {
+  display: inline-block;
+  width: 3px;
+  height: 0.8em;
+  background: var(--f-sky);
+  border-radius: 2px;
+  margin-left: 3px;
+  vertical-align: text-bottom;
+  animation: tw-blink 0.7s step-end infinite;
+}
+@keyframes tw-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
 
 /* ── GRADIENT TEXT ── */
 .text-gradient {

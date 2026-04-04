@@ -169,14 +169,29 @@ export default function PraticiensPage() {
 
               return (
                 <Link key={p.slug} href={`/praticiens/${p.slug}`} className="f-card-link">
-                  <article className="f-card f-card-hover praticien-card" style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '1rem',
-                    padding: '1.5rem',
-                    position: 'relative',
-                    overflow: 'hidden',
-                  }}>
+                  <article
+                    className="f-card f-card-hover praticien-card"
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '1rem',
+                      padding: '1.5rem',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      willChange: 'transform',
+                    }}
+                    onMouseMove={e => {
+                      const r = e.currentTarget.getBoundingClientRect();
+                      const x = (e.clientX - r.left) / r.width - 0.5;
+                      const y = (e.clientY - r.top) / r.height - 0.5;
+                      e.currentTarget.style.transition = 'transform 0.08s linear, box-shadow 0.2s';
+                      e.currentTarget.style.transform = `perspective(900px) rotateY(${x * 10}deg) rotateX(${-y * 8}deg) scale3d(1.02,1.02,1.02)`;
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transition = 'transform 0.55s cubic-bezier(.4,0,.2,1), box-shadow 0.2s';
+                      e.currentTarget.style.transform = 'perspective(900px) rotateY(0deg) rotateX(0deg) scale3d(1,1,1)';
+                    }}
+                  >
                     {/* Bande couleur catégorie */}
                     <div style={{
                       position: 'absolute',
