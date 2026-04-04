@@ -91,14 +91,9 @@ export default function Layout({ children }: Props) {
 
       {/* Footer */}
       <div className="sidebar-footer">
-        <button
-          className="nav-item"
-          onClick={logout}
-          style={{ width: '100%', opacity: .65 }}
-        >
-          <span className="nav-icon">↩</span>
-          Déconnexion
-        </button>
+        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--text-3)', opacity: .5 }}>
+          from0tohero // admin
+        </span>
       </div>
     </>
   );
