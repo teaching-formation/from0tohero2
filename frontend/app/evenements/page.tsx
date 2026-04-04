@@ -309,18 +309,6 @@ export default function EvenementsPage() {
                     )}
                   </div>
 
-                  {/* Ghost icon décoratif */}
-                  <div style={{
-                    position: 'absolute',
-                    bottom: '-0.5rem',
-                    right: '1rem',
-                    fontSize: '4.5rem',
-                    fontFamily: "'Geist Mono', monospace",
-                    color: `${typeColor}10`,
-                    pointerEvents: 'none',
-                    userSelect: 'none',
-                    lineHeight: 1,
-                  }}>{TYPE_ICON[primaryType]}</div>
                 </article>
               );
             })}

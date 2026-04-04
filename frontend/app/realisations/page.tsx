@@ -316,18 +316,6 @@ export default function RealisationsPage() {
                     }}>voir →</span>
                   </div>
 
-                  {/* Ghost icon décoratif */}
-                  <div style={{
-                    position: 'absolute',
-                    bottom: '-0.5rem',
-                    right: '1rem',
-                    fontSize: '4.5rem',
-                    fontFamily: "'Geist Mono', monospace",
-                    color: `${catColor}10`,
-                    pointerEvents: 'none',
-                    userSelect: 'none',
-                    lineHeight: 1,
-                  }}>{typeIcon}</div>
                 </article>
               );
             })}
