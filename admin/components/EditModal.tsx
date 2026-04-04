@@ -117,9 +117,11 @@ export default function EditModal({ table, row, fields, onClose, onSaved }: Prop
                 value={form[f.key] ?? ''}
                 onChange={e => set(f.key, e.target.value)}
               >
-                {f.options?.map(o => (
-                  <option key={o} value={o}>{o}</option>
-                ))}
+                <option value="">— Choisir —</option>
+                {f.options?.map(o => o.startsWith('──') || o.startsWith('─')
+                  ? <option key={o} disabled style={{ color: 'var(--text-4)', fontStyle: 'italic' }}>{o}</option>
+                  : <option key={o} value={o}>{o}</option>
+                )}
               </select>
             ) : f.type === 'textarea' ? (
               <textarea

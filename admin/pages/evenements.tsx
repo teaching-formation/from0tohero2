@@ -3,6 +3,20 @@ import AuthGuard, { getToken } from '@/components/AuthGuard';
 import EditModal from '@/components/EditModal';
 import AddModal  from '@/components/AddModal';
 
+const PAYS = [
+  'Afrique du Sud','Algérie','Angola','Bénin','Botswana','Burkina Faso','Burundi',
+  'Cabo Verde','Cameroun','Comores','Congo (Brazzaville)','Congo (RDC)',"Côte d'Ivoire",
+  'Djibouti','Égypte','Érythrée','Eswatini','Éthiopie','Gabon','Gambie','Ghana',
+  'Guinée','Guinée-Bissau','Guinée équatoriale','Kenya','Lesotho','Liberia','Libye',
+  'Madagascar','Malawi','Mali','Maroc','Maurice','Mauritanie','Mozambique','Namibie',
+  'Niger','Nigeria','Ouganda','Rwanda','São Tomé-et-Príncipe','Sénégal','Seychelles',
+  'Sierra Leone','Somalie','Soudan','Soudan du Sud','Tanzanie','Tchad','Togo','Tunisie',
+  'Zambie','Zimbabwe',
+  '── Diaspora ──',
+  'France','Belgique','Canada','États-Unis','Royaume-Uni','Suisse','Allemagne',
+  'Italie','Espagne','Portugal','Pays-Bas','Suède','Norvège','Autre',
+];
+
 type Row = {
   id: string;
   slug: string;
@@ -24,7 +38,7 @@ type Row = {
 const EDIT_FIELDS = [
   { key: 'title',      label: 'Titre' },
   { key: 'type',       label: 'Type', type: 'select' as const, options: ['conference','meetup','hackathon','webinaire','bootcamp','autre'] },
-  { key: 'pays',       label: 'Pays' },
+  { key: 'pays',       label: 'Pays', type: 'select' as const, options: PAYS },
   { key: 'lieu',       label: 'Lieu' },
   { key: 'url',        label: 'Lien', type: 'url' as const },
   { key: 'date_debut', label: 'Date début', type: 'date' as const },
@@ -252,7 +266,7 @@ function EvenementsPage() {
           fields={[
             { key: 'title',      label: 'Titre',       required: true },
             { key: 'type',       label: 'Type',        type: 'select', options: ['conference','meetup','hackathon','webinaire','bootcamp','autre'] },
-            { key: 'pays',       label: 'Pays' },
+            { key: 'pays',       label: 'Pays', type: 'select', options: PAYS },
             { key: 'lieu',       label: 'Lieu' },
             { key: 'url',        label: 'Lien',        type: 'url' },
             { key: 'date_debut', label: 'Date début',  type: 'date', required: true },

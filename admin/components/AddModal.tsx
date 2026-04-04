@@ -85,7 +85,10 @@ export default function AddModal({ table, fields, defaults = {}, onClose, onCrea
             {f.type === 'select' ? (
               <select value={form[f.key] ?? ''} onChange={e => set(f.key, e.target.value)}>
                 <option value="">— Choisir —</option>
-                {f.options?.map(o => <option key={o} value={o}>{o}</option>)}
+                {f.options?.map(o => o.startsWith('──') || o.startsWith('─')
+                  ? <option key={o} disabled style={{ color: 'var(--text-4)', fontStyle: 'italic' }}>{o}</option>
+                  : <option key={o} value={o}>{o}</option>
+                )}
               </select>
             ) : f.type === 'textarea' ? (
               <textarea rows={3} value={form[f.key] ?? ''} onChange={e => set(f.key, e.target.value)} style={{ resize: 'vertical' }} />
