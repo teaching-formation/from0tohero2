@@ -10,6 +10,7 @@ export default function Document() {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </Head>
       <body>
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('admin_theme');if(t==='light'){document.documentElement.classList.add('light')}else{document.documentElement.classList.remove('light')}}catch(e){}})()` }} />
         <Main />
         <NextScript />
       </body>

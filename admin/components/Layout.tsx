@@ -17,6 +17,24 @@ export default function Layout({ children }: Props) {
   const router   = useRouter();
   const [open, setOpen]           = useState(false);
   const [pendingCount, setPending] = useState(0);
+  const [isDark, setIsDark]       = useState(true);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('admin_theme');
+    setIsDark(saved !== 'light');
+  }, []);
+
+  function toggleTheme() {
+    const next = !isDark;
+    setIsDark(next);
+    if (next) {
+      document.documentElement.classList.remove('light');
+      localStorage.setItem('admin_theme', 'dark');
+    } else {
+      document.documentElement.classList.add('light');
+      localStorage.setItem('admin_theme', 'light');
+    }
+  }
 
   // Close sidebar on route change (mobile)
   useEffect(() => { setOpen(false); }, [router.pathname]);
@@ -167,6 +185,9 @@ export default function Layout({ children }: Props) {
             <a href="https://from0tohero.dev" target="_blank" rel="noreferrer" className="topbar-link">
               ↗ Voir le site
             </a>
+            <button className="topbar-theme" onClick={toggleTheme} title={isDark ? 'Mode clair' : 'Mode sombre'}>
+              {isDark ? '☀' : '☾'}
+            </button>
             <button className="topbar-logout" onClick={logout}>
               ↩ Déconnexion
             </button>
