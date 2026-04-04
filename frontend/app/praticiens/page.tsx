@@ -160,7 +160,7 @@ export default function PraticiensPage() {
       ) : (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
-            {filtered.slice(0, visible).map(p => {
+            {filtered.slice(0, visible).map((p, i) => {
               const cats: string[] = (p as any).categories ?? (p.category ? [p.category] : []);
               const primaryCat = cats[0] || 'autre';
               const catColor = CAT_COLORS[primaryCat] || 'var(--f-text-3)';
@@ -168,7 +168,9 @@ export default function PraticiensPage() {
               const countryDisplay = flag || countryName || p.country;
 
               return (
-                <Link key={p.slug} href={`/praticiens/${p.slug}`} className="f-card-link">
+                <Link key={p.slug} href={`/praticiens/${p.slug}`} className="f-card-link"
+                  style={{ animation: `cardReveal 0.45s cubic-bezier(.4,0,.2,1) ${Math.min(i, 11) * 45}ms both` }}
+                >
                   <article
                     className="f-card f-card-hover praticien-card"
                     style={{

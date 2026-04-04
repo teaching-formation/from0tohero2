@@ -9,6 +9,7 @@ export default function Navbar() {
   const [dark, setDark] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('theme');
@@ -24,6 +25,13 @@ export default function Navbar() {
       setIsLoggedIn(!!session);
     });
     return () => subscription.unsubscribe();
+  }, []);
+
+  // Frosted glass au scroll
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   // Ferme le menu quand on change de page
@@ -46,8 +54,14 @@ export default function Navbar() {
   return (
     <nav className="navbar" style={{
       position: 'sticky', top: 0, zIndex: 50,
-      background: dark ? 'rgba(13,17,23,0.97)' : 'rgba(255,255,255,0.97)',
+      background: scrolled
+        ? (dark ? 'rgba(13,17,23,0.75)' : 'rgba(241,245,249,0.75)')
+        : (dark ? 'rgba(13,17,23,0.97)' : 'rgba(241,245,249,0.97)'),
+      backdropFilter: scrolled ? 'blur(16px) saturate(180%)' : 'none',
+      WebkitBackdropFilter: scrolled ? 'blur(16px) saturate(180%)' : 'none',
       borderBottom: '1px solid var(--f-border)',
+      boxShadow: scrolled ? '0 4px 24px rgba(0,0,0,.06)' : 'none',
+      transition: 'background 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease',
     }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 6vw', height: 56, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
 

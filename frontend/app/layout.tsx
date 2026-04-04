@@ -3,6 +3,7 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CursorGlow from '@/components/CursorGlow';
+import PageTransition from '@/components/PageTransition';
 
 export const metadata: Metadata = {
   title: 'from0tohero.dev',
@@ -33,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CursorGlow />
         <Navbar />
         <main style={{ flex: 1 }}>
-          {children}
+          <PageTransition>{children}</PageTransition>
         </main>
         <Footer />
       </body>

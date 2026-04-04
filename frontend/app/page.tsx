@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import ScrollReveal from '@/components/ScrollReveal';
 import TypeWriter from '@/components/TypeWriter';
 import CountUp from '@/components/CountUp';
+import HeroParallax from '@/components/HeroParallax';
 
 export const revalidate = 60;
 
@@ -90,19 +91,8 @@ export default async function Home() {
         position: 'relative',
         overflow: 'hidden',
       }}>
-        {/* Orbs décoratifs */}
-        <div className="hero-orb" style={{
-          position: 'absolute', top: '15%', right: '-8%',
-          width: 520, height: 520, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(249,115,22,.13) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }} />
-        <div className="hero-orb-2" style={{
-          position: 'absolute', bottom: '10%', left: '-12%',
-          width: 640, height: 640, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(14,165,233,.11) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }} />
+        {/* Orbs décoratifs avec parallax */}
+        <HeroParallax />
 
         {/* Badge live */}
         <div style={{ marginBottom: '2rem', position: 'relative', zIndex: 1 }}>

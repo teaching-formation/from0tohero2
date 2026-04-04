@@ -634,11 +634,18 @@ a:focus-visible {
   border-color: var(--f-border) !important;
 }
 
+/* ── Card stagger reveal ── */
+@keyframes cardReveal {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ── Mobile responsive additions ── */
 @media (max-width: 768px) {
   .community-cta { padding: 2rem 1.5rem; }
   .step-num-bg { font-size: 4rem; }
   .stats-strip { grid-template-columns: repeat(2, 1fr) !important; }
+  footer > div:first-child > div { grid-template-columns: 1fr !important; gap: 2rem !important; }
 }
 @media (max-width: 480px) {
   .stats-strip { grid-template-columns: repeat(2, 1fr) !important; }
