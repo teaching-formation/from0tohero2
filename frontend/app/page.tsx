@@ -73,8 +73,8 @@ export default async function Home() {
   const statItems = [
     { n: stats.praticiens,   l: 'Praticiens',   icon: '◈' },
     { n: stats.realisations, l: 'Réalisations',  icon: '⬡' },
-    { n: stats.evenements,   l: 'Événements',    icon: '◎' },
     { n: stats.articles,     l: 'Articles',      icon: '◧' },
+    { n: stats.evenements,   l: 'Événements',    icon: '◎' },
   ];
 
   return (
