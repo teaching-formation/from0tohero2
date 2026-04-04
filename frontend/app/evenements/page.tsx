@@ -162,6 +162,7 @@ export default function EvenementsPage() {
                     position: 'relative',
                     overflow: 'hidden',
                     opacity: status === 'past' ? .65 : 1,
+                    height: '100%',
                   }}
                 >
                   {/* Bande couleur type */}
@@ -265,9 +266,11 @@ export default function EvenementsPage() {
                       WebkitLineClamp: 3,
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
-                      flex: 1,
                     }}>{e.excerpt}</p>
                   )}
+
+                  {/* Spacer */}
+                  <div style={{ flex: 1 }} />
 
                   {/* Footer */}
                   <div style={{

@@ -109,7 +109,7 @@ export default function ArticlesPage() {
               const srcLabel = a.source_label || a.source || '';
 
               return (
-                <a key={a.slug} href={a.external_url} target="_blank" rel="noreferrer" className="f-card-link">
+                <a key={a.slug} href={a.external_url} target="_blank" rel="noreferrer" className="f-card-link" style={{ display: 'flex', height: '100%' }}>
                   <article
                     className="f-card f-card-hover"
                     style={{
@@ -119,7 +119,7 @@ export default function ArticlesPage() {
                       padding: '1.5rem',
                       position: 'relative',
                       overflow: 'hidden',
-                      height: '100%',
+                      flex: 1,
                     }}
                   >
                     {/* Bande couleur catégorie */}

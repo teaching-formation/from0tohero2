@@ -157,6 +157,7 @@ export default function RealisationsPage() {
                     padding: '1.5rem',
                     position: 'relative',
                     overflow: 'hidden',
+                    height: '100%',
                   }}
                 >
                   {/* Bande couleur catégorie */}
@@ -238,13 +239,15 @@ export default function RealisationsPage() {
                       WebkitLineClamp: 3,
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
-                      flex: 1,
                     }}>{r.excerpt}</p>
                   )}
 
+                  {/* Spacer */}
+                  <div style={{ flex: 1 }} />
+
                   {/* Stack */}
                   {r.stack?.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.3rem', marginTop: 'auto' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.3rem' }}>
                       {r.stack.slice(0, 5).map(s => (
                         <span key={s} className="f-tag">{s}</span>
                       ))}
