@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import CropModal from '@/components/CropModal';
 
 const PAYS_AFRIQUE = [
   'Afrique du Sud','Algérie','Angola','Bénin','Botswana','Burkina Faso','Burundi',
@@ -94,19 +95,36 @@ export default function EditProfilClient({ praticien: p }: Props) {
   const [photoFile,    setPhotoFile]    = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(String(p.photo_url || '') || null);
   const [photoError,   setPhotoError]   = useState('');
+  const [cropSrc,      setCropSrc]      = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { setPhotoError('Max 2 Mo.'); return; }
+    if (file.size > 10 * 1024 * 1024) { setPhotoError('Max 10 Mo.'); return; }
     if (!['image/jpeg','image/png','image/webp'].includes(file.type)) {
       setPhotoError('Format : JPG, PNG ou WebP.'); return;
     }
     setPhotoError('');
+    // Ouvre la modale de recadrage
+    const src = URL.createObjectURL(file);
+    setCropSrc(src);
+    // Reset l'input pour permettre de resélectionner le même fichier
+    e.target.value = '';
+  }
+
+  function handleCropDone(blob: Blob) {
     if (photoPreview && photoPreview.startsWith('blob:')) URL.revokeObjectURL(photoPreview);
-    setPhotoFile(file);
-    setPhotoPreview(URL.createObjectURL(file));
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
+    setCropSrc(null);
+    const croppedFile = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
+    setPhotoFile(croppedFile);
+    setPhotoPreview(URL.createObjectURL(croppedFile));
+  }
+
+  function handleCropCancel() {
+    if (cropSrc) URL.revokeObjectURL(cropSrc);
+    setCropSrc(null);
   }
 
   function set(key: string, val: string | string[]) {
@@ -206,6 +224,14 @@ export default function EditProfilClient({ praticien: p }: Props) {
     : '?';
 
   return (
+    <>
+    {cropSrc && (
+      <CropModal
+        imageSrc={cropSrc}
+        onCrop={handleCropDone}
+        onCancel={handleCropCancel}
+      />
+    )}
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
       {/* ── Photo de profil ── */}
@@ -251,7 +277,7 @@ export default function EditProfilClient({ praticien: p }: Props) {
               )}
             </div>
             <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', margin: 0 }}>
-              JPG · PNG · WebP &nbsp;·&nbsp; max 2 Mo
+              JPG · PNG · WebP &nbsp;·&nbsp; max 10 Mo
             </p>
             {photoError && <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.63rem', color: '#f87171', margin: '.3rem 0 0' }}>{photoError}</p>}
           </div>
@@ -468,6 +494,7 @@ export default function EditProfilClient({ praticien: p }: Props) {
         <a href="/mon-compte" className="btn-f btn-f-secondary">Annuler</a>
       </div>
     </form>
+    </>
   );
 }
 

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Avatar from '@/components/Avatar';
 
 type User        = { id: string; email: string; name: string };
 type Praticien   = Record<string, unknown> | null;
@@ -96,16 +97,25 @@ export default function MonCompteClient({ user, praticien, articles, realisation
 
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
-        <div>
-          <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--f-orange)', margin: '0 0 .4rem 0' }}>
-            // mon espace
-          </p>
-          <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.6rem', fontWeight: 700, color: 'var(--f-text-1)', margin: 0 }}>
-            {String(p.name)}
-          </h1>
-          <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-3)', margin: '.3rem 0 0 0' }}>
-            @{String(p.slug)} · {user.email}
-          </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <Avatar
+            name={String(p.name)}
+            photoUrl={p.photo_url ? String(p.photo_url) : null}
+            size={64}
+            radius={12}
+            fontSize='.85rem'
+          />
+          <div>
+            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--f-orange)', margin: '0 0 .4rem 0' }}>
+              // mon espace
+            </p>
+            <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.6rem', fontWeight: 700, color: 'var(--f-text-1)', margin: 0 }}>
+              {String(p.name)}
+            </h1>
+            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-3)', margin: '.3rem 0 0 0' }}>
+              @{String(p.slug)} · {user.email}
+            </p>
+          </div>
         </div>
         <button onClick={handleSignOut} className="btn-f btn-f-secondary" style={{ fontSize: '.7rem' }}>
           Se déconnecter
