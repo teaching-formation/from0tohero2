@@ -37,6 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { data: row, error } = await supabaseAdmin.from('realisations').insert({
       slug,
       title:          data.title,
+      praticien_id:   data.praticien_id || null,
       category:       data.category || 'data',
       type:           data.type || 'autre',
       type_label:     data.type === 'autre' ? (data.type_label || null) : null,

@@ -21,8 +21,9 @@ type Row = {
 
 const EDIT_FIELDS = [
   { key: 'title',          label: 'Titre' },
+  { key: 'praticien_id',   label: 'Praticien ID (UUID)' },
   { key: 'category',       label: 'Catégorie', type: 'select' as const, options: ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'] },
-  { key: 'type',           label: 'Type', type: 'select' as const, options: ['pipeline','dashboard','api','app','bootcamp','autre'] },
+  { key: 'type',           label: 'Type', type: 'select' as const, options: ['pipeline','dashboard','api','app','bootcamp','youtube','podcast','newsletter','blog','autre'] },
   { key: 'type_label',     label: 'Type custom (si "autre")' },
   { key: 'stack',          label: 'Stack (séparé par ,)' },
   { key: 'excerpt',        label: 'Description', type: 'textarea' as const },
@@ -229,8 +230,9 @@ function RealisationsPage() {
         <AddModal table="realisations"
           fields={[
             { key: 'title',          label: 'Titre', required: true },
+            { key: 'praticien_id',   label: 'Praticien ID (UUID)' },
             { key: 'category',       label: 'Catégorie', type: 'select', options: ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'] },
-            { key: 'type',           label: 'Type', type: 'select', options: ['pipeline','dashboard','api','app','bootcamp','youtube','autre'] },
+            { key: 'type',           label: 'Type', type: 'select', options: ['pipeline','dashboard','api','app','bootcamp','youtube','podcast','newsletter','blog','autre'] },
             { key: 'type_label',     label: 'Type précisé (si Autre)' },
             { key: 'stack',          label: 'Stack (séparé par ,)' },
             { key: 'excerpt',        label: 'Description', type: 'textarea' },
