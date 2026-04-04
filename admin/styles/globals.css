@@ -847,31 +847,85 @@ pre {
 @media (max-width: 768px) {
   .mobile-topbar { display: flex; }
 
+  /* Sidebar slide-in */
   .sidebar {
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
     height: 100vh;
     transform: translateX(-100%);
     z-index: 60;
     box-shadow: 8px 0 32px rgba(0,0,0,.4);
   }
-  .sidebar.open {
-    transform: translateX(0);
-  }
+  .sidebar.open { transform: translateX(0); }
   .sidebar-overlay.open { display: block; }
 
+  /* Main */
   .main {
-    padding: 1.25rem 1rem 1.25rem;
-    padding-top: 4rem;
+    padding: 1.25rem 1rem 2rem;
+    padding-top: 4.5rem;
   }
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+
+  /* Page header — empile titre + contrôles */
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 1.25rem;
+    gap: .75rem;
   }
-  .page-header { margin-bottom: 1.25rem; }
+  .page-header > div:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    width: 100%;
+  }
+  .page-header input[type="search"] {
+    width: 100% !important;
+  }
+  .page-header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Tables — scroll horizontal */
+  .table-card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  table { min-width: 580px; }
+
+  /* Stats grid */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Soumissions — boutons action wrappent mieux */
+  .soum-card-header {
+    gap: .6rem;
+  }
+  .soum-title { font-size: .85rem; }
+
+  /* Modal plein écran sur mobile */
+  .modal {
+    width: 95%;
+    padding: 1.5rem;
+    max-height: 95vh;
+  }
+  .modal-actions { flex-wrap: wrap; }
+  .modal-actions .btn { flex: 1; justify-content: center; min-width: 0; }
+
+  /* Filter pills scroll horizontal */
+  .filter-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: .25rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .filter-pill { flex-shrink: 0; }
 }
 
 @media (max-width: 480px) {
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .login-card { padding: 1.75rem 1.5rem; }
+  .page-title { font-size: 1.25rem; }
+  .modal { padding: 1.25rem; }
 }
