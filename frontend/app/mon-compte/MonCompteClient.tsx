@@ -195,10 +195,17 @@ export default function MonCompteClient({ user, praticien, articles, realisation
             </a>
           </div>
           {articles.length === 0 ? (
-            <div style={{ border: '1.5px dashed var(--f-border)', borderRadius: 8, padding: '3rem', textAlign: 'center' }}>
-              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-text-3)', margin: 0 }}>
-                Aucun article pour l&apos;instant.
+            <div style={{ border: '1.5px dashed var(--f-border)', borderRadius: 12, padding: '3rem 2rem', textAlign: 'center', background: 'var(--f-surface)' }}>
+              <div style={{ fontSize: '2.2rem', marginBottom: '1rem' }}>✍️</div>
+              <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0' }}>
+                Partage ton expertise
               </p>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', margin: '0 0 1.5rem 0', lineHeight: 1.7, maxWidth: 360, marginInline: 'auto' }}>
+                Publie un article, un tutoriel ou un retour d&apos;expérience. Tes pairs en ont besoin.
+              </p>
+              <a href="/mon-compte/nouvel-article" className="btn-f btn-f-primary" style={{ fontSize: '.75rem' }}>
+                + Écrire mon premier article
+              </a>
             </div>
           ) : (articles as Record<string, unknown>[]).map((a) => (
             <div key={String(a.id)} style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
@@ -235,10 +242,24 @@ export default function MonCompteClient({ user, praticien, articles, realisation
             </a>
           </div>
           {realisations.length === 0 ? (
-            <div style={{ border: '1.5px dashed var(--f-border)', borderRadius: 8, padding: '3rem', textAlign: 'center' }}>
-              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-text-3)', margin: 0 }}>
-                Aucune réalisation pour l&apos;instant.
+            <div style={{ border: '1.5px dashed var(--f-border)', borderRadius: 12, padding: '3rem 2rem', textAlign: 'center', background: 'var(--f-surface)' }}>
+              <div style={{ fontSize: '2.2rem', marginBottom: '1rem' }}>⚡</div>
+              <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0' }}>
+                Montre ce que tu as construit
               </p>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', margin: '0 0 .75rem 0', lineHeight: 1.7, maxWidth: 380, marginInline: 'auto' }}>
+                Pipeline, dashboard, API, app… Colle ton lien GitHub et le formulaire se remplit automatiquement.
+              </p>
+              <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '1.25rem' }}>
+                {['Pipeline de données', 'Dashboard BI', 'API REST', 'App mobile'].map(ex => (
+                  <span key={ex} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-sky)', border: '1px solid var(--f-sky-border)', background: 'var(--f-sky-bg)', padding: '3px 10px', borderRadius: 99 }}>
+                    {ex}
+                  </span>
+                ))}
+              </div>
+              <a href="/mon-compte/nouvelle-realisation" className="btn-f btn-f-primary" style={{ fontSize: '.75rem' }}>
+                + Ajouter ma première réalisation
+              </a>
             </div>
           ) : (realisations as Record<string, unknown>[]).map((r) => (
             <div key={String(r.id)} style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
@@ -275,10 +296,17 @@ export default function MonCompteClient({ user, praticien, articles, realisation
             </a>
           </div>
           {evenements.length === 0 ? (
-            <div style={{ border: '1.5px dashed var(--f-border)', borderRadius: 8, padding: '3rem', textAlign: 'center' }}>
-              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-text-3)', margin: 0 }}>
-                Aucun événement pour l&apos;instant.
+            <div style={{ border: '1.5px dashed var(--f-border)', borderRadius: 12, padding: '3rem 2rem', textAlign: 'center', background: 'var(--f-surface)' }}>
+              <div style={{ fontSize: '2.2rem', marginBottom: '1rem' }}>📅</div>
+              <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0' }}>
+                Tu organises ou participes à un événement ?
               </p>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', margin: '0 0 1.5rem 0', lineHeight: 1.7, maxWidth: 360, marginInline: 'auto' }}>
+                Meetup, conférence, hackathon, webinaire… Partage-le avec la communauté.
+              </p>
+              <a href="/mon-compte/nouvel-evenement" className="btn-f btn-f-primary" style={{ fontSize: '.75rem' }}>
+                + Ajouter un événement
+              </a>
             </div>
           ) : (evenements as Record<string, unknown>[]).map((ev) => (
             <div key={String(ev.id)} style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
