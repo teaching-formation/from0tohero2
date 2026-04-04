@@ -36,6 +36,7 @@ type Row = {
 const EDIT_FIELDS = [
   { key: 'name',           label: 'Nom complet' },
   { key: 'role',           label: 'Rôle / titre' },
+  { key: 'photo_url',      label: 'Photo URL', type: 'url' as const },
   { key: 'country',        label: 'Pays', type: 'select' as const, options: PAYS },
   { key: 'city',           label: 'Ville' },
   { key: 'category',       label: 'Catégorie', type: 'select' as const, options: CAT_OPTIONS },
@@ -154,7 +155,26 @@ function PraticiensPage() {
               {filtered.map(r => (
                 <tr key={r.id}>
                   <td>
-                    <span className="td-primary">{r.name}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '.65rem' }}>
+                      {/* Avatar : photo ou initiales */}
+                      {r.photo_url ? (
+                        <img
+                          src={r.photo_url}
+                          alt={r.name}
+                          style={{ width: 32, height: 32, borderRadius: 8, objectFit: 'cover', flexShrink: 0, border: '1px solid var(--border)' }}
+                        />
+                      ) : (
+                        <div style={{
+                          width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                          background: 'rgba(14,165,233,.12)', border: '1px solid rgba(14,165,233,.25)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '.62rem', color: '#38bdf8',
+                        }}>
+                          {r.name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()}
+                        </div>
+                      )}
+                      <span className="td-primary">{r.name}</span>
+                    </div>
                   </td>
                   <td>
                     <span className="td-mono">{r.role}</span>
