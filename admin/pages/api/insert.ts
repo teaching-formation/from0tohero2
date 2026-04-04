@@ -78,5 +78,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.json(row);
   }
 
+  if (table === 'evenements') {
+    const slug = slugify(data.title || '');
+    const { data: row, error } = await supabaseAdmin.from('evenements').insert({
+      slug,
+      title:      data.title,
+      type:       data.type || 'autre',
+      type_label: data.type === 'autre' ? (data.type_label || null) : null,
+      pays:       data.pays || null,
+      lieu:       data.lieu || null,
+      online:     data.online === true || data.online === 'true' || false,
+      url:        data.url || null,
+      date_debut: data.date_debut,
+      date_fin:   data.date_fin || null,
+      gratuit:    data.gratuit === true || data.gratuit === 'true' || false,
+      excerpt:    data.excerpt || null,
+      status:     data.status || 'approved',
+    }).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    return res.json(row);
+  }
+
   return res.status(400).json({ error: 'Table non supportée' });
 }

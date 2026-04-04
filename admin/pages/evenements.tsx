@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import AuthGuard, { getToken } from '@/components/AuthGuard';
 import EditModal from '@/components/EditModal';
+import AddModal  from '@/components/AddModal';
 
 type Row = {
   id: string;
@@ -52,6 +53,7 @@ function EvenementsPage() {
   const [search, setSearch]     = useState('');
   const [editing, setEditing]   = useState<Row | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [adding,   setAdding]   = useState(false);
 
   async function deleteRow(id: string, title: string) {
     if (!window.confirm(`Supprimer "${title}" ? Cette action est irréversible.`)) return;
@@ -81,6 +83,10 @@ function EvenementsPage() {
     setRows(prev => prev.map(r => r.id === updated.id ? { ...r, ...updated } as Row : r));
   }
 
+  function onCreated(row: Record<string, unknown>) {
+    setRows(prev => [row as Row, ...prev]);
+  }
+
   const counts = {
     all:      rows.length,
     approved: rows.filter(r => r.status === 'approved').length,
@@ -99,13 +105,11 @@ function EvenementsPage() {
             <span className="page-title-count">({rows.length})</span>
           </h1>
         </div>
-        <input
-          type="search"
-          placeholder="Rechercher…"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{ width: 220, fontSize: '.72rem' }}
-        />
+        <div style={{ display: 'flex', gap: '.75rem', alignItems: 'center' }}>
+          <input type="search" placeholder="Rechercher…" value={search}
+            onChange={e => setSearch(e.target.value)} style={{ width: 220, fontSize: '.72rem' }} />
+          <button className="btn btn-primary btn-sm" onClick={() => setAdding(true)}>+ Nouveau</button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -240,6 +244,27 @@ function EvenementsPage() {
           fields={EDIT_FIELDS}
           onClose={() => setEditing(null)}
           onSaved={onSaved}
+        />
+      )}
+      {adding && (
+        <AddModal
+          table="evenements"
+          fields={[
+            { key: 'title',      label: 'Titre',       required: true },
+            { key: 'type',       label: 'Type',        type: 'select', options: ['conference','meetup','hackathon','webinaire','bootcamp','autre'] },
+            { key: 'pays',       label: 'Pays' },
+            { key: 'lieu',       label: 'Lieu' },
+            { key: 'url',        label: 'Lien',        type: 'url' },
+            { key: 'date_debut', label: 'Date début',  type: 'date', required: true },
+            { key: 'date_fin',   label: 'Date fin',    type: 'date' },
+            { key: 'online',     label: 'En ligne ?',  type: 'select', options: ['false','true'] },
+            { key: 'gratuit',    label: 'Gratuit ?',   type: 'select', options: ['false','true'] },
+            { key: 'excerpt',    label: 'Description', type: 'textarea' },
+            { key: 'status',     label: 'Statut',      type: 'select', options: ['approved','pending','rejected'] },
+          ]}
+          defaults={{ status: 'approved', type: 'meetup', online: 'false', gratuit: 'false' }}
+          onClose={() => setAdding(false)}
+          onCreated={onCreated}
         />
       )}
     </div>
