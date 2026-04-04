@@ -70,6 +70,7 @@ export default function EditProfilClient({ praticien: p }: Props) {
     name:         String(p.name        || ''),
     role:         String(p.role        || ''),
     pays:         String(p.country     || ''),
+    ville:        String(p.city        || ''),
     bio:          String(p.bio         || ''),
     categories:   initCats,
     linkedin_url: String(p.linkedin_url || ''),
@@ -307,6 +308,10 @@ export default function EditProfilClient({ praticien: p }: Props) {
               : <option key={p} value={p}>{p}</option>
           ))}
         </select>
+      </Field>
+
+      <Field label="Ville">
+        <input className="f-input" placeholder="Ex: Abidjan, Paris…" value={form.ville} onChange={e => set('ville', e.target.value)} style={{ maxWidth: '100%' }} />
       </Field>
 
       <Field label="Catégories" required error={errors.categories}>

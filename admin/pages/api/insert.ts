@@ -39,6 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       title:          data.title,
       category:       data.category || 'data',
       type:           data.type || 'autre',
+      type_label:     data.type === 'autre' ? (data.type_label || null) : null,
       stack,
       excerpt:        data.excerpt || null,
       demo_url:       data.demo_url || null,

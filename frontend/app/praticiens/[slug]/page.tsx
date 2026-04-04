@@ -17,8 +17,11 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
 
   useEffect(() => {
     async function load() {
-      const { data: praticien } = await supabase
-        .from('praticiens').select('*').eq('slug', slug).single();
+      const { data: praticienRaw } = await supabase
+        .from('praticiens')
+        .select('id,slug,name,role,country,city,bio,categories,category,category_label,stack,skills,badges,certifications,linkedin_url,github_url,twitter_url,youtube_url,website_url,whatsapp_url,photo_url,status,created_at,user_id')
+        .eq('slug', slug).single();
+      const praticien = praticienRaw as unknown as Praticien | null;
       if (!praticien) { notFound(); return; }
       setP(praticien);
       const { data: reals } = await supabase
