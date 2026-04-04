@@ -194,9 +194,91 @@ body {
 .main {
   flex: 1;
   min-width: 0;
-  padding: 2.25rem 2.5rem;
+  padding: 0;
   overflow-x: hidden;
   background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Top header bar ─────────────────────────────────────── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .85rem 2.5rem;
+  background: var(--card);
+  border-bottom: 1px solid var(--border-1);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  flex-shrink: 0;
+}
+.topbar-section {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+}
+.topbar-icon {
+  font-size: .9rem;
+  color: var(--accent);
+  line-height: 1;
+}
+.topbar-title {
+  font-family: 'Syne', sans-serif;
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--text-1);
+  letter-spacing: -.01em;
+}
+.topbar-badge {
+  font-family: 'Geist Mono', monospace;
+  font-size: .62rem;
+  font-weight: 600;
+  background: rgba(249,115,22,.15);
+  color: #f97316;
+  border: 1px solid rgba(249,115,22,.3);
+  border-radius: 20px;
+  padding: 2px 9px;
+  text-decoration: none;
+  transition: background .15s;
+}
+.topbar-badge:hover { background: rgba(249,115,22,.25); }
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+.topbar-link {
+  font-family: 'Geist Mono', monospace;
+  font-size: .72rem;
+  color: var(--text-3);
+  text-decoration: none;
+  transition: color .15s;
+}
+.topbar-link:hover { color: var(--text-1); }
+.topbar-logout {
+  font-family: 'Geist Mono', monospace;
+  font-size: .72rem;
+  color: var(--text-3);
+  background: none;
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius-sm);
+  padding: .3rem .75rem;
+  cursor: pointer;
+  transition: all .15s;
+}
+.topbar-logout:hover {
+  color: var(--text-1);
+  border-color: var(--text-3);
+  background: var(--card-2);
+}
+
+/* Main inner content padding */
+.main-content {
+  padding: 2.25rem 2.5rem;
+  flex: 1;
 }
 
 /* ─── Page header ────────────────────────────────────────── */
@@ -861,8 +943,12 @@ pre {
 
   /* Main */
   .main {
+    padding: 0;
+    padding-top: 3.25rem; /* space for mobile-topbar */
+  }
+  .topbar { padding: .75rem 1rem; }
+  .main-content {
     padding: 1.25rem 1rem 2rem;
-    padding-top: 4.5rem;
   }
 
   /* Page header — empile titre + contrôles */

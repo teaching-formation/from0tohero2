@@ -2,13 +2,13 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 
 const NAV = [
-  { href: '/',             label: 'Dashboard',    icon: '▦',  badge: false },
-  { href: '/soumissions',  label: 'Soumissions',  icon: '◎',  badge: true  },
-  { href: '/praticiens',   label: 'Praticiens',   icon: '◉',  badge: false },
-  { href: '/articles',     label: 'Articles',     icon: '✍',  badge: false },
-  { href: '/realisations', label: 'Réalisations', icon: '◆',  badge: false },
-  { href: '/evenements',   label: 'Événements',   icon: '◷',  badge: false },
-  { href: '/chaines',      label: 'Chaînes YouTube', icon: '▶', badge: false },
+  { href: '/',             label: 'Dashboard',       icon: '▦',  badge: false },
+  { href: '/soumissions',  label: 'Soumissions',     icon: '◎',  badge: true  },
+  { href: '/praticiens',   label: 'Praticiens',      icon: '◉',  badge: false },
+  { href: '/articles',     label: 'Articles',        icon: '✍',  badge: false },
+  { href: '/realisations', label: 'Réalisations',    icon: '◆',  badge: false },
+  { href: '/evenements',   label: 'Événements',      icon: '◷',  badge: false },
+  { href: '/chaines',      label: 'Chaînes YouTube', icon: '▶',  badge: false },
 ];
 
 type Props = { children: React.ReactNode };
@@ -151,7 +151,35 @@ export default function Layout({ children }: Props) {
 
       {/* Main content */}
       <main className="main">
-        {children}
+        {/* Top header */}
+        <header className="topbar">
+          <div className="topbar-section">
+            {NAV.find(n => n.href === router.pathname)?.icon && (
+              <span className="topbar-icon">
+                {NAV.find(n => n.href === router.pathname)?.icon}
+              </span>
+            )}
+            <span className="topbar-title">
+              {NAV.find(n => n.href === router.pathname)?.label ?? 'Admin'}
+            </span>
+            {pendingCount > 0 && router.pathname !== '/soumissions' && (
+              <a href="/soumissions" className="topbar-badge">
+                {pendingCount} en attente
+              </a>
+            )}
+          </div>
+          <div className="topbar-right">
+            <a href="https://from0tohero.dev" target="_blank" rel="noreferrer" className="topbar-link">
+              ↗ Voir le site
+            </a>
+            <button className="topbar-logout" onClick={logout}>
+              ↩ Déconnexion
+            </button>
+          </div>
+        </header>
+        <div className="main-content">
+          {children}
+        </div>
       </main>
     </div>
   );
