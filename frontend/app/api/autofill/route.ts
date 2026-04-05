@@ -70,6 +70,65 @@ function extractTitle(html: string): string {
   return m?.[1]?.trim() ?? '';
 }
 
+// ── Medium : extrait via flux RSS de la publication ──────────────────────
+async function fetchMediumViaRss(parsed: URL): Promise<{ title: string; excerpt: string; external_url: string } | null> {
+  try {
+    // Ex: /gitconnected/article-slug  ou  /@user/article-slug
+    const parts = parsed.pathname.split('/').filter(Boolean);
+    if (parts.length < 2) return null;
+    const pub = parts[0]; // publication ou @user
+    const feedUrl = `https://medium.com/feed/${pub}`;
+
+    const rssRes = await fetch(feedUrl, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!rssRes.ok) return null;
+    const rssText = await rssRes.text();
+
+    // Cherche l'item dont le lien correspond à l'URL demandée (slug)
+    const slug = parts[parts.length - 1].replace(/-[a-f0-9]{8,}$/, ''); // retire l'ID Medium final
+    const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+    let bestItem: { title: string; excerpt: string; link: string } | null = null;
+    let m: RegExpExecArray | null;
+
+    while ((m = itemRegex.exec(rssText)) !== null) {
+      const block = m[1];
+      const linkMatch  = block.match(/<link[^>]*>([^<]+)<\/link>/i) || block.match(/<link>(.*?)<\/link>/i);
+      const link = linkMatch?.[1]?.trim() ?? '';
+      if (!link.includes(slug)) continue;
+
+      const titleMatch = block.match(/<title[^>]*><!\[CDATA\[([\s\S]*?)\]\]><\/title>/i) || block.match(/<title[^>]*>([^<]+)<\/title>/i);
+      const descMatch  = block.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/i) || block.match(/<description>([^<]+)<\/description>/i);
+      const rawTitle   = titleMatch?.[1]?.trim() ?? '';
+      let rawDesc      = descMatch?.[1]?.trim() ?? '';
+      // Nettoie le HTML de la description RSS
+      rawDesc = rawDesc.replace(/<[^>]+>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&').replace(/&quot;/g, '"').slice(0, 300).trim();
+
+      bestItem = { title: rawTitle, excerpt: rawDesc, link };
+      break;
+    }
+
+    if (!bestItem) {
+      // Aucun item matchant — prend le premier du flux
+      const firstItem = rssText.match(/<item>([\s\S]*?)<\/item>/i);
+      if (!firstItem) return null;
+      const block = firstItem[1];
+      const titleMatch = block.match(/<title[^>]*><!\[CDATA\[([\s\S]*?)\]\]><\/title>/i) || block.match(/<title[^>]*>([^<]+)<\/title>/i);
+      const descMatch  = block.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/i);
+      const rawTitle   = titleMatch?.[1]?.trim() ?? '';
+      let rawDesc      = descMatch?.[1]?.trim() ?? '';
+      rawDesc = rawDesc.replace(/<[^>]+>/g, '').slice(0, 300).trim();
+      const linkMatch  = block.match(/<link>(.*?)<\/link>/i);
+      bestItem = { title: rawTitle, excerpt: rawDesc, link: linkMatch?.[1]?.trim() ?? '' };
+    }
+
+    return { title: bestItem.title, excerpt: bestItem.excerpt, external_url: bestItem.link || parsed.href };
+  } catch {
+    return null;
+  }
+}
+
 export async function GET(req: NextRequest) {
   const url = req.nextUrl.searchParams.get('url');
   if (!url) return NextResponse.json({ error: 'URL requise' }, { status: 400 });
@@ -104,10 +163,24 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    // ── Medium — via RSS (Medium bloque le scraping direct depuis Vercel) ──
+    if (parsed.hostname === 'medium.com' || parsed.hostname.endsWith('.medium.com')) {
+      const mediumData = await fetchMediumViaRss(parsed);
+      if (mediumData) {
+        return NextResponse.json({
+          title:        mediumData.title,
+          excerpt:      mediumData.excerpt,
+          external_url: mediumData.external_url,
+          source:       'medium',
+          stack:        '',
+          category:     '',
+        });
+      }
+    }
+
     // ── URL générique — extraction OG tags ────────────────────────────────
-    const BROWSER_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
     const BROWSER_HEADERS = {
-      'User-Agent': BROWSER_UA,
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
       'Cache-Control': 'no-cache',
@@ -118,7 +191,7 @@ export async function GET(req: NextRequest) {
       signal: AbortSignal.timeout(8000),
     });
 
-    // Fallback Googlebot si la page bloque les navigateurs (rare mais possible)
+    // Fallback Googlebot si la page bloque les navigateurs
     if (!pageRes.ok) {
       pageRes = await fetch(url, {
         headers: {
@@ -136,8 +209,8 @@ export async function GET(req: NextRequest) {
     const excerpt = extractMeta(html, 'description') || extractMeta(html, 'og:description');
 
     return NextResponse.json({
-      title:    title,
-      excerpt:  excerpt,
+      title,
+      excerpt,
       stack:    '',
       category: '',
       type:     'app',

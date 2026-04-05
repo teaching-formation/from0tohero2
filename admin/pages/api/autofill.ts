@@ -106,6 +106,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
+    // ── Medium — via RSS ──────────────────────────────────────────────────
+    if (parsed.hostname === 'medium.com' || parsed.hostname.endsWith('.medium.com')) {
+      try {
+        const parts = parsed.pathname.split('/').filter(Boolean);
+        if (parts.length >= 2) {
+          const pub = parts[0];
+          const slug = parts[parts.length - 1].replace(/-[a-f0-9]{8,}$/, '');
+          const feedUrl = `https://medium.com/feed/${pub}`;
+          const rssRes = await fetch(feedUrl, {
+            headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' },
+            signal: AbortSignal.timeout(10000),
+          });
+          if (rssRes.ok) {
+            const rssText = await rssRes.text();
+            const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+            let m: RegExpExecArray | null;
+            let title = '', excerpt = '', link = '';
+            while ((m = itemRegex.exec(rssText)) !== null) {
+              const block = m[1];
+              const linkMatch = block.match(/<link>(.*?)<\/link>/i);
+              if (!linkMatch?.[1]?.includes(slug)) continue;
+              const titleMatch = block.match(/<title[^>]*><!\[CDATA\[([\s\S]*?)\]\]><\/title>/i) || block.match(/<title[^>]*>([^<]+)<\/title>/i);
+              const descMatch  = block.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/i);
+              title   = titleMatch?.[1]?.trim() ?? '';
+              excerpt = (descMatch?.[1] ?? '').replace(/<[^>]+>/g, '').slice(0, 300).trim();
+              link    = linkMatch[1].trim();
+              break;
+            }
+            if (title) {
+              return res.json({ title, excerpt, external_url: link || url, source: 'medium', stack: '', category: '' });
+            }
+          }
+        }
+      } catch { /* fallback vers scraping générique */ }
+    }
+
     // ── URL générique — extraction OG tags ────────────────────────────────
     const BROWSER_HEADERS = {
       'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
