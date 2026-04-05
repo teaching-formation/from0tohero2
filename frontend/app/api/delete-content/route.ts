@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
-const ALLOWED_TABLES = ['articles', 'realisations', 'evenements'] as const;
+const ALLOWED_TABLES = ['articles', 'realisations', 'evenements', 'collections', 'tips'] as const;
 type AllowedTable = typeof ALLOWED_TABLES[number];
 
 export async function POST(req: Request) {

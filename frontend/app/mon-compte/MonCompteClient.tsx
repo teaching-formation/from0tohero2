@@ -434,14 +434,19 @@ export default function MonCompteClient({ user, praticien, articles, realisation
                   {String(tip.content)}
                 </p>
               </div>
-              <button
-                onClick={() => deleteTip(String(tip.id))}
-                disabled={deleting === String(tip.id)}
-                className="btn-f btn-f-danger"
-                style={{ fontSize: '.68rem', flexShrink: 0 }}
-              >
-                {deleting === String(tip.id) ? '…' : '✕'}
-              </button>
+              <div style={{ display: 'flex', gap: '.5rem', flexShrink: 0 }}>
+                <a href={`/mon-compte/tip/${String(tip.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem' }}>
+                  ✎ Modifier
+                </a>
+                <button
+                  onClick={() => deleteTip(String(tip.id))}
+                  disabled={deleting === String(tip.id)}
+                  className="btn-f btn-f-danger"
+                  style={{ fontSize: '.68rem' }}
+                >
+                  {deleting === String(tip.id) ? '…' : '✕'}
+                </button>
+              </div>
             </div>
           ))}
         </div>
