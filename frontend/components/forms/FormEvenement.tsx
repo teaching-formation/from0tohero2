@@ -34,6 +34,31 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
   });
   const [errors, setErrors]   = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [afUrl,     setAfUrl]     = useState('');
+  const [afLoading, setAfLoading] = useState(false);
+  const [afMsg,     setAfMsg]     = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
+
+  async function handleAutofill() {
+    if (!afUrl.trim()) return;
+    setAfLoading(true); setAfMsg(null);
+    try {
+      const res  = await fetch(`/api/autofill?url=${encodeURIComponent(afUrl.trim())}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erreur');
+      setForm(f => ({
+        ...f,
+        ...(data.title   ? { title:   data.title   } : {}),
+        ...(data.excerpt ? { excerpt: data.excerpt } : {}),
+        ...(data.demo_url && !f.url ? { url: data.demo_url } : {}),
+      }));
+      const filled = [data.title, data.excerpt].filter(Boolean).length;
+      setAfMsg({ type: 'ok', text: `✓ ${filled} champ${filled > 1 ? 's' : ''} rempli${filled > 1 ? 's' : ''} automatiquement` });
+    } catch (e: unknown) {
+      setAfMsg({ type: 'err', text: e instanceof Error ? e.message : 'Impossible de récupérer les infos' });
+    } finally {
+      setAfLoading(false);
+    }
+  }
 
   function set(key: string, val: string | boolean) {
     setForm(f => ({ ...f, [key]: val }));
@@ -98,6 +123,32 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+      {/* Autofill */}
+      <div style={{ background: 'linear-gradient(135deg, rgba(56,189,248,.07) 0%, rgba(56,189,248,.02) 100%)', border: '1px solid var(--f-sky-border)', borderRadius: 10, padding: '1rem 1.25rem' }}>
+        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', fontWeight: 600, color: 'var(--f-sky)', marginBottom: '.2rem' }}>
+          ✦ Autofill depuis l&apos;URL de l&apos;événement
+        </p>
+        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', marginBottom: '.75rem' }}>
+          Colle le lien de la page événement pour remplir le titre et la description automatiquement.
+        </p>
+        <div style={{ display: 'flex', gap: '.5rem' }}>
+          <input className="f-input" type="text" placeholder="https://meetup.com/…"
+            value={afUrl} onChange={e => setAfUrl(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAutofill())}
+            style={{ flex: 1 }} />
+          <button type="button" className="btn-f btn-f-secondary"
+            onClick={handleAutofill} disabled={afLoading || !afUrl.trim()}
+            style={{ fontSize: '.72rem', flexShrink: 0 }}>
+            {afLoading ? '…' : 'Autofill →'}
+          </button>
+        </div>
+        {afMsg && (
+          <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: afMsg.type === 'ok' ? 'var(--f-green)' : '#f87171', marginTop: '.4rem' }}>
+            {afMsg.text}
+          </p>
+        )}
+      </div>
 
       <Field label="Titre de l'événement" required error={errors.title}>
         <input className="f-input" placeholder="Ex: SIADE 2026 — Salon IA & Data d'Afrique"

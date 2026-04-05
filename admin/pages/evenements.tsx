@@ -266,6 +266,7 @@ function EvenementsPage() {
           table="evenements"
           row={editing}
           fields={EDIT_FIELDS}
+          autofill
           onClose={() => setEditing(null)}
           onSaved={onSaved}
         />
@@ -273,6 +274,7 @@ function EvenementsPage() {
       {adding && (
         <AddModal
           table="evenements"
+          autofill
           fields={[
             { key: 'title',      label: 'Titre',       required: true },
             { key: 'types',      label: 'Types (séparés par ,)',   type: 'array' },
