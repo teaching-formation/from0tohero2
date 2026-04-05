@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import FormProfil      from '@/components/forms/FormProfil';
@@ -13,7 +13,6 @@ type GateState = 'idle' | 'checking' | 'found' | 'not_found';
 export default function SoumettreePage() {
   const router = useRouter();
   const [activeForm, setActiveForm] = useState<FormType>(null);
-  const [pendingType, setPendingType] = useState<'article'|'realisation'|'evenement'|null>(null);
   const [showForm, setShowForm]     = useState(false);
   const [submitted, setSubmitted]   = useState(false);
   const [userEmail, setUserEmail]   = useState('');
@@ -21,30 +20,20 @@ export default function SoumettreePage() {
   const [userSlug,    setUserSlug]    = useState('');
   const [userName,    setUserName]    = useState('');
   const [userCountry, setUserCountry] = useState('');
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) return;
-      if (data.user.email) setUserEmail(data.user.email);
-      const { data: p } = await supabase
-        .from('praticiens').select('id, slug, name, country').eq('user_id', data.user.id).maybeSingle();
-      if (p) {
-        setHasProfil(true);
-        setUserSlug(p.slug);
-        setUserName(p.name);
-        if (p.country) setUserCountry(p.country);
-      }
-    });
-  }, []);
+  const [authLoading, setAuthLoading] = useState(true);
+  const pendingCardRef = useRef<FormType>(null);
 
   // Gate
   const [usernameInput, setUsernameInput] = useState('');
   const [gateState, setGateState]         = useState<GateState>('idle');
   const [praticienName, setPraticienName] = useState('');
 
-  function selectCard(type: FormType) {
-    if (type === 'profil' && hasProfil) {
+  function selectCard(type: FormType, slug?: string, name?: string, profil?: boolean) {
+    const resolvedSlug   = slug   ?? userSlug;
+    const resolvedName   = name   ?? userName;
+    const resolvedProfil = profil ?? hasProfil;
+
+    if (type === 'profil' && resolvedProfil) {
       router.push('/mon-compte/edit');
       return;
     }
@@ -55,18 +44,47 @@ export default function SoumettreePage() {
     if (type === 'profil') {
       setUsernameInput('');
       setShowForm(true);
-    } else if (userSlug) {
+    } else if (resolvedSlug) {
       // Connecté avec un profil → on saute la gate
-      setUsernameInput(userSlug);
-      setPraticienName(userName);
+      setUsernameInput(resolvedSlug);
+      setPraticienName(resolvedName);
       setGateState('found');
       setShowForm(true);
     } else {
       setUsernameInput('');
       setShowForm(false);
-      setPendingType(type as 'article'|'realisation'|'evenement');
     }
   }
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(async ({ data }) => {
+      let slug = '', name = '', country = '', profil = false;
+      if (data.user) {
+        if (data.user.email) setUserEmail(data.user.email);
+        const { data: p } = await supabase
+          .from('praticiens').select('id, slug, name, country').eq('user_id', data.user.id).maybeSingle();
+        if (p) {
+          profil  = true;
+          slug    = p.slug;
+          name    = p.name;
+          country = p.country || '';
+          setHasProfil(true);
+          setUserSlug(p.slug);
+          setUserName(p.name);
+          if (p.country) setUserCountry(p.country);
+        }
+      }
+      setAuthLoading(false);
+      // Si l'utilisateur avait cliqué avant que l'auth se résolve → on déclenche maintenant
+      if (pendingCardRef.current) {
+        const pending = pendingCardRef.current;
+        pendingCardRef.current = null;
+        selectCard(pending, slug, name, profil);
+      }
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function checkUsername() {
     if (!usernameInput.trim()) return;
@@ -117,7 +135,15 @@ export default function SoumettreePage() {
         {CARDS.map(card => (
           <div key={card.type as string}
             className={`submit-card${activeForm === card.type ? ' selected' : ''}`}
-            onClick={() => selectCard(card.type)}>
+            onClick={() => {
+              if (authLoading) {
+                // Auth pas encore résolue → mémorise la carte et sélectionne visuellement
+                pendingCardRef.current = card.type;
+                setActiveForm(card.type);
+              } else {
+                selectCard(card.type);
+              }
+            }}>
             <div className="submit-icon" style={{ background: card.iconBg }}>{card.icon}</div>
             <p className="f-label" style={{ marginBottom: '.5rem', fontSize: '.65rem' }}>{card.num}</p>
             <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .4rem 0' }}>{card.title}</h3>
@@ -152,8 +178,16 @@ export default function SoumettreePage() {
             </div>
           )}
 
-          {/* ── GATE LINKEDIN (article / réalisation / événement) ── */}
-          {(activeForm === 'article' || activeForm === 'realisation' || activeForm === 'evenement') && !showForm && !submitted && (
+          {/* ── Chargement auth ── */}
+          {authLoading && activeForm && activeForm !== 'profil' && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', padding: '1.5rem 0', color: 'var(--f-text-3)', fontFamily: "'Geist Mono', monospace", fontSize: '.75rem' }}>
+              <span className="spinner" style={{ width: 14, height: 14, borderWidth: 2 }} />
+              Vérification de ton compte…
+            </div>
+          )}
+
+          {/* ── GATE (article / réalisation / événement) ── */}
+          {(activeForm === 'article' || activeForm === 'realisation' || activeForm === 'evenement') && !showForm && !submitted && !authLoading && (
             <div className="gate-box">
               <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.05rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .4rem 0' }}>
                 Vérifions ton profil
