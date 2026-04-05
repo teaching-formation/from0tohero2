@@ -33,10 +33,25 @@ export async function GET(req: NextRequest) {
   );
 
   // Appel GitHub API
-  const ghRes = await fetch(
-    `https://api.github.com/users/${username}/repos?sort=updated&per_page=50&type=public`,
-    { headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'from0tohero' } }
-  );
+  const ghHeaders: Record<string, string> = {
+    Accept: 'application/vnd.github+json',
+    'User-Agent': 'from0tohero',
+  };
+  if (process.env.GITHUB_TOKEN) {
+    ghHeaders['Authorization'] = `Bearer ${process.env.GITHUB_TOKEN}`;
+  }
+  let ghRes: Response;
+  try {
+    ghRes = await fetch(
+      `https://api.github.com/users/${username}/repos?sort=updated&per_page=50&type=public`,
+      { headers: ghHeaders, signal: AbortSignal.timeout(8000) }
+    );
+  } catch {
+    return NextResponse.json({ error: 'Impossible de joindre l\'API GitHub (timeout).' }, { status: 502 });
+  }
+  if (ghRes.status === 403) {
+    return NextResponse.json({ error: 'Limite de requêtes GitHub atteinte. Réessaie dans quelques minutes.' }, { status: 502 });
+  }
   if (!ghRes.ok) return NextResponse.json({ error: 'Impossible de récupérer les repos GitHub.' }, { status: 502 });
 
   const repos = await ghRes.json();
