@@ -3,8 +3,8 @@ import { supabaseAdmin } from '@/lib/supabase';
 
 const ALLOWED: Record<string, string[]> = {
   praticiens:      ['name','role','country','city','category','category_label','categories','bio','stack','badges','certifications','linkedin_url','github_url','youtube_url','website_url','twitter_url','whatsapp_url','photo_url','status'],
-  articles:        ['title','author','author_country','category','source','source_label','external_url','excerpt','date_published','status'],
-  realisations:    ['title','category','type','type_label','stack','excerpt','demo_url','repo_url','date_published','status'],
+  articles:        ['title','author','author_country','category','source','source_label','external_url','excerpt','date_published','collaborateurs','status'],
+  realisations:    ['title','category','type','type_label','stack','excerpt','demo_url','repo_url','date_published','collaborateurs','status'],
   evenements:      ['title','type','types','type_label','lieu','pays','online','url','date_debut','date_fin','gratuit','excerpt','status'],
   chaines_youtube: ['name','description','url','subs','ordre','active','status'],
   collections:     ['title','description','ordre','status'],

@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   // Récupère le github_url du praticien
   const { data: praticien } = await supabaseAdmin
     .from('praticiens')
-    .select('github_url, slug')
+    .select('id, github_url, slug')
     .eq('user_id', user.id)
     .maybeSingle();
 
@@ -26,9 +26,7 @@ export async function GET(req: NextRequest) {
   const { data: existingRepos } = await supabaseAdmin
     .from('realisations')
     .select('repo_url')
-    .eq('praticien_id', (
-      await supabaseAdmin.from('praticiens').select('id').eq('user_id', user.id).maybeSingle()
-    ).data?.id || '');
+    .eq('praticien_id', praticien.id);
 
   const importedUrls = new Set(
     (existingRepos || []).map(r => String(r.repo_url || '').replace(/\/$/, '').toLowerCase())

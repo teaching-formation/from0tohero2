@@ -113,7 +113,7 @@ export async function GET(req: NextRequest) {
 
     const html    = await pageRes.text();
     const title   = extractTitle(html);
-    const excerpt = extractMeta(html, 'description') || extractMeta(html, 'description');
+    const excerpt = extractMeta(html, 'description') || extractMeta(html, 'og:description');
 
     return NextResponse.json({
       title:    title,
