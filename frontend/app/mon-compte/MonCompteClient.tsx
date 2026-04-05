@@ -371,7 +371,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
               <div key={String(col.id)} style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-text-1)', margin: '0 0 .2rem 0', fontWeight: 500 }}>{String(col.title)}</p>
-                  {col.description && (
+                  {!!col.description && (
                     <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', margin: '0 0 .3rem 0' }}>{String(col.description)}</p>
                   )}
                   <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', margin: 0 }}>
