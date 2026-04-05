@@ -142,6 +142,68 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       } catch { /* fallback vers scraping générique */ }
     }
 
+    // ── Substack — via RSS ────────────────────────────────────────────────
+    if (parsed.hostname.endsWith('.substack.com')) {
+      try {
+        const feedUrl = `${parsed.protocol}//${parsed.hostname}/feed`;
+        const parts   = parsed.pathname.split('/').filter(Boolean);
+        const slug    = parts[parts.length - 1] ?? '';
+        const rssRes  = await fetch(feedUrl, {
+          headers: { 'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)' },
+          signal: AbortSignal.timeout(10000),
+        });
+        if (rssRes.ok) {
+          const rssText   = await rssRes.text();
+          const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+          let m: RegExpExecArray | null;
+          while ((m = itemRegex.exec(rssText)) !== null) {
+            const block     = m[1];
+            const linkMatch = block.match(/<link>(.*?)<\/link>/i);
+            const link      = linkMatch?.[1]?.trim() ?? '';
+            if (slug && !link.includes(slug)) continue;
+            const titleMatch = block.match(/<title[^>]*><!\[CDATA\[([\s\S]*?)\]\]><\/title>/i) || block.match(/<title>([^<]+)<\/title>/i);
+            const descMatch  = block.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/i);
+            const title      = titleMatch?.[1]?.trim() ?? '';
+            const excerpt    = (descMatch?.[1] ?? '').replace(/<[^>]+>/g, '').slice(0, 300).trim();
+            if (title) return res.json({ title, excerpt, external_url: link || url, source: 'substack', stack: '', category: '' });
+          }
+        }
+      } catch { /* fallback */ }
+    }
+
+    // ── Dev.to — via API publique ─────────────────────────────────────────
+    if (parsed.hostname === 'dev.to') {
+      try {
+        const parts = parsed.pathname.split('/').filter(Boolean);
+        if (parts.length >= 2) {
+          const apiRes = await fetch(`https://dev.to/api/articles/${parts[0]}/${parts[1]}`, {
+            headers: { 'User-Agent': 'from0tohero' },
+            signal: AbortSignal.timeout(8000),
+          });
+          if (apiRes.ok) {
+            const data = await apiRes.json();
+            return res.json({ title: data.title ?? '', excerpt: data.description ?? '', external_url: data.url ?? url, source: 'devto', stack: (data.tags ?? []).join(', '), category: guessCategory(data.tags ?? []) });
+          }
+        }
+      } catch { /* fallback */ }
+    }
+
+    // ── LinkedIn — impossible à scraper ───────────────────────────────────
+    if (parsed.hostname.includes('linkedin.com')) {
+      return res.status(422).json({ error: "LinkedIn ne permet pas la récupération automatique. Remplis le titre et la description manuellement, puis colle l'URL dans le champ \"Lien externe\"." });
+    }
+
+    // ── YouTube — via oEmbed ──────────────────────────────────────────────
+    if (parsed.hostname.includes('youtube.com') || parsed.hostname === 'youtu.be') {
+      try {
+        const oembedRes = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`, { signal: AbortSignal.timeout(6000) });
+        if (oembedRes.ok) {
+          const data = await oembedRes.json();
+          return res.json({ title: data.title ?? '', excerpt: '', external_url: url, source: 'youtube', stack: '', category: '' });
+        }
+      } catch { /* fallback */ }
+    }
+
     // ── URL générique — extraction OG tags ────────────────────────────────
     const BROWSER_HEADERS = {
       'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
