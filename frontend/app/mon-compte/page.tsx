@@ -38,18 +38,21 @@ export default async function MonComptePage() {
   let realisations: Record<string, unknown>[] = [];
   let evenements:   Record<string, unknown>[] = [];
   let collections:  Record<string, unknown>[] = [];
+  let tips:         Record<string, unknown>[] = [];
 
   if (praticien) {
-    const [{ data: arts }, { data: reals }, { data: evts }, { data: cols }] = await Promise.all([
+    const [{ data: arts }, { data: reals }, { data: evts }, { data: cols }, { data: tps }] = await Promise.all([
       supabase.from('articles').select('id, slug, title, source, date_published, status, category').eq('praticien_id', praticien.id).order('created_at', { ascending: false }),
       supabase.from('realisations').select('id, slug, title, type, stack, status, category').eq('praticien_id', praticien.id).order('created_at', { ascending: false }),
       supabase.from('evenements').select('id, slug, title, type, type_label, date_debut, date_fin, pays, online, status').eq('praticien_id', praticien.id).order('date_debut', { ascending: true }),
       supabase.from('collections').select('id, title, description, items, ordre, status').eq('praticien_id', praticien.id).order('ordre', { ascending: true }),
+      supabase.from('tips').select('id, content, type, category, stack, status, created_at').eq('praticien_id', praticien.id).order('created_at', { ascending: false }),
     ]);
     articles     = (arts  ?? []) as Record<string, unknown>[];
     realisations = (reals ?? []) as Record<string, unknown>[];
     evenements   = (evts  ?? []) as Record<string, unknown>[];
     collections  = (cols  ?? []) as Record<string, unknown>[];
+    tips         = (tps   ?? []) as Record<string, unknown>[];
   }
 
   return (
@@ -60,6 +63,7 @@ export default async function MonComptePage() {
       realisations={realisations}
       evenements={evenements}
       collections={collections}
+      tips={tips}
     />
   );
 }

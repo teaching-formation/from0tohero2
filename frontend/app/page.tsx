@@ -53,6 +53,20 @@ async function getStats() {
   };
 }
 
+async function getLatestTips() {
+  const { data } = await supabase
+    .from('tips')
+    .select('id, content, type, category, stack, praticien_id, created_at, praticiens(slug, name)')
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false })
+    .limit(6);
+  return (data ?? []) as unknown as Array<{
+    id: string; content: string; type: string; category: string;
+    stack: string[]; praticien_id: string; created_at: string;
+    praticiens: { slug: string; name: string } | null;
+  }>;
+}
+
 async function getLastArticles() {
   const { data } = await supabase
     .from('articles')
@@ -66,8 +80,8 @@ async function getLastArticles() {
 const STAT_ACCENT = ['--f-sky', '--f-orange', '--f-green', '#a78bfa'];
 
 export default async function Home() {
-  const [stats, lastArticles, youtubeChannels, bootcamps] = await Promise.all([
-    getStats(), getLastArticles(), getYoutubeChannels(), getBootcamps(),
+  const [stats, lastArticles, youtubeChannels, bootcamps, latestTips] = await Promise.all([
+    getStats(), getLastArticles(), getYoutubeChannels(), getBootcamps(), getLatestTips(),
   ]);
 
   const statItems = [
@@ -363,6 +377,46 @@ export default async function Home() {
             </ScrollReveal>
           ))}
         </div>
+
+        {/* Tips & TIL */}
+        {latestTips.length > 0 && (
+          <>
+            <ScrollReveal>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '.6rem' }}>
+                <span style={{ display: 'inline-block', width: 18, height: 1.5, background: 'var(--f-orange)', borderRadius: 2 }} />
+                Tips &amp; TIL
+              </p>
+            </ScrollReveal>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '1rem', marginBottom: '3.5rem' }}>
+              {latestTips.map((tip, i) => {
+                const TYPE_COLOR: Record<string,string> = { tip:'var(--f-orange)', TIL:'var(--f-sky)', snippet:'var(--f-green)' };
+                const praticien = tip.praticiens;
+                return (
+                  <ScrollReveal key={tip.id} delay={i * 60}>
+                    <div className="f-card" style={{ padding: '1.1rem 1.25rem', height: '100%', display: 'flex', flexDirection: 'column', gap: '.6rem' }}>
+                      <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap' }}>
+                        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.08em', color: TYPE_COLOR[tip.type] ?? 'var(--f-text-3)', border: `1px solid currentColor`, padding: '2px 8px', borderRadius: 4 }}>
+                          {tip.type}
+                        </span>
+                        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 8px', borderRadius: 4 }}>
+                          {tip.category}
+                        </span>
+                      </div>
+                      <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-text-1)', margin: 0, lineHeight: 1.65, flex: 1, whiteSpace: 'pre-wrap', display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                        {tip.content}
+                      </p>
+                      {praticien && (
+                        <Link href={`/praticiens/${praticien.slug}`} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', textDecoration: 'none' }}>
+                          @{praticien.slug}
+                        </Link>
+                      )}
+                    </div>
+                  </ScrollReveal>
+                );
+              })}
+            </div>
+          </>
+        )}
 
         {/* Articles récents */}
         {lastArticles.length > 0 && (

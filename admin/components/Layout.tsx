@@ -10,6 +10,7 @@ const NAV = [
   { href: '/evenements',   label: 'Événements',      icon: '◷',  badge: false },
   { href: '/chaines',      label: 'Chaînes YouTube', icon: '▶',  badge: false },
   { href: '/collections',  label: 'Collections',     icon: '◈',  badge: false },
+  { href: '/tips',         label: 'Tips & TIL',      icon: '💡', badge: false },
 ];
 
 type Props = { children: React.ReactNode };

@@ -15,6 +15,7 @@ type Props = {
   realisations: ContentRow[];
   evenements:   ContentRow[];
   collections:  ContentRow[];
+  tips:         ContentRow[];
 };
 
 const SOURCE_LABEL: Record<string, string> = {
@@ -31,13 +32,13 @@ const EVTYPE_LABEL: Record<string, string> = {
   webinaire:'Webinaire', bootcamp:'Bootcamp', autre:'Autre',
 };
 
-export default function MonCompteClient({ user, praticien, articles, realisations, evenements, collections }: Props) {
+export default function MonCompteClient({ user, praticien, articles, realisations, evenements, collections, tips }: Props) {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const supabase     = createClient();
-  type Tab = 'profil' | 'articles' | 'realisations' | 'evenements' | 'collections';
+  type Tab = 'profil' | 'articles' | 'realisations' | 'evenements' | 'collections' | 'tips';
   const rawTab    = searchParams.get('tab') ?? '';
-  const initialTab: Tab = (['profil','articles','realisations','evenements','collections'] as Tab[]).includes(rawTab as Tab)
+  const initialTab: Tab = (['profil','articles','realisations','evenements','collections','tips'] as Tab[]).includes(rawTab as Tab)
     ? (rawTab as Tab)
     : 'profil';
   const [tab, setTab]         = useState<Tab>(initialTab);
@@ -51,6 +52,15 @@ export default function MonCompteClient({ user, praticien, articles, realisation
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ table, id }),
     });
+    setDeleting(null);
+    if (!r.ok) { alert('Erreur lors de la suppression.'); return; }
+    router.refresh();
+  }
+
+  async function deleteTip(id: string) {
+    if (!window.confirm('Supprimer ce tip ? Cette action est irréversible.')) return;
+    setDeleting(id);
+    const r = await fetch(`/api/tip/${id}`, { method: 'DELETE' });
     setDeleting(null);
     if (!r.ok) { alert('Erreur lors de la suppression.'); return; }
     router.refresh();
@@ -131,6 +141,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
           { key: 'realisations', label: `Réalisations (${realisations.length})` },
           { key: 'evenements',   label: `Événements (${evenements.length})` },
           { key: 'collections',  label: `Collections (${collections.length})` },
+          { key: 'tips',         label: `Tips (${tips.length})` },
         ] as { key: typeof tab; label: string }[]).map(t => (
           <button
             key={t.key}
@@ -384,6 +395,55 @@ export default function MonCompteClient({ user, praticien, articles, realisation
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Onglet Tips */}
+      {tab === 'tips' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <a href="/mon-compte/nouveau-tip" className="btn-f btn-f-primary" style={{ fontSize: '.72rem' }}>
+              + Nouveau tip
+            </a>
+          </div>
+          {tips.length === 0 ? (
+            <div style={{ border: '1.5px dashed var(--f-border)', borderRadius: 12, padding: '3rem 2rem', textAlign: 'center', background: 'var(--f-surface)' }}>
+              <div style={{ fontSize: '2.2rem', marginBottom: '1rem' }}>💡</div>
+              <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0' }}>
+                Partage ce que tu sais
+              </p>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', margin: '0 0 1.5rem 0', lineHeight: 1.7, maxWidth: 380, marginInline: 'auto' }}>
+                Tips, TIL, snippets… Publie en 30 secondes. Instantanément visible sur ton profil et la homepage.
+              </p>
+              <a href="/mon-compte/nouveau-tip" className="btn-f btn-f-primary" style={{ fontSize: '.75rem' }}>
+                + Publier mon premier tip
+              </a>
+            </div>
+          ) : (tips as Record<string, unknown>[]).map((tip) => (
+            <div key={String(tip.id)} style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 10, padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', gap: '.4rem', marginBottom: '.5rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', letterSpacing: '.08em', padding: '2px 8px', borderRadius: 4, border: '1px solid var(--f-sky-border)', background: 'var(--f-sky-bg)', color: 'var(--f-sky)' }}>
+                    {String(tip.type)}
+                  </span>
+                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', letterSpacing: '.08em', padding: '2px 8px', borderRadius: 4, border: '1px solid var(--f-border)', color: 'var(--f-text-3)' }}>
+                    {String(tip.category)}
+                  </span>
+                </div>
+                <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-1)', margin: '0 0 .25rem 0', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                  {String(tip.content)}
+                </p>
+              </div>
+              <button
+                onClick={() => deleteTip(String(tip.id))}
+                disabled={deleting === String(tip.id)}
+                className="btn-f btn-f-danger"
+                style={{ fontSize: '.68rem', flexShrink: 0 }}
+              >
+                {deleting === String(tip.id) ? '…' : '✕'}
+              </button>
+            </div>
+          ))}
         </div>
       )}
 

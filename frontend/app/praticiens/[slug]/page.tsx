@@ -12,9 +12,11 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
   const { slug } = use(params);
   type CollectionItem = { id: string; title: string; url: string; description: string };
   type Collection = { id: string; title: string; description?: string; items: CollectionItem[] };
+  type Tip = { id: string; content: string; type: string; category: string; stack: string[]; created_at: string };
   const [p, setP] = useState<Praticien | null>(null);
   const [realisations, setRealisations] = useState<Realisation[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
+  const [tipsList, setTipsList] = useState<Tip[]>([]);
   const [loading, setLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
   const [contactLoading, setContactLoading] = useState(false);
@@ -44,12 +46,14 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
       const praticien = praticienRaw as unknown as Praticien | null;
       if (!praticien) { notFound(); return; }
       setP(praticien);
-      const [{ data: reals }, { data: cols }] = await Promise.all([
+      const [{ data: reals }, { data: cols }, { data: tps }] = await Promise.all([
         supabase.from('realisations').select('*').eq('praticien_id', praticien.id).eq('status', 'approved'),
         supabase.from('collections').select('id, title, description, items, ordre').eq('praticien_id', praticien.id).eq('status', 'approved').order('ordre', { ascending: true }),
+        supabase.from('tips').select('id, content, type, category, stack, created_at').eq('praticien_id', praticien.id).eq('status', 'approved').order('created_at', { ascending: false }).limit(20),
       ]);
       setRealisations(reals ?? []);
       setCollections((cols ?? []) as Collection[]);
+      setTipsList((tps ?? []) as Tip[]);
       setLoading(false);
 
       // Check if logged-in user owns this profile
@@ -247,6 +251,36 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
                 )}
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* TIPS & TIL */}
+      {tipsList.length > 0 && (
+        <div style={{ marginBottom: '2.5rem' }}>
+          <span className="f-label" style={{ marginBottom: '1.25rem' }}>// tips & TIL</span>
+          <div style={{ marginTop: '.75rem', display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+            {tipsList.map(tip => {
+              const TYPE_COLOR: Record<string,string> = { tip:'var(--f-orange)', TIL:'var(--f-sky)', snippet:'var(--f-green)' };
+              return (
+                <div key={tip.id} style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 10, padding: '1rem 1.25rem' }}>
+                  <div style={{ display: 'flex', gap: '.4rem', marginBottom: '.6rem', flexWrap: 'wrap' }}>
+                    <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', letterSpacing: '.08em', color: TYPE_COLOR[tip.type] ?? 'var(--f-text-3)', border: `1px solid ${TYPE_COLOR[tip.type] ?? 'var(--f-border)'}22`, background: `${TYPE_COLOR[tip.type] ?? 'var(--f-surface)'}11`, padding: '2px 9px', borderRadius: 4 }}>
+                      {tip.type}
+                    </span>
+                    <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 8px', borderRadius: 4 }}>
+                      {tip.category}
+                    </span>
+                    {tip.stack?.map((s: string) => (
+                      <span key={s} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 8px', borderRadius: 4 }}>{s}</span>
+                    ))}
+                  </div>
+                  <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.8rem', color: 'var(--f-text-1)', margin: 0, lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>
+                    {tip.content}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

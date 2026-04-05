@@ -112,6 +112,18 @@ export type Collection = {
   updated_at: string
 }
 
+export type Tip = {
+  id: string
+  praticien_id: string
+  content: string
+  type: 'tip' | 'TIL' | 'snippet'
+  category: string
+  stack: string[]
+  status: 'pending' | 'approved' | 'rejected'
+  created_at: string
+  updated_at: string
+}
+
 export type Soumission = {
   id: string
   type: 'praticien' | 'article' | 'realisation' | 'evenement'
