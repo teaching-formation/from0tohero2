@@ -114,5 +114,34 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.json(row);
   }
 
+  if (table === 'collections') {
+    const { data: row, error } = await supabaseAdmin.from('collections').insert({
+      praticien_id: data.praticien_id,
+      title:        data.title,
+      description:  data.description || null,
+      items:        Array.isArray(data.items) ? data.items : [],
+      ordre:        Number(data.ordre) || 0,
+      status:       data.status || 'approved',
+    }).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    return res.json(row);
+  }
+
+  if (table === 'tips') {
+    const cleanStack = typeof data.stack === 'string'
+      ? data.stack.split(',').map((s: string) => s.trim()).filter(Boolean)
+      : (Array.isArray(data.stack) ? data.stack : []);
+    const { data: row, error } = await supabaseAdmin.from('tips').insert({
+      praticien_id: data.praticien_id,
+      content:      data.content,
+      type:         data.type || 'tip',
+      category:     data.category || 'autre',
+      stack:        cleanStack,
+      status:       data.status || 'approved',
+    }).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    return res.json(row);
+  }
+
   return res.status(400).json({ error: 'Table non supportée' });
 }
