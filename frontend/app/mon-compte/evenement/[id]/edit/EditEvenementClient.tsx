@@ -35,6 +35,10 @@ export default function EditEvenementClient({ evenement: ev }: Props) {
   async function handleAutofill() {
     const urlToFetch = afUrl.trim() || form.url.trim();
     if (!urlToFetch) return;
+    if (urlToFetch.includes('linkedin.com')) {
+      setAfMsg({ type: 'err', text: '⚠ LinkedIn ne permet pas la récupération automatique. Colle l\'URL directe de l\'événement (lu.ma, eventbrite, meetup…) pour l\'autofill.' });
+      return;
+    }
     setAfLoading(true); setAfMsg(null);
     try {
       const res  = await fetch(`/api/autofill?url=${encodeURIComponent(urlToFetch)}`);

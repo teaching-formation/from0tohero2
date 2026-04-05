@@ -39,10 +39,16 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
   const [afMsg,     setAfMsg]     = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
 
   async function handleAutofill() {
-    if (!afUrl.trim()) return;
+    const target = afUrl.trim();
+    if (!target) return;
+    // LinkedIn ne peut pas être scrapé — message guidé spécifique
+    if (target.includes('linkedin.com')) {
+      setAfMsg({ type: 'err', text: '⚠ LinkedIn ne permet pas la récupération automatique. Colle l\'URL directe de l\'événement (lu.ma, eventbrite, meetup…) pour l\'autofill, et mets le lien LinkedIn dans le champ "Lien vers l\'événement" si tu le souhaites.' });
+      return;
+    }
     setAfLoading(true); setAfMsg(null);
     try {
-      const res  = await fetch(`/api/autofill?url=${encodeURIComponent(afUrl.trim())}`);
+      const res  = await fetch(`/api/autofill?url=${encodeURIComponent(target)}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erreur');
       setForm(f => ({

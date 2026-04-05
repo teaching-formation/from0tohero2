@@ -23,6 +23,10 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
 
   async function handleAutofill() {
     if (!autofillUrl.trim()) return;
+    if (autofillUrl.trim().includes('linkedin.com')) {
+      setAutofillMsg({ type: 'err', text: '⚠ LinkedIn ne permet pas la récupération automatique. Utilise un lien GitHub, un lien de démo, ou remplis le formulaire manuellement.' });
+      return;
+    }
     setAutofillLoading(true);
     setAutofillMsg(null);
     try {
