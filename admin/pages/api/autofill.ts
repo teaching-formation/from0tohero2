@@ -107,15 +107,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     // ── URL générique — extraction OG tags ────────────────────────────────
-    const pageRes = await fetch(url, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; from0tohero/1.0)' },
+    const BROWSER_HEADERS = {
+      'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
+      'Cache-Control': 'no-cache',
+    };
+
+    let pageRes = await fetch(url, {
+      headers: BROWSER_HEADERS,
       signal: AbortSignal.timeout(8000),
     });
+
+    if (!pageRes.ok) {
+      pageRes = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+          'Accept': 'text/html,application/xhtml+xml,*/*;q=0.8',
+        },
+        signal: AbortSignal.timeout(8000),
+      });
+    }
+
     if (!pageRes.ok) throw new Error('Page inaccessible');
 
     const html    = await pageRes.text();
     const title   = extractTitle(html);
-    const excerpt = extractMeta(html, 'description');
+    const excerpt = extractMeta(html, 'description') || extractMeta(html, 'og:description');
 
     return res.json({
       title,
