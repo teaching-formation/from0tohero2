@@ -29,6 +29,7 @@ const EDIT_FIELDS = [
   { key: 'external_url',   label: 'Lien article', type: 'url' as const },
   { key: 'excerpt',        label: 'Résumé', type: 'textarea' as const },
   { key: 'date_published', label: 'Date publication', type: 'date' as const },
+  { key: 'collaborateurs', label: 'Co-auteurs (slugs séparés par ,)' },
   { key: 'status',         label: 'Statut', type: 'select' as const, options: ['pending','approved','rejected'] },
 ];
 
@@ -220,11 +221,11 @@ function ArticlesPage() {
       )}
 
       {editing && (
-        <EditModal table="articles" row={editing} fields={EDIT_FIELDS}
+        <EditModal table="articles" row={editing} fields={EDIT_FIELDS} autofill
           onClose={() => setEditing(null)} onSaved={onSaved} />
       )}
       {adding && (
-        <AddModal table="articles"
+        <AddModal table="articles" autofill
           fields={[
             { key: 'title',          label: 'Titre', required: true },
             { key: 'author',         label: 'Auteur', required: true },
@@ -235,6 +236,7 @@ function ArticlesPage() {
             { key: 'external_url',   label: 'Lien article', type: 'url', required: true },
             { key: 'excerpt',        label: 'Résumé', type: 'textarea' },
             { key: 'date_published', label: 'Date publication', type: 'date' },
+            { key: 'collaborateurs', label: 'Co-auteurs (slugs séparés par ,)' },
             { key: 'status',         label: 'Statut', type: 'select', options: ['approved','pending','rejected'] },
           ]}
           defaults={{ status: 'approved' }}

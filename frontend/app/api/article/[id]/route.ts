@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
-const ALLOWED = ['title', 'category', 'source', 'source_label', 'external_url', 'excerpt', 'date_published'];
+const ALLOWED = ['title', 'category', 'source', 'source_label', 'external_url', 'excerpt', 'date_published', 'collaborateurs'];
 
 export async function PATCH(
   req: Request,

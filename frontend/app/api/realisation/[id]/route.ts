@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
-const ALLOWED = ['title', 'category', 'type', 'type_label', 'stack', 'excerpt', 'demo_url', 'repo_url', 'date_published'];
+const ALLOWED = ['title', 'category', 'type', 'type_label', 'stack', 'excerpt', 'demo_url', 'repo_url', 'date_published', 'collaborateurs'];
 
 export async function PATCH(
   req: Request,

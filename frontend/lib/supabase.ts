@@ -48,6 +48,7 @@ export type Realisation = {
   demo_url?: string
   repo_url?: string
   date_published?: string
+  collaborateurs?: string[]
   status: 'pending' | 'approved' | 'rejected'
   created_at: string
   updated_at: string
@@ -86,6 +87,26 @@ export type Article = {
   external_url: string
   excerpt?: string
   date_published?: string
+  collaborateurs?: string[]
+  status: 'pending' | 'approved' | 'rejected'
+  created_at: string
+  updated_at: string
+}
+
+export type CollectionItem = {
+  id: string
+  title: string
+  url: string
+  description: string
+}
+
+export type Collection = {
+  id: string
+  praticien_id: string
+  title: string
+  description?: string
+  items: CollectionItem[]
+  ordre: number
   status: 'pending' | 'approved' | 'rejected'
   created_at: string
   updated_at: string

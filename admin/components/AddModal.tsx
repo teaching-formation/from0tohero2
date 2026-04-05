@@ -13,14 +13,18 @@ type Props = {
   table: string;
   fields: Field[];
   defaults?: Record<string, string>;
+  autofill?: boolean;
   onClose: () => void;
   onCreated: (row: Record<string, unknown>) => void;
 };
 
-export default function AddModal({ table, fields, defaults = {}, onClose, onCreated }: Props) {
+export default function AddModal({ table, fields, defaults = {}, autofill = false, onClose, onCreated }: Props) {
   const [form, setForm]       = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
+  const [afUrl,     setAfUrl]     = useState('');
+  const [afLoading, setAfLoading] = useState(false);
+  const [afMsg,     setAfMsg]     = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
 
   useEffect(() => {
     const init: Record<string, string> = {};
@@ -38,13 +42,42 @@ export default function AddModal({ table, fields, defaults = {}, onClose, onCrea
     setForm(p => ({ ...p, [key]: value }));
   }, []);
 
+  async function handleAutofill() {
+    if (!afUrl.trim()) return;
+    setAfLoading(true);
+    setAfMsg(null);
+    try {
+      const res  = await fetch(`/api/autofill?url=${encodeURIComponent(afUrl.trim())}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erreur');
+      setForm(f => ({
+        ...f,
+        ...(data.title        && { title:        data.title }),
+        ...(data.excerpt      && { excerpt:      data.excerpt }),
+        ...(data.stack        && { stack:        data.stack }),
+        ...(data.category     && { category:     data.category }),
+        ...(data.type         && { type:         data.type }),
+        ...(data.demo_url     && { demo_url:     data.demo_url }),
+        ...(data.repo_url     && { repo_url:     data.repo_url }),
+        ...(data.external_url && { external_url: data.external_url }),
+        ...(data.source       && { source:       data.source }),
+      }));
+      const filled = [data.title, data.excerpt, data.stack, data.external_url].filter(Boolean).length;
+      setAfMsg({ type: 'ok', text: `✓ ${filled} champ${filled > 1 ? 's' : ''} rempli${filled > 1 ? 's' : ''} automatiquement` });
+    } catch (e: unknown) {
+      setAfMsg({ type: 'err', text: e instanceof Error ? e.message : 'Impossible de récupérer les infos' });
+    } finally {
+      setAfLoading(false);
+    }
+  }
+
   async function save() {
     setLoading(true);
     setError('');
 
     const data: Record<string, unknown> = {};
     for (const f of fields) {
-      if (f.type === 'array' || f.key === 'stack') {
+      if (f.type === 'array' || f.key === 'stack' || f.key === 'collaborateurs') {
         data[f.key] = form[f.key].split(',').map(s => s.trim()).filter(Boolean);
       } else {
         data[f.key] = form[f.key] || null;
@@ -77,6 +110,53 @@ export default function AddModal({ table, fields, defaults = {}, onClose, onCrea
           <button className="modal-close" onClick={onClose} aria-label="Fermer">✕</button>
         </div>
         <hr />
+
+        {autofill && (
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(56,189,248,.08) 0%, rgba(56,189,248,.02) 100%)',
+            border: '1px solid var(--sky-border)',
+            borderRadius: 'var(--radius)',
+            padding: '.9rem 1rem',
+            marginBottom: '.5rem',
+          }}>
+            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', fontWeight: 600, color: 'var(--sky)', marginBottom: '.2rem' }}>
+              ✦ Autofill depuis une URL
+            </p>
+            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--text-3)', marginBottom: '.7rem' }}>
+              Colle un lien GitHub ou de démo pour remplir les champs automatiquement.
+            </p>
+            <div style={{ display: 'flex', gap: '.5rem' }}>
+              <input
+                type="text"
+                placeholder="https://github.com/user/repo"
+                value={afUrl}
+                onChange={e => setAfUrl(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAutofill())}
+                style={{ flex: 1, fontSize: '.72rem' }}
+              />
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={handleAutofill}
+                disabled={afLoading || !afUrl.trim()}
+                style={{ flexShrink: 0 }}
+              >
+                {afLoading ? '…' : 'Autofill →'}
+              </button>
+            </div>
+            {afMsg && (
+              <p style={{
+                fontFamily: "'Geist Mono', monospace",
+                fontSize: '.6rem',
+                color: afMsg.type === 'ok' ? 'var(--green)' : 'var(--red)',
+                marginTop: '.4rem',
+              }}>
+                {afMsg.text}
+              </p>
+            )}
+          </div>
+        )}
+
         {fields.map(f => (
           <div key={f.key} className="field-group">
             <label className="field-label">

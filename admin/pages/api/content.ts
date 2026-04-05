@@ -7,6 +7,7 @@ const TABLES: Record<string, string> = {
   realisations:    'realisations',
   evenements:      'evenements',
   chaines_youtube: 'chaines_youtube',
+  collections:     'collections',
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

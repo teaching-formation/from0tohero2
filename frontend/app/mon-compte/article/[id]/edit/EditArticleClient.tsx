@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import CollabInput from '@/components/forms/CollabInput';
 
 const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
 const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cyber-Sécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
@@ -20,9 +21,49 @@ export default function EditArticleClient({ article: a }: Props) {
     date_published: String(a.date_published || ''),
     excerpt:        String(a.excerpt        || ''),
   });
+  const [collaborateurs, setCollaborateurs] = useState<string[]>(
+    Array.isArray(a.collaborateurs) ? (a.collaborateurs as string[]) : []
+  );
+  const [afUrl,     setAfUrl]     = useState('');
+  const [afLoading, setAfLoading] = useState(false);
+  const [afMsg,     setAfMsg]     = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
   const [errors,  setErrors]  = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  function detectSource(url: string): string {
+    if (url.includes('medium.com'))   return 'medium';
+    if (url.includes('substack.com')) return 'substack';
+    if (url.includes('dev.to'))       return 'devto';
+    if (url.includes('linkedin.com')) return 'linkedin';
+    if (url.includes('youtube.com'))  return 'youtube';
+    return 'blog';
+  }
+
+  async function handleAutofill() {
+    if (!afUrl.trim()) return;
+    setAfLoading(true);
+    setAfMsg(null);
+    try {
+      const res  = await fetch(`/api/autofill?url=${encodeURIComponent(afUrl.trim())}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erreur');
+      const src = detectSource(afUrl);
+      setForm(f => ({
+        ...f,
+        title:        data.title   || f.title,
+        excerpt:      data.excerpt || f.excerpt,
+        external_url: afUrl.trim(),
+        source:       src,
+      }));
+      const filled = [data.title, data.excerpt].filter(Boolean).length;
+      setAfMsg({ type: 'ok', text: `✓ ${filled} champ${filled > 1 ? 's' : ''} rempli${filled > 1 ? 's' : ''} automatiquement` });
+    } catch (e: unknown) {
+      setAfMsg({ type: 'err', text: e instanceof Error ? e.message : 'Impossible de récupérer les infos' });
+    } finally {
+      setAfLoading(false);
+    }
+  }
 
   function set(key: string, val: string) {
     setForm(f => ({ ...f, [key]: val }));
@@ -55,6 +96,7 @@ export default function EditArticleClient({ article: a }: Props) {
         source_label: form.source === 'autre'
           ? form.source_autre
           : PLAT_LABELS[form.source] || form.source,
+        collaborateurs,
       }),
     });
     setLoading(false);
@@ -78,6 +120,46 @@ export default function EditArticleClient({ article: a }: Props) {
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+      {/* ── Bloc Autofill ── */}
+      <div style={{
+        background: 'linear-gradient(135deg, var(--f-sky-bg) 0%, rgba(56,189,248,.04) 100%)',
+        border: '1px solid var(--f-sky-border)',
+        borderRadius: 10,
+        padding: '1.1rem 1.25rem',
+      }}>
+        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', fontWeight: 600, color: 'var(--f-sky)', marginBottom: '.25rem' }}>
+          ✦ Autofill depuis une URL
+        </p>
+        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', marginBottom: '.85rem' }}>
+          Colle le lien de l'article — on écrase les champs automatiquement.
+        </p>
+        <div style={{ display: 'flex', gap: '.5rem' }}>
+          <input
+            className="f-input"
+            type="text"
+            placeholder="https://medium.com/@toi/mon-article"
+            value={afUrl}
+            onChange={e => setAfUrl(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAutofill())}
+            style={{ flex: 1 }}
+          />
+          <button
+            type="button"
+            className="btn-f btn-f-primary"
+            onClick={handleAutofill}
+            disabled={afLoading || !afUrl.trim()}
+            style={{ flexShrink: 0, fontSize: '.72rem' }}
+          >
+            {afLoading ? '…' : 'Autofill →'}
+          </button>
+        </div>
+        {afMsg && (
+          <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: afMsg.type === 'ok' ? 'var(--f-green)' : '#f87171', marginTop: '.5rem' }}>
+            {afMsg.text}
+          </p>
+        )}
+      </div>
 
       <Field label="Titre de l'article" required error={errors.title}>
         <input className="f-input" value={form.title} onChange={e => set('title', e.target.value)} style={{ maxWidth: '100%' }} />
@@ -113,6 +195,10 @@ export default function EditArticleClient({ article: a }: Props) {
 
       <Field label="Date de publication" required error={errors.date_published}>
         <input className="f-input" type="date" value={form.date_published} onChange={e => set('date_published', e.target.value)} style={{ maxWidth: '280px' }} />
+      </Field>
+
+      <Field label="Co-auteurs" error={errors.collaborateurs}>
+        <CollabInput value={collaborateurs} onChange={setCollaborateurs} />
       </Field>
 
       <Field label="Résumé (1-2 phrases)" required error={errors.excerpt}>

@@ -10,8 +10,11 @@ import { BADGE_STYLES } from '@/lib/badges';
 
 export default function PraticienPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
+  type CollectionItem = { id: string; title: string; url: string; description: string };
+  type Collection = { id: string; title: string; description?: string; items: CollectionItem[] };
   const [p, setP] = useState<Praticien | null>(null);
   const [realisations, setRealisations] = useState<Realisation[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
   const [contactLoading, setContactLoading] = useState(false);
@@ -41,11 +44,12 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
       const praticien = praticienRaw as unknown as Praticien | null;
       if (!praticien) { notFound(); return; }
       setP(praticien);
-      const { data: reals } = await supabase
-        .from('realisations').select('*')
-        .eq('praticien_id', praticien.id)
-        .eq('status', 'approved');
+      const [{ data: reals }, { data: cols }] = await Promise.all([
+        supabase.from('realisations').select('*').eq('praticien_id', praticien.id).eq('status', 'approved'),
+        supabase.from('collections').select('id, title, description, items, ordre').eq('praticien_id', praticien.id).eq('status', 'approved').order('ordre', { ascending: true }),
+      ]);
       setRealisations(reals ?? []);
+      setCollections((cols ?? []) as Collection[]);
       setLoading(false);
 
       // Check if logged-in user owns this profile
@@ -209,6 +213,44 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
 
       <hr className="f-hr" style={{ marginBottom: '2.5rem' }} />
 
+      {/* COLLECTIONS */}
+      {collections.length > 0 && (
+        <div style={{ marginBottom: '2.5rem' }}>
+          <span className="f-label" style={{ marginBottom: '1.25rem' }}>// collections & ressources</span>
+          <div style={{ marginTop: '.75rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            {collections.map(col => (
+              <div key={col.id} style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 12, padding: '1.25rem 1.5rem' }}>
+                <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .25rem 0' }}>{col.title}</p>
+                {col.description && (
+                  <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', margin: '0 0 1rem 0', lineHeight: 1.6 }}>{col.description}</p>
+                )}
+                {Array.isArray(col.items) && col.items.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                    {col.items.map((item, i) => (
+                      <div key={item.id} style={{ display: 'flex', alignItems: 'flex-start', gap: '.6rem' }}>
+                        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', flexShrink: 0, marginTop: '.15rem' }}>{i + 1}.</span>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          {item.url ? (
+                            <a href={item.url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', fontWeight: 600, color: 'var(--f-sky)', textDecoration: 'none' }}>
+                              {item.title}
+                            </a>
+                          ) : (
+                            <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', fontWeight: 600, color: 'var(--f-text-1)' }}>{item.title}</span>
+                          )}
+                          {item.description && (
+                            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', margin: '.1rem 0 0 0' }}>{item.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* RÉALISATIONS */}
       {praticienRealisations.length > 0 && (
         <div>
@@ -235,6 +277,16 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginBottom: '1.1rem' }}>
                     {r.stack.map(s => <span key={s} className="f-tag">{s}</span>)}
                   </div>
+                  {Array.isArray(r.collaborateurs) && (r.collaborateurs as string[]).length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginBottom: '.85rem' }}>
+                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>avec</span>
+                      {(r.collaborateurs as string[]).map(c => (
+                        <a key={c} href={`/praticiens/${c}`} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-sky)', textDecoration: 'none', border: '1px solid var(--f-sky-border)', background: 'var(--f-sky-bg)', padding: '1px 7px', borderRadius: 99 }}>
+                          @{c}
+                        </a>
+                      ))}
+                    </div>
+                  )}
                   <div style={{ display: 'flex', gap: '.75rem' }}>
                     {r.demo_url && <a href={r.demo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-sky)', textDecoration: 'none' }}>Demo →</a>}
                     {r.repo_url && <a href={r.repo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', textDecoration: 'none' }}>Repo →</a>}

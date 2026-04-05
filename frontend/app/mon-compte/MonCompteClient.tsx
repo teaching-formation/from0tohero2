@@ -14,6 +14,7 @@ type Props = {
   articles:     ContentRow[];
   realisations: ContentRow[];
   evenements:   ContentRow[];
+  collections:  ContentRow[];
 };
 
 const SOURCE_LABEL: Record<string, string> = {
@@ -30,13 +31,13 @@ const EVTYPE_LABEL: Record<string, string> = {
   webinaire:'Webinaire', bootcamp:'Bootcamp', autre:'Autre',
 };
 
-export default function MonCompteClient({ user, praticien, articles, realisations, evenements }: Props) {
+export default function MonCompteClient({ user, praticien, articles, realisations, evenements, collections }: Props) {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const supabase     = createClient();
-  type Tab = 'profil' | 'articles' | 'realisations' | 'evenements';
+  type Tab = 'profil' | 'articles' | 'realisations' | 'evenements' | 'collections';
   const rawTab    = searchParams.get('tab') ?? '';
-  const initialTab: Tab = (['profil','articles','realisations','evenements'] as Tab[]).includes(rawTab as Tab)
+  const initialTab: Tab = (['profil','articles','realisations','evenements','collections'] as Tab[]).includes(rawTab as Tab)
     ? (rawTab as Tab)
     : 'profil';
   const [tab, setTab]         = useState<Tab>(initialTab);
@@ -129,6 +130,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
           { key: 'articles',     label: `Articles (${articles.length})` },
           { key: 'realisations', label: `Réalisations (${realisations.length})` },
           { key: 'evenements',   label: `Événements (${evenements.length})` },
+          { key: 'collections',  label: `Collections (${collections.length})` },
         ] as { key: typeof tab; label: string }[]).map(t => (
           <button
             key={t.key}
@@ -189,7 +191,10 @@ export default function MonCompteClient({ user, praticien, articles, realisation
       {/* Onglet Articles */}
       {tab === 'articles' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '.5rem', flexWrap: 'wrap' }}>
+            <a href="/mon-compte/import-rss" className="btn-f btn-f-secondary" style={{ fontSize: '.72rem' }}>
+              ↓ Importer des articles
+            </a>
             <a href="/mon-compte/nouvel-article" className="btn-f btn-f-primary" style={{ fontSize: '.72rem' }}>
               + Ajouter un article
             </a>
@@ -236,7 +241,12 @@ export default function MonCompteClient({ user, praticien, articles, realisation
       {/* Onglet Réalisations */}
       {tab === 'realisations' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '.5rem', flexWrap: 'wrap' }}>
+            {Boolean((p as Record<string, unknown>).github_url) && (
+              <a href="/mon-compte/import-github" className="btn-f btn-f-secondary" style={{ fontSize: '.72rem' }}>
+                ↓ Importer depuis GitHub
+              </a>
+            )}
             <a href="/mon-compte/nouvelle-realisation" className="btn-f btn-f-primary" style={{ fontSize: '.72rem' }}>
               + Ajouter une réalisation
             </a>
@@ -331,6 +341,49 @@ export default function MonCompteClient({ user, praticien, articles, realisation
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Onglet Collections */}
+      {tab === 'collections' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <a href="/mon-compte/collections/new" className="btn-f btn-f-primary" style={{ fontSize: '.72rem' }}>
+              + Nouvelle collection
+            </a>
+          </div>
+          {collections.length === 0 ? (
+            <div style={{ border: '1.5px dashed var(--f-border)', borderRadius: 12, padding: '3rem 2rem', textAlign: 'center', background: 'var(--f-surface)' }}>
+              <div style={{ fontSize: '2.2rem', marginBottom: '1rem' }}>◈</div>
+              <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0' }}>
+                Crée ta première collection
+              </p>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', margin: '0 0 1.5rem 0', lineHeight: 1.7, maxWidth: 380, marginInline: 'auto' }}>
+                Regroupe des ressources utiles (livres, outils, articles, cours…) et partage-les sur ton profil.
+              </p>
+              <a href="/mon-compte/collections/new" className="btn-f btn-f-primary" style={{ fontSize: '.75rem' }}>
+                + Créer une collection
+              </a>
+            </div>
+          ) : (collections as Record<string, unknown>[]).map((col) => {
+            const items = Array.isArray(col.items) ? col.items as Record<string,unknown>[] : [];
+            return (
+              <div key={String(col.id)} style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-text-1)', margin: '0 0 .2rem 0', fontWeight: 500 }}>{String(col.title)}</p>
+                  {col.description && (
+                    <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', margin: '0 0 .3rem 0' }}>{String(col.description)}</p>
+                  )}
+                  <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', margin: 0 }}>
+                    {items.length} ressource{items.length !== 1 ? 's' : ''}
+                  </p>
+                </div>
+                <a href={`/mon-compte/collections/${String(col.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem', flexShrink: 0 }}>
+                  ✎ Modifier
+                </a>
+              </div>
+            );
+          })}
         </div>
       )}
 

@@ -83,6 +83,7 @@ export async function POST(req: Request) {
         external_url:   payload.external_url,
         excerpt:        payload.excerpt || null,
         date_published: payload.date_published || null,
+        collaborateurs:  Array.isArray(payload.collaborateurs) ? payload.collaborateurs : [],
         status:         'approved',
       });
       if (error) insertError = error.message;
@@ -118,11 +119,12 @@ export async function POST(req: Request) {
           stack:          Array.isArray(payload.stack)
             ? payload.stack
             : String(payload.stack || '').split(',').map((s: string) => s.trim()).filter(Boolean),
-          excerpt:        payload.excerpt || null,
-          demo_url:       payload.demo_url   || null,
-          repo_url:       payload.repo_url   || null,
-          date_published: payload.date_published || null,
-          status:         'approved',
+          excerpt:         payload.excerpt || null,
+          demo_url:        payload.demo_url   || null,
+          repo_url:        payload.repo_url   || null,
+          date_published:  payload.date_published || null,
+          collaborateurs:  Array.isArray(payload.collaborateurs) ? payload.collaborateurs : [],
+          status:          'approved',
         });
         if (error) insertError = error.message;
       }

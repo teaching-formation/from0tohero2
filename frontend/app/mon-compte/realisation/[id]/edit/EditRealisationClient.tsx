@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import CollabInput from '@/components/forms/CollabInput';
 
 const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
 const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cyber-Sécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
@@ -12,6 +13,7 @@ type Props = { realisation: Record<string, unknown> };
 export default function EditRealisationClient({ realisation: r }: Props) {
   const router = useRouter();
   const initStack = Array.isArray(r.stack) ? (r.stack as string[]).join(', ') : String(r.stack || '');
+  const initCollabs = Array.isArray(r.collaborateurs) ? (r.collaborateurs as string[]) : [];
 
   const [form, setForm] = useState({
     title:          String(r.title          || ''),
@@ -24,9 +26,40 @@ export default function EditRealisationClient({ realisation: r }: Props) {
     repo_url:       String(r.repo_url       || ''),
     date_published: String(r.date_published || ''),
   });
+  const [collaborateurs, setCollaborateurs] = useState<string[]>(initCollabs);
   const [errors,  setErrors]  = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [autofillUrl,     setAutofillUrl]     = useState('');
+  const [autofillLoading, setAutofillLoading] = useState(false);
+  const [autofillMsg,     setAutofillMsg]     = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
+
+  async function handleAutofill() {
+    if (!autofillUrl.trim()) return;
+    setAutofillLoading(true);
+    setAutofillMsg(null);
+    try {
+      const res  = await fetch(`/api/autofill?url=${encodeURIComponent(autofillUrl.trim())}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erreur');
+      setForm(f => ({
+        ...f,
+        title:    data.title    || f.title,
+        excerpt:  data.excerpt  || f.excerpt,
+        stack:    data.stack    || f.stack,
+        category: data.category || f.category,
+        type:     data.type     || f.type,
+        demo_url: data.demo_url || f.demo_url,
+        repo_url: data.repo_url || f.repo_url,
+      }));
+      const filled = [data.title, data.excerpt, data.stack].filter(Boolean).length;
+      setAutofillMsg({ type: 'ok', text: `✓ ${filled} champ${filled > 1 ? 's' : ''} rempli${filled > 1 ? 's' : ''} automatiquement` });
+    } catch (e: unknown) {
+      setAutofillMsg({ type: 'err', text: e instanceof Error ? e.message : 'Impossible de récupérer les infos' });
+    } finally {
+      setAutofillLoading(false);
+    }
+  }
 
   function set(key: string, val: string) {
     setForm(f => ({ ...f, [key]: val }));
@@ -41,7 +74,6 @@ export default function EditRealisationClient({ realisation: r }: Props) {
     if (form.type === 'autre' && !form.type_autre.trim()) e.type_autre = 'Précise le type';
     if (!form.stack.trim())        e.stack    = 'Champ requis';
     if (!form.excerpt.trim())      e.excerpt  = 'Champ requis';
-    if (!form.date_published)      e.date_published = 'Champ requis';
     return e;
   }
 
@@ -58,6 +90,7 @@ export default function EditRealisationClient({ realisation: r }: Props) {
         ...form,
         stack: form.stack.split(',').map(s => s.trim()).filter(Boolean),
         type_label: form.type === 'autre' ? form.type_autre : TYPE_LABELS[form.type] || form.type,
+        collaborateurs,
       }),
     });
     setLoading(false);
@@ -81,6 +114,51 @@ export default function EditRealisationClient({ realisation: r }: Props) {
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+      {/* ── Bloc Autofill ── */}
+      <div style={{
+        background: 'linear-gradient(135deg, var(--f-sky-bg) 0%, rgba(56,189,248,.04) 100%)',
+        border: '1px solid var(--f-sky-border)',
+        borderRadius: 10,
+        padding: '1.1rem 1.25rem',
+      }}>
+        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', fontWeight: 600, color: 'var(--f-sky)', marginBottom: '.25rem' }}>
+          ✦ Autofill depuis une URL
+        </p>
+        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', marginBottom: '.85rem' }}>
+          Colle le lien GitHub ou de démo — on écrase les champs automatiquement.
+        </p>
+        <div style={{ display: 'flex', gap: '.5rem' }}>
+          <input
+            className="f-input"
+            type="text"
+            placeholder="https://github.com/toi/mon-projet"
+            value={autofillUrl}
+            onChange={e => setAutofillUrl(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAutofill())}
+            style={{ flex: 1 }}
+          />
+          <button
+            type="button"
+            className="btn-f btn-f-primary"
+            onClick={handleAutofill}
+            disabled={autofillLoading || !autofillUrl.trim()}
+            style={{ flexShrink: 0, fontSize: '.72rem' }}
+          >
+            {autofillLoading ? '…' : 'Autofill →'}
+          </button>
+        </div>
+        {autofillMsg && (
+          <p style={{
+            fontFamily: "'Geist Mono', monospace",
+            fontSize: '.65rem',
+            color: autofillMsg.type === 'ok' ? 'var(--f-green)' : '#f87171',
+            marginTop: '.5rem',
+          }}>
+            {autofillMsg.text}
+          </p>
+        )}
+      </div>
 
       <Field label="Titre du projet" required error={errors.title}>
         <input className="f-input" value={form.title} onChange={e => set('title', e.target.value)} style={{ maxWidth: '100%' }} />
@@ -126,7 +204,11 @@ export default function EditRealisationClient({ realisation: r }: Props) {
         <input className="f-input" type="text" value={form.repo_url} onChange={e => set('repo_url', e.target.value)} onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('repo_url', 'https://' + v); }} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Date de réalisation" required error={errors.date_published}>
+      <Field label="Collaborateurs" error={errors.collaborateurs}>
+        <CollabInput value={collaborateurs} onChange={setCollaborateurs} />
+      </Field>
+
+      <Field label="Date de réalisation" error={errors.date_published}>
         <input className="f-input" type="date" value={form.date_published} onChange={e => set('date_published', e.target.value)} style={{ maxWidth: '280px' }} />
       </Field>
 

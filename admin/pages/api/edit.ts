@@ -7,6 +7,7 @@ const ALLOWED: Record<string, string[]> = {
   realisations:    ['title','category','type','type_label','stack','excerpt','demo_url','repo_url','date_published','status'],
   evenements:      ['title','type','types','type_label','lieu','pays','online','url','date_debut','date_fin','gratuit','excerpt','status'],
   chaines_youtube: ['name','description','url','subs','ordre','active','status'],
+  collections:     ['title','description','ordre','status'],
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

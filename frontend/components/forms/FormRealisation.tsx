@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import CollabInput from './CollabInput';
 
 const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
 const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cyber-Sécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
@@ -13,6 +14,7 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
     title: '', username: username, category: '', type: '', type_autre: '',
     stack: '', excerpt: '', demo_url: '', repo_url: '', date_published: '', email: initialEmail,
   });
+  const [collaborateurs, setCollaborateurs] = useState<string[]>([]);
   const [errors, setErrors]     = useState<Record<string, string>>({});
   const [loading, setLoading]   = useState(false);
   const [autofillUrl, setAutofillUrl]     = useState('');
@@ -85,6 +87,7 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
           ...form,
           stack: form.stack.split(',').map(s => s.trim()).filter(Boolean),
           type_label: form.type === 'autre' ? form.type_autre : TYPE_LABELS[form.type],
+          collaborateurs,
         },
       }),
     });
@@ -198,6 +201,10 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
 
       <Field label="Lien repo GitHub" error={errors.repo_url}>
         <input className="f-input" type="text" placeholder="https://github.com/..." value={form.repo_url} onChange={e => set('repo_url', e.target.value)} onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('repo_url', 'https://' + v); }} style={{ maxWidth: '100%' }} />
+      </Field>
+
+      <Field label="Collaborateurs" error={errors.collaborateurs}>
+        <CollabInput value={collaborateurs} onChange={setCollaborateurs} />
       </Field>
 
       <Field label="Date de réalisation" error={errors.date_published}>

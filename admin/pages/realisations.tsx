@@ -30,6 +30,7 @@ const EDIT_FIELDS = [
   { key: 'demo_url',       label: 'Lien Demo', type: 'url' as const },
   { key: 'repo_url',       label: 'Lien Repo', type: 'url' as const },
   { key: 'date_published', label: 'Date', type: 'date' as const },
+  { key: 'collaborateurs', label: 'Collaborateurs (slugs séparés par ,)' },
   { key: 'status',         label: 'Statut', type: 'select' as const, options: ['pending','approved','rejected'] },
 ];
 
@@ -223,11 +224,11 @@ function RealisationsPage() {
       )}
 
       {editing && (
-        <EditModal table="realisations" row={editing} fields={EDIT_FIELDS}
+        <EditModal table="realisations" row={editing} fields={EDIT_FIELDS} autofill
           onClose={() => setEditing(null)} onSaved={onSaved} />
       )}
       {adding && (
-        <AddModal table="realisations"
+        <AddModal table="realisations" autofill
           fields={[
             { key: 'title',          label: 'Titre', required: true },
             { key: 'praticien_id',   label: 'Praticien ID (UUID)' },
@@ -239,6 +240,7 @@ function RealisationsPage() {
             { key: 'demo_url',       label: 'Lien Demo', type: 'url' },
             { key: 'repo_url',       label: 'Lien Repo', type: 'url' },
             { key: 'date_published', label: 'Date', type: 'date' },
+            { key: 'collaborateurs', label: 'Collaborateurs (slugs séparés par ,)' },
             { key: 'status',         label: 'Statut', type: 'select', options: ['approved','pending','rejected'] },
           ]}
           defaults={{ status: 'approved' }}

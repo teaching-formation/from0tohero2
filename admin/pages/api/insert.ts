@@ -23,6 +23,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       external_url:   data.external_url || null,
       excerpt:        data.excerpt || null,
       date_published: data.date_published || null,
+      collaborateurs: Array.isArray(data.collaborateurs) ? data.collaborateurs
+        : (data.collaborateurs ? String(data.collaborateurs).split(',').map((s: string) => s.trim()).filter(Boolean) : []),
       status:         data.status || 'approved',
     }).select().single();
     if (error) return res.status(500).json({ error: error.message });
@@ -46,6 +48,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       demo_url:       data.demo_url || null,
       repo_url:       data.repo_url || null,
       date_published: data.date_published || null,
+      collaborateurs: Array.isArray(data.collaborateurs) ? data.collaborateurs
+        : (data.collaborateurs ? String(data.collaborateurs).split(',').map((s: string) => s.trim()).filter(Boolean) : []),
       status:         data.status || 'approved',
     }).select().single();
     if (error) return res.status(500).json({ error: error.message });
