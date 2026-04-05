@@ -316,13 +316,6 @@ export default function PraticiensPage() {
                           <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.56rem', color: 'var(--f-text-3)' }}>+{cats.length - 3}</span>
                         )}
                       </div>
-                      <span style={{
-                        fontFamily: "'Geist Mono', monospace",
-                        fontSize: '.62rem',
-                        color: catColor,
-                        opacity: .7,
-                        letterSpacing: '.04em',
-                      }}>voir →</span>
                     </div>
                   </article>
                 </Link>
