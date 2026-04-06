@@ -10,7 +10,7 @@ type RealisationWithPraticien = {
   id: string; slug: string; title: string; praticien_id: string;
   category: string; type: string; stack: string[]; excerpt?: string;
   demo_url?: string; repo_url?: string; date_published?: string;
-  status: string; created_at: string;
+  status: string; created_at: string; collaborateurs?: string[];
   praticiens: { name: string; slug: string } | null;
 };
 
@@ -223,24 +223,33 @@ export default function RealisationsPage() {
                     lineHeight: 1.3,
                   }}>{r.title}</h3>
 
-                  {/* Auteur */}
+                  {/* Auteur + co-auteurs */}
                   {r.praticiens && (
-                    <Link
-                      href={`/praticiens/${r.praticiens.slug}`}
-                      style={{
-                        fontFamily: "'Geist Mono', monospace",
-                        fontSize: '.7rem',
-                        color: catColor,
-                        textDecoration: 'none',
-                        opacity: .85,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '.3rem',
-                      }}
-                      onClick={e => e.stopPropagation()}
-                    >
-                      <span style={{ opacity: .6 }}>by</span> {r.praticiens.name}
-                    </Link>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '.3rem' }}>
+                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: catColor, opacity: .6 }}>by</span>
+                      <Link
+                        href={`/praticiens/${r.praticiens.slug}`}
+                        style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: catColor, textDecoration: 'none', opacity: .85 }}
+                        onClick={e => e.stopPropagation()}
+                      >
+                        {r.praticiens.name}
+                      </Link>
+                      {r.collaborateurs && r.collaborateurs.length > 0 && (
+                        <>
+                          <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', opacity: .6 }}>+</span>
+                          {r.collaborateurs.map(c => (
+                            <Link
+                              key={c}
+                              href={`/praticiens/${c}`}
+                              style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', textDecoration: 'none', border: '1px solid var(--f-border)', padding: '1px 6px', borderRadius: 99 }}
+                              onClick={e => e.stopPropagation()}
+                            >
+                              @{c}
+                            </Link>
+                          ))}
+                        </>
+                      )}
+                    </div>
                   )}
 
                   {/* Excerpt */}
