@@ -6,6 +6,7 @@ import CursorGlow from '@/components/CursorGlow';
 import PageTransition from '@/components/PageTransition';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://from0tohero.dev'),
   title: 'from0tohero.dev',
   description: 'La plateforme des praticiens — Data, DevOps, Cloud, IA, Cybersécurité, Dev.',
   openGraph: {
