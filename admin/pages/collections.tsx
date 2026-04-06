@@ -73,7 +73,7 @@ function CollectionsPage() {
     setRows(prev => prev.map(r => r.id === updated.id ? { ...r, ...updated } as Row : r));
   }
 
-  function onAdded(created: Record<string, unknown>) {
+  function onCreated(created: Record<string, unknown>) {
     setRows(prev => [created as Row, ...prev]);
     setAdding(false);
   }
@@ -205,7 +205,7 @@ function CollectionsPage() {
       )}
       {adding && (
         <AddModal table="collections" fields={ADD_FIELDS}
-          onClose={() => setAdding(false)} onAdded={onAdded} />
+          onClose={() => setAdding(false)} onCreated={onCreated} />
       )}
     </div>
   );
