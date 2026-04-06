@@ -67,9 +67,10 @@ export async function POST(req: Request) {
 
     } else if (type === 'article') {
       const slug = slugify(payload.title);
-      const { data: praticien } = await supabaseAdmin
-        .from('praticiens').select('id, name')
-        .eq('slug', String(payload.username || '')).maybeSingle();
+      // Si authentifié, on récupère le praticien depuis la session (jamais depuis le payload)
+      const { data: praticien } = user
+        ? await supabaseAdmin.from('praticiens').select('id, name').eq('user_id', user.id).maybeSingle()
+        : await supabaseAdmin.from('praticiens').select('id, name').eq('slug', String(payload.username || '')).maybeSingle();
 
       const { error } = await supabaseAdmin.from('articles').insert({
         slug,
@@ -90,6 +91,9 @@ export async function POST(req: Request) {
 
     } else if (type === 'realisation') {
 
+      // Réalisations : l'utilisateur doit être authentifié
+      if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+
       if (payload.type === 'youtube') {
         // Chaîne YouTube → insérée dans chaines_youtube directement
         const { error } = await supabaseAdmin.from('chaines_youtube').insert({
@@ -105,9 +109,12 @@ export async function POST(req: Request) {
 
       } else {
         const slug = slugify(payload.title);
+        // Récupère le praticien depuis la session (jamais depuis le payload)
         const { data: praticien } = await supabaseAdmin
           .from('praticiens').select('id')
-          .eq('slug', String(payload.username || '')).maybeSingle();
+          .eq('user_id', user.id).maybeSingle();
+
+        if (!praticien) return NextResponse.json({ error: 'Profil praticien introuvable.' }, { status: 403 });
 
         const { error } = await supabaseAdmin.from('realisations').insert({
           slug,
@@ -131,9 +138,10 @@ export async function POST(req: Request) {
 
     } else if (type === 'evenement') {
       const slug = slugify(payload.title);
-      const { data: praticienEvt } = await supabaseAdmin
-        .from('praticiens').select('id')
-        .eq('slug', String(payload.username || '')).maybeSingle();
+      // Si authentifié, on récupère le praticien depuis la session
+      const { data: praticienEvt } = user
+        ? await supabaseAdmin.from('praticiens').select('id').eq('user_id', user.id).maybeSingle()
+        : await supabaseAdmin.from('praticiens').select('id').eq('slug', String(payload.username || '')).maybeSingle();
 
       const evTypes: string[] = Array.isArray(payload.types) && payload.types.length > 0
         ? payload.types
