@@ -95,7 +95,8 @@ body {
 }
 
 /* ── FOCUS ACCESSIBILITY (WCAG 2.1 AA) ── */
-*:focus { outline: none; }
+/* Supprime l'outline uniquement pour les interactions souris/touch, pas clavier */
+*:focus:not(:focus-visible) { outline: none; }
 
 *:focus-visible {
   outline: none;

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import AuthGuard, { getToken } from '@/components/AuthGuard';
 import EditModal from '@/components/EditModal';
+import AddModal  from '@/components/AddModal';
 import { statusLabel } from '@/lib/utils';
 
 type Row = {
@@ -29,7 +30,14 @@ const STATUS_FILTERS = ['all', 'approved', 'pending', 'rejected'];
 const STATUS_LABEL: Record<string, string> = { all: 'Toutes', approved: 'Approuvées', pending: 'En attente', rejected: 'Rejetées' };
 const STATUS_CLASS: Record<string, string> = { approved: 'active-green', pending: 'active-orange', rejected: 'active-red', all: 'active-sky' };
 
-const EMPTY_FORM = { name: '', description: '', url: '', subs: '', ordre: '0' };
+const ADD_FIELDS = [
+  { key: 'name',        label: 'Nom de la chaîne', required: true },
+  { key: 'description', label: 'Description (ex: DevOps · Linux)' },
+  { key: 'url',         label: 'URL YouTube', type: 'url' as const, required: true },
+  { key: 'subs',        label: 'Abonnés (ex: 100k+ abonnés)' },
+  { key: 'ordre',       label: "Ordre d'affichage (1 = premier)" },
+  { key: 'status',      label: 'Statut', type: 'select' as const, options: ['pending', 'approved', 'rejected'] },
+];
 
 function ChainesPage() {
   const [rows,     setRows]     = useState<Row[]>([]);
@@ -37,10 +45,8 @@ function ChainesPage() {
   const [filter,   setFilter]   = useState('all');
   const [search,   setSearch]   = useState('');
   const [editing,  setEditing]  = useState<Row | null>(null);
+  const [adding,   setAdding]   = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
-  const [form,     setForm]     = useState(EMPTY_FORM);
-  const [saving,   setSaving]   = useState(false);
-  const [formErr,  setFormErr]  = useState('');
 
   useEffect(() => {
     fetch('/api/content?table=chaines_youtube', { headers: { Authorization: `Bearer ${getToken()}` } })
@@ -62,21 +68,9 @@ function ChainesPage() {
     setDeleting(null);
   }
 
-  async function handleAdd(e: React.FormEvent) {
-    e.preventDefault();
-    setFormErr('');
-    if (!form.name.trim() || !form.url.trim()) { setFormErr('Nom et URL sont requis.'); return; }
-    setSaving(true);
-    const r = await fetch('/api/chaines-insert', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
-      body: JSON.stringify({ ...form, ordre: Number(form.ordre) || 0, active: false }),
-    });
-    const data = await r.json();
-    if (!r.ok) { setFormErr(data.error || 'Erreur'); setSaving(false); return; }
-    setRows(prev => [...prev, { ...data, status: 'pending' }]);
-    setForm(EMPTY_FORM);
-    setSaving(false);
+  function onCreated(created: Record<string, unknown>) {
+    setRows(prev => [created as Row, ...prev]);
+    setAdding(false);
   }
 
   function onSaved(updated: Record<string, unknown>) {
@@ -105,13 +99,13 @@ function ChainesPage() {
             <span className="page-title-count">({rows.length})</span>
           </h1>
         </div>
-        <input
-          type="search"
-          placeholder="Rechercher…"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          style={{ width: 220, fontSize: '.72rem' }}
-        />
+        <div style={{ display: 'flex', gap: '.75rem', alignItems: 'center' }}>
+          <input type="search" placeholder="Rechercher…" value={search}
+            onChange={e => setSearch(e.target.value)} style={{ width: 220, fontSize: '.72rem' }} />
+          <button className="btn btn-primary btn-sm" onClick={() => setAdding(true)}>
+            + Nouvelle chaîne
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -128,34 +122,6 @@ function ChainesPage() {
             </span>
           </button>
         ))}
-      </div>
-
-      {/* Formulaire d'ajout */}
-      <div className="table-card" style={{ marginBottom: '1.5rem', padding: '1.25rem' }}>
-        <p style={{ fontSize: '.68rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: '1rem' }}>
-          + Ajouter une chaîne
-        </p>
-        <form onSubmit={handleAdd} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '.75rem' }}>
-          <input placeholder="Nom *" value={form.name}
-            onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-            style={{ fontSize: '.75rem', padding: '.45rem .7rem', border: '1px solid var(--border)', borderRadius: 6, background: 'var(--surface-2)', color: 'var(--text-1)' }} />
-          <input placeholder="Description (ex: DevOps · Linux)" value={form.description}
-            onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-            style={{ fontSize: '.75rem', padding: '.45rem .7rem', border: '1px solid var(--border)', borderRadius: 6, background: 'var(--surface-2)', color: 'var(--text-1)' }} />
-          <input placeholder="URL YouTube *" value={form.url}
-            onChange={e => setForm(f => ({ ...f, url: e.target.value }))}
-            style={{ fontSize: '.75rem', padding: '.45rem .7rem', border: '1px solid var(--border)', borderRadius: 6, background: 'var(--surface-2)', color: 'var(--text-1)' }} />
-          <input placeholder="Abonnés (ex: 100k+ abonnés)" value={form.subs}
-            onChange={e => setForm(f => ({ ...f, subs: e.target.value }))}
-            style={{ fontSize: '.75rem', padding: '.45rem .7rem', border: '1px solid var(--border)', borderRadius: 6, background: 'var(--surface-2)', color: 'var(--text-1)' }} />
-          <input type="number" placeholder="Ordre (1 = premier)" value={form.ordre}
-            onChange={e => setForm(f => ({ ...f, ordre: e.target.value }))}
-            style={{ fontSize: '.75rem', padding: '.45rem .7rem', border: '1px solid var(--border)', borderRadius: 6, background: 'var(--surface-2)', color: 'var(--text-1)' }} />
-          <button type="submit" className="btn btn-primary btn-sm" disabled={saving} style={{ alignSelf: 'end' }}>
-            {saving ? '…' : '+ Ajouter'}
-          </button>
-        </form>
-        {formErr && <p style={{ fontSize: '.7rem', color: 'var(--red)', marginTop: '.5rem' }}>{formErr}</p>}
       </div>
 
       {/* Table */}
@@ -217,6 +183,10 @@ function ChainesPage() {
       {editing && (
         <EditModal table="chaines_youtube" row={editing} fields={EDIT_FIELDS}
           onClose={() => setEditing(null)} onSaved={onSaved} />
+      )}
+      {adding && (
+        <AddModal table="chaines_youtube" fields={ADD_FIELDS}
+          onClose={() => setAdding(false)} onCreated={onCreated} />
       )}
     </div>
   );

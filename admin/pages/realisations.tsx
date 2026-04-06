@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import AuthGuard, { getToken } from '@/components/AuthGuard';
 import EditModal from '@/components/EditModal';
 import AddModal  from '@/components/AddModal';
-import { statusLabel } from '@/lib/utils';
+import { statusLabel, fmtDate } from '@/lib/utils';
 
 type Row = {
   id: string;
@@ -132,7 +132,7 @@ function RealisationsPage() {
           <table>
             <thead>
               <tr>
-                {['Titre', 'Catégorie', 'Type', 'Stack', 'Statut', 'Liens', ''].map(h => (
+                {['Titre', 'Catégorie', 'Type', 'Stack', 'Statut', 'Date', 'Liens', ''].map(h => (
                   <th key={h}>{h}</th>
                 ))}
               </tr>
@@ -170,6 +170,9 @@ function RealisationsPage() {
                   </td>
                   <td>
                     <span className={`badge badge-${r.status}`}>{statusLabel(r.status)}</span>
+                  </td>
+                  <td>
+                    <span className="td-faint" style={{ whiteSpace: 'nowrap' }}>{fmtDate(r.date_published)}</span>
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: '.5rem' }}>

@@ -144,5 +144,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.json(row);
   }
 
+  if (table === 'chaines_youtube') {
+    const { data: row, error } = await supabaseAdmin.from('chaines_youtube').insert({
+      name:        data.name,
+      description: data.description || null,
+      url:         data.url,
+      subs:        data.subs || null,
+      ordre:       Number(data.ordre) || 0,
+      active:      false,
+      status:      data.status || 'pending',
+    }).select().single();
+    if (error) return res.status(500).json({ error: error.message });
+    return res.json(row);
+  }
+
   return res.status(400).json({ error: 'Table non supportée' });
 }
