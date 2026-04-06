@@ -253,11 +253,9 @@ export default function MonCompteClient({ user, praticien, articles, realisation
       {tab === 'realisations' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '.5rem', flexWrap: 'wrap' }}>
-            {Boolean((p as Record<string, unknown>).github_url) && (
-              <a href="/mon-compte/import-github" className="btn-f btn-f-secondary" style={{ fontSize: '.72rem' }}>
-                ↓ Importer depuis GitHub
-              </a>
-            )}
+            <a href="/mon-compte/import-github" className="btn-f btn-f-secondary" style={{ fontSize: '.72rem' }}>
+              ↓ Importer depuis GitHub
+            </a>
             <a href="/mon-compte/nouvelle-realisation" className="btn-f btn-f-primary" style={{ fontSize: '.72rem' }}>
               + Ajouter une réalisation
             </a>
