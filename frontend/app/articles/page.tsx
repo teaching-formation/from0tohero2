@@ -37,9 +37,10 @@ export default function ArticlesPage() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
+  const [search, setSearch] = useState('');
   const [visible, setVisible] = useState(PAGE_SIZE);
 
-  useEffect(() => { setVisible(PAGE_SIZE); }, [activeFilter]);
+  useEffect(() => { setVisible(PAGE_SIZE); }, [activeFilter, search]);
 
   useEffect(() => {
     supabase
@@ -50,7 +51,14 @@ export default function ArticlesPage() {
       .then(({ data }) => { setArticles(data ?? []); setLoading(false); });
   }, []);
 
-  const filtered = activeFilter === 'all' ? articles : articles.filter(a => a.category === activeFilter);
+  const filtered = articles.filter(a => {
+    if (activeFilter !== 'all' && a.category !== activeFilter) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (!a.title.toLowerCase().includes(q) && !a.author.toLowerCase().includes(q) && !(a.excerpt || '').toLowerCase().includes(q)) return false;
+    }
+    return true;
+  });
 
   return (
     <div style={{ padding: '4.5rem 6vw', maxWidth: 1200, margin: '0 auto' }}>
@@ -72,6 +80,16 @@ export default function ArticlesPage() {
         <p style={{ color: 'var(--f-text-3)', fontSize: '.88rem', margin: '0 0 2.25rem 0', lineHeight: 1.7 }}>
           Medium · LinkedIn · Dev.to · Hashnode — agrégés ici.
         </p>
+
+        {/* Barre de recherche */}
+        <input
+          className="f-input"
+          type="search"
+          placeholder="Rechercher un article, un auteur…"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ maxWidth: '100%', marginBottom: '1.25rem' }}
+        />
 
         {/* Filtres catégorie */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>

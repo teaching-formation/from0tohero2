@@ -48,9 +48,10 @@ export default function EvenementsPage() {
   const [loading, setLoading] = useState(true);
   const [activeStatut, setActiveStatut] = useState('upcoming');
   const [activeType, setActiveType] = useState('all');
+  const [search, setSearch] = useState('');
   const [visible, setVisible] = useState(PAGE_SIZE);
 
-  useEffect(() => { setVisible(PAGE_SIZE); }, [activeStatut, activeType]);
+  useEffect(() => { setVisible(PAGE_SIZE); }, [activeStatut, activeType, search]);
 
   useEffect(() => {
     supabase
@@ -66,6 +67,10 @@ export default function EvenementsPage() {
     if (activeStatut !== 'all' && status !== activeStatut) return false;
     const types: string[] = (e as any).types?.length ? (e as any).types : [e.type];
     if (activeType !== 'all' && !types.includes(activeType)) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (!e.title.toLowerCase().includes(q) && !(e.excerpt || '').toLowerCase().includes(q) && !(e.lieu || '').toLowerCase().includes(q)) return false;
+    }
     return true;
   });
 
@@ -89,6 +94,16 @@ export default function EvenementsPage() {
         <p style={{ color: 'var(--f-text-3)', fontSize: '.88rem', margin: '0 0 2.25rem 0', lineHeight: 1.7 }}>
           Événements tech francophones — en ligne et en présentiel.
         </p>
+
+        {/* Barre de recherche */}
+        <input
+          className="f-input"
+          type="search"
+          placeholder="Rechercher un événement, un lieu…"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ maxWidth: '100%', marginBottom: '1.25rem' }}
+        />
 
         {/* Filtres statut */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem', marginBottom: '.75rem' }}>

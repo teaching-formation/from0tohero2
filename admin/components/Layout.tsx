@@ -2,15 +2,16 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 
 const NAV = [
-  { href: '/',             label: 'Dashboard',       icon: '▦',  badge: false },
-  { href: '/soumissions',  label: 'Soumissions',     icon: '◎',  badge: true  },
-  { href: '/praticiens',   label: 'Praticiens',      icon: '◉',  badge: false },
-  { href: '/articles',     label: 'Articles',        icon: '✍',  badge: false },
-  { href: '/realisations', label: 'Réalisations',    icon: '◆',  badge: false },
-  { href: '/evenements',   label: 'Événements',      icon: '◷',  badge: false },
-  { href: '/chaines',      label: 'Chaînes YouTube', icon: '▶',  badge: false },
-  { href: '/collections',  label: 'Collections',     icon: '◈',  badge: false },
-  { href: '/tips',         label: 'Tips & TIL',      icon: '💡', badge: false },
+  { href: '/',               label: 'Dashboard',       icon: '▦',  badge: false },
+  { href: '/soumissions',    label: 'Soumissions',     icon: '◎',  badge: true  },
+  { href: '/praticiens',     label: 'Praticiens',      icon: '◉',  badge: false },
+  { href: '/articles',       label: 'Articles',        icon: '✍',  badge: false },
+  { href: '/realisations',   label: 'Réalisations',    icon: '◆',  badge: false },
+  { href: '/evenements',     label: 'Événements',      icon: '◷',  badge: false },
+  { href: '/chaines',        label: 'Chaînes YouTube', icon: '▶',  badge: false },
+  { href: '/collections',    label: 'Collections',     icon: '◈',  badge: false },
+  { href: '/tips',           label: 'Tips & TIL',      icon: '💡', badge: false },
+  { href: '/utilisateurs',   label: 'Utilisateurs',    icon: '◐',  badge: false },
 ];
 
 type Props = { children: React.ReactNode };

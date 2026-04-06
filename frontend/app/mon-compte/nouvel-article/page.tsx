@@ -9,7 +9,7 @@ export default async function NouvelArticlePage() {
   if (!user) redirect('/connexion?next=/mon-compte/nouvel-article');
 
   const { data: praticien } = await supabaseAdmin
-    .from('praticiens').select('slug, name').eq('user_id', user.id).maybeSingle();
+    .from('praticiens').select('slug, name, country').eq('user_id', user.id).maybeSingle();
 
   if (!praticien) redirect('/mon-compte');
 
@@ -26,7 +26,7 @@ export default async function NouvelArticlePage() {
           Publication liée à @{praticien.slug}
         </p>
       </div>
-      <NouvelArticleClient username={praticien.slug} />
+      <NouvelArticleClient username={praticien.slug} initialCountry={praticien.country || ''} />
     </div>
   );
 }

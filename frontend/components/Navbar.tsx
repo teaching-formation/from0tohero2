@@ -50,6 +50,7 @@ export default function Navbar() {
     { href: '/realisations', label: 'Réalisations' },
     { href: '/articles',     label: 'Articles' },
     { href: '/evenements',   label: 'Événements' },
+    { href: '/tips',         label: 'Tips' },
   ];
 
   return (

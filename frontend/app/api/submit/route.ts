@@ -116,6 +116,7 @@ export async function POST(req: Request) {
 
         if (!praticien) return NextResponse.json({ error: 'Profil praticien introuvable.' }, { status: 403 });
 
+        const collabs: string[] = Array.isArray(payload.collaborateurs) ? payload.collaborateurs : [];
         const { error } = await supabaseAdmin.from('realisations').insert({
           slug,
           title:          payload.title,
@@ -130,10 +131,42 @@ export async function POST(req: Request) {
           demo_url:        payload.demo_url   || null,
           repo_url:        payload.repo_url   || null,
           date_published:  payload.date_published || null,
-          collaborateurs:  Array.isArray(payload.collaborateurs) ? payload.collaborateurs : [],
+          collaborateurs:  collabs,
           status:          'approved',
         });
         if (error) insertError = error.message;
+
+        // ── Notifier les co-auteurs par email ─────────────────────────────
+        if (!error && collabs.length > 0) {
+          const { data: collabPraticiens } = await supabaseAdmin
+            .from('praticiens').select('name, email, slug').in('slug', collabs);
+          const { data: submitter } = await supabaseAdmin
+            .from('praticiens').select('name, slug').eq('id', praticien.id).maybeSingle();
+          for (const collab of (collabPraticiens ?? [])) {
+            if (!collab.email) continue;
+            resend.emails.send({
+              from: 'from0tohero <onboarding@resend.dev>',
+              to: collab.email,
+              subject: `[from0tohero] Tu as été ajouté en co-auteur d'une réalisation`,
+              html: `
+                <div style="font-family:monospace;max-width:520px;margin:0 auto;padding:2rem;background:#0d1117;color:#e6edf3;border-radius:8px;">
+                  <h2 style="color:#38bdf8;font-size:1rem;margin:0 0 1.5rem 0;letter-spacing:.05em;">// co-auteur ✓</h2>
+                  <p style="color:#e6edf3;font-size:.9rem;line-height:1.7;margin:0 0 1.25rem 0;">
+                    Bonjour ${escHtml(collab.name)},<br/><br/>
+                    <strong style="color:#f97316;">${escHtml(submitter?.name ?? 'Un praticien')}</strong> t'a ajouté en co-auteur de la réalisation
+                    <strong style="color:#f0f6fc;">"${escHtml(payload.title)}"</strong> sur from0tohero.dev.
+                  </p>
+                  <p style="color:#8b949e;font-size:.8rem;margin:0 0 1.5rem 0;">
+                    Cette réalisation apparaît maintenant sur ton profil public.
+                  </p>
+                  <a href="https://from0tohero.dev/praticiens/${collab.slug}" style="display:inline-block;background:#f97316;color:#fff;text-decoration:none;padding:.6rem 1.2rem;border-radius:4px;font-size:.8rem;">
+                    Voir mon profil →
+                  </a>
+                </div>
+              `,
+            }).catch((err) => console.error('[submit] collab email error:', err));
+          }
+        }
       }
 
     } else if (type === 'evenement') {

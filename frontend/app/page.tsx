@@ -359,10 +359,10 @@ export default async function Home() {
           </p>
         </ScrollReveal>
         <div style={{ marginBottom: '3.5rem' }}>
-          <Marquee speed={28} gap={14}>
+          <Marquee speed={28} gap={14} itemWidth={230} itemHeight={150}>
             {youtubeChannels.map((ch) => (
-              <a key={ch.name} href={ch.url} className="f-card-link" target="_blank" rel="noreferrer">
-                <div className="f-card f-card-hover" style={{ padding: '1.1rem 1.25rem', width: 230 }}>
+              <a key={ch.name} href={ch.url} className="f-card-link" target="_blank" rel="noreferrer" style={{ display: 'flex', height: '100%' }}>
+                <div className="f-card f-card-hover" style={{ padding: '1.1rem 1.25rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '.55rem', marginBottom: '.7rem' }}>
                     <span style={{
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -371,8 +371,8 @@ export default async function Home() {
                     }}>▶</span>
                     <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: '.85rem', color: 'var(--f-text-1)', letterSpacing: '-.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ch.name}</span>
                   </div>
-                  <p style={{ fontSize: '.75rem', color: 'var(--f-text-2)', lineHeight: 1.6, margin: '0 0 .7rem 0', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{ch.description}</p>
-                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', color: 'var(--f-text-3)' }}>{ch.subs}</span>
+                  <p style={{ fontSize: '.75rem', color: 'var(--f-text-2)', lineHeight: 1.6, margin: '0 0 .7rem 0', flex: 1, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{ch.description}</p>
+                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', color: 'var(--f-text-3)', marginTop: 'auto' }}>{ch.subs}</span>
                 </div>
               </a>
             ))}
@@ -392,11 +392,11 @@ export default async function Home() {
               {(() => {
                 const TYPE_COLOR: Record<string,string> = { tip:'var(--f-orange)', TIL:'var(--f-sky)', snippet:'var(--f-green)' };
                 return (
-                  <Marquee speed={40} gap={14}>
+                  <Marquee speed={40} gap={14} itemWidth={290} itemHeight={190}>
                     {latestTips.map((tip) => {
                       const praticien = tip.praticiens;
                       return (
-                        <div key={tip.id} className="f-card" style={{ padding: '1.1rem 1.25rem', width: 290, display: 'flex', flexDirection: 'column', gap: '.55rem' }}>
+                        <div key={tip.id} className="f-card" style={{ padding: '1.1rem 1.25rem', height: '100%', display: 'flex', flexDirection: 'column', gap: '.55rem' }}>
                           <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap' }}>
                             <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', letterSpacing: '.08em', color: TYPE_COLOR[tip.type] ?? 'var(--f-text-3)', border: `1px solid currentColor`, padding: '2px 7px', borderRadius: 4 }}>
                               {tip.type}
@@ -433,10 +433,10 @@ export default async function Home() {
               </p>
             </ScrollReveal>
             <div style={{ marginBottom: '1.75rem' }}>
-              <Marquee speed={35} gap={14}>
+              <Marquee speed={35} gap={14} itemWidth={300} itemHeight={220}>
                 {lastArticles.map((a) => (
-                  <a key={a.slug} href={a.external_url} className="f-card-link" target="_blank" rel="noreferrer">
-                    <div className="f-card f-card-hover" style={{ padding: '1.1rem 1.25rem', width: 300, display: 'flex', flexDirection: 'column', gap: '.65rem' }}>
+                  <a key={a.slug} href={a.external_url} className="f-card-link" target="_blank" rel="noreferrer" style={{ display: 'flex', height: '100%' }}>
+                    <div className="f-card f-card-hover" style={{ padding: '1.1rem 1.25rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '.65rem' }}>
                       <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap' }}>
                         <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-sky)', border: '1px solid var(--f-sky-border)', background: 'var(--f-sky-bg)', padding: '2px 7px', borderRadius: 4 }}>{a.category}</span>
                         <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 7px', borderRadius: 4 }}>{a.source}</span>

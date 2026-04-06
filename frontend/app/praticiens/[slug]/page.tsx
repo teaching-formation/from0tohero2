@@ -42,16 +42,24 @@ export default async function PraticienPage({ params }: { params: Promise<{ slug
   if (!praticienRaw) notFound();
   const praticien = praticienRaw as unknown as Praticien;
 
-  const [{ data: reals }, { data: cols }, { data: tps }] = await Promise.all([
+  const [{ data: realsOwned }, { data: realsCollab }, { data: cols }, { data: tps }] = await Promise.all([
     supabase.from('realisations').select('*').eq('praticien_id', praticien.id).eq('status', 'approved'),
+    supabase.from('realisations').select('*').contains('collaborateurs', [slug]).eq('status', 'approved'),
     supabase.from('collections').select('id, title, description, items, ordre').eq('praticien_id', praticien.id).eq('status', 'approved').order('ordre', { ascending: true }),
     supabase.from('tips').select('id, content, type, category, stack, created_at').eq('praticien_id', praticien.id).eq('status', 'approved').order('created_at', { ascending: false }).limit(20),
   ]);
 
+  // Fusionner réalisations possédées + en tant que co-auteur (sans doublons)
+  const ownedIds = new Set((realsOwned ?? []).map((r: Record<string,unknown>) => r.id));
+  const reals = [
+    ...(realsOwned ?? []),
+    ...(realsCollab ?? []).filter((r: Record<string,unknown>) => !ownedIds.has(r.id)),
+  ];
+
   return (
     <PraticienClient
       praticien={praticien}
-      realisations={(reals ?? []) as Realisation[]}
+      realisations={reals as Realisation[]}
       collections={(cols ?? []) as Collection[]}
       tips={(tps ?? []) as Tip[]}
     />

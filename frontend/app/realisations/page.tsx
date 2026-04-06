@@ -56,9 +56,10 @@ export default function RealisationsPage() {
   const [loading, setLoading] = useState(true);
   const [activeType, setActiveType] = useState('all');
   const [activeCat, setActiveCat] = useState('all');
+  const [search, setSearch] = useState('');
   const [visible, setVisible] = useState(PAGE_SIZE);
 
-  useEffect(() => { setVisible(PAGE_SIZE); }, [activeType, activeCat]);
+  useEffect(() => { setVisible(PAGE_SIZE); }, [activeType, activeCat, search]);
 
   useEffect(() => {
     supabase
@@ -75,6 +76,10 @@ export default function RealisationsPage() {
   const filtered = realisations.filter(r => {
     if (activeType !== 'all' && r.type !== activeType) return false;
     if (activeCat !== 'all' && r.category !== activeCat) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (!r.title.toLowerCase().includes(q) && !(r.praticiens?.name || '').toLowerCase().includes(q) && !(r.excerpt || '').toLowerCase().includes(q)) return false;
+    }
     return true;
   });
 
@@ -98,6 +103,16 @@ export default function RealisationsPage() {
         <p style={{ color: 'var(--f-text-3)', fontSize: '.88rem', margin: '0 0 2.25rem 0', lineHeight: 1.7 }}>
           Pipelines · Dashboards · APIs · Bootcamps · Chaînes YT — du concret, pas des promesses.
         </p>
+
+        {/* Barre de recherche */}
+        <input
+          className="f-input"
+          type="search"
+          placeholder="Rechercher une réalisation, un auteur…"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{ maxWidth: '100%', marginBottom: '1.25rem' }}
+        />
 
         {/* Filtres type */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem', marginBottom: '.75rem' }}>
