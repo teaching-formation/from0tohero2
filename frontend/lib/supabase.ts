@@ -58,7 +58,7 @@ export type Evenement = {
   id: string
   slug: string
   title: string
-  type: 'conference' | 'meetup' | 'hackathon' | 'webinaire' | 'bootcamp' | 'autre'
+  type: 'conference' | 'meetup' | 'hackathon' | 'webinaire' | 'bootcamp' | 'atelier' | 'autre'
   types: string[]
   type_label?: string
   lieu?: string

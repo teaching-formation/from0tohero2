@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
 import { createClient } from '@/lib/supabase/server';
 import MonCompteClient from './MonCompteClient';
 
@@ -56,14 +57,16 @@ export default async function MonComptePage() {
   }
 
   return (
-    <MonCompteClient
-      user={{ id: user.id, email: user.email ?? '', name: user.user_metadata?.full_name ?? '' }}
-      praticien={praticien}
-      articles={articles}
-      realisations={realisations}
-      evenements={evenements}
-      collections={collections}
-      tips={tips}
-    />
+    <Suspense fallback={null}>
+      <MonCompteClient
+        user={{ id: user.id, email: user.email ?? '', name: user.user_metadata?.full_name ?? '' }}
+        praticien={praticien}
+        articles={articles}
+        realisations={realisations}
+        evenements={evenements}
+        collections={collections}
+        tips={tips}
+      />
+    </Suspense>
   );
 }

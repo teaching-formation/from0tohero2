@@ -309,14 +309,6 @@ export default function RealisationsPage() {
                         </a>
                       )}
                     </div>
-                    {/* Ghost type icon */}
-                    <span style={{
-                      fontFamily: "'Geist Mono', monospace",
-                      fontSize: '.62rem',
-                      color: catColor,
-                      opacity: .7,
-                      letterSpacing: '.04em',
-                    }}>voir →</span>
                   </div>
 
                 </article>

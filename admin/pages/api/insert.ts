@@ -20,6 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       author_country: data.author_country || null,
       category:       data.category || 'data',
       source:         data.source || 'autre',
+      source_label:   data.source === 'autre' ? (data.source_label || null) : null,
       external_url:   data.external_url || null,
       excerpt:        data.excerpt || null,
       date_published: data.date_published || null,

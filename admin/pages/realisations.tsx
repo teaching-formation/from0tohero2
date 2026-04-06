@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import AuthGuard, { getToken } from '@/components/AuthGuard';
 import EditModal from '@/components/EditModal';
 import AddModal  from '@/components/AddModal';
+import { statusLabel } from '@/lib/utils';
 
 type Row = {
   id: string;
@@ -168,7 +169,7 @@ function RealisationsPage() {
                     </div>
                   </td>
                   <td>
-                    <span className={`badge badge-${r.status}`}>{r.status}</span>
+                    <span className={`badge badge-${r.status}`}>{statusLabel(r.status)}</span>
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: '.5rem' }}>

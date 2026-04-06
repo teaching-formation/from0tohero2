@@ -5,6 +5,7 @@ import ScrollReveal from '@/components/ScrollReveal';
 import TypeWriter from '@/components/TypeWriter';
 import CountUp from '@/components/CountUp';
 import HeroParallax from '@/components/HeroParallax';
+import Marquee from '@/components/Marquee';
 
 export const revalidate = 60;
 
@@ -59,7 +60,7 @@ async function getLatestTips() {
     .select('id, content, type, category, stack, praticien_id, created_at, praticiens(slug, name)')
     .eq('status', 'approved')
     .order('created_at', { ascending: false })
-    .limit(6);
+    .limit(7);
   return (data ?? []) as unknown as Array<{
     id: string; content: string; type: string; category: string;
     stack: string[]; praticien_id: string; created_at: string;
@@ -73,11 +74,11 @@ async function getLastArticles() {
     .select('slug, title, author, author_country, category, source, external_url, excerpt, date_published')
     .eq('status', 'approved')
     .order('date_published', { ascending: false })
-    .limit(3);
+    .limit(8);
   return data ?? [];
 }
 
-const STAT_ACCENT = ['--f-sky', '--f-orange', '--f-green', '#a78bfa'];
+const STAT_ACCENT = ['--f-sky', '--f-orange', '--f-green', '--f-purple'];
 
 export default async function Home() {
   const [stats, lastArticles, youtubeChannels, bootcamps, latestTips] = await Promise.all([
@@ -357,25 +358,25 @@ export default async function Home() {
             Chaînes YouTube francophones
           </p>
         </ScrollReveal>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: '1rem', marginBottom: '3.5rem' }}>
-          {youtubeChannels.map((ch, i) => (
-            <ScrollReveal key={ch.name} delay={i * 60}>
-              <a href={ch.url} className="f-card-link" target="_blank" rel="noreferrer" style={{ display: 'block', height: '100%' }}>
-                <div className="f-card f-card-hover" style={{ padding: '1.25rem', height: '100%' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '.65rem', marginBottom: '.85rem' }}>
+        <div style={{ marginBottom: '3.5rem' }}>
+          <Marquee speed={28} gap={14}>
+            {youtubeChannels.map((ch) => (
+              <a key={ch.name} href={ch.url} className="f-card-link" target="_blank" rel="noreferrer">
+                <div className="f-card f-card-hover" style={{ padding: '1.1rem 1.25rem', width: 230 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '.55rem', marginBottom: '.7rem' }}>
                     <span style={{
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                      width: 30, height: 30, borderRadius: '50%',
-                      background: 'rgba(239,68,68,.12)', color: '#ef4444', fontSize: '.75rem', flexShrink: 0,
+                      width: 26, height: 26, borderRadius: '50%',
+                      background: 'rgba(239,68,68,.12)', color: '#ef4444', fontSize: '.7rem', flexShrink: 0,
                     }}>▶</span>
-                    <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: '.9rem', color: 'var(--f-text-1)', letterSpacing: '-.01em' }}>{ch.name}</span>
+                    <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: '.85rem', color: 'var(--f-text-1)', letterSpacing: '-.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ch.name}</span>
                   </div>
-                  <p style={{ fontSize: '.78rem', color: 'var(--f-text-2)', lineHeight: 1.65, margin: '0 0 .85rem 0' }}>{ch.description}</p>
-                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)' }}>{ch.subs}</span>
+                  <p style={{ fontSize: '.75rem', color: 'var(--f-text-2)', lineHeight: 1.6, margin: '0 0 .7rem 0', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{ch.description}</p>
+                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', color: 'var(--f-text-3)' }}>{ch.subs}</span>
                 </div>
               </a>
-            </ScrollReveal>
-          ))}
+            ))}
+          </Marquee>
         </div>
 
         {/* Tips & TIL */}
@@ -387,33 +388,37 @@ export default async function Home() {
                 Tips &amp; TIL
               </p>
             </ScrollReveal>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '1rem', marginBottom: '3.5rem' }}>
-              {latestTips.map((tip, i) => {
+            <div style={{ marginBottom: '3.5rem' }}>
+              {(() => {
                 const TYPE_COLOR: Record<string,string> = { tip:'var(--f-orange)', TIL:'var(--f-sky)', snippet:'var(--f-green)' };
-                const praticien = tip.praticiens;
                 return (
-                  <ScrollReveal key={tip.id} delay={i * 60}>
-                    <div className="f-card" style={{ padding: '1.1rem 1.25rem', height: '100%', display: 'flex', flexDirection: 'column', gap: '.6rem' }}>
-                      <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap' }}>
-                        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.08em', color: TYPE_COLOR[tip.type] ?? 'var(--f-text-3)', border: `1px solid currentColor`, padding: '2px 8px', borderRadius: 4 }}>
-                          {tip.type}
-                        </span>
-                        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 8px', borderRadius: 4 }}>
-                          {tip.category}
-                        </span>
-                      </div>
-                      <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-text-1)', margin: 0, lineHeight: 1.65, flex: 1, whiteSpace: 'pre-wrap', display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                        {tip.content}
-                      </p>
-                      {praticien && (
-                        <Link href={`/praticiens/${praticien.slug}`} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', textDecoration: 'none' }}>
-                          @{praticien.slug}
-                        </Link>
-                      )}
-                    </div>
-                  </ScrollReveal>
+                  <Marquee speed={40} gap={14}>
+                    {latestTips.map((tip) => {
+                      const praticien = tip.praticiens;
+                      return (
+                        <div key={tip.id} className="f-card" style={{ padding: '1.1rem 1.25rem', width: 290, display: 'flex', flexDirection: 'column', gap: '.55rem' }}>
+                          <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap' }}>
+                            <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', letterSpacing: '.08em', color: TYPE_COLOR[tip.type] ?? 'var(--f-text-3)', border: `1px solid currentColor`, padding: '2px 7px', borderRadius: 4 }}>
+                              {tip.type}
+                            </span>
+                            <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 7px', borderRadius: 4 }}>
+                              {tip.category}
+                            </span>
+                          </div>
+                          <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.76rem', color: 'var(--f-text-1)', margin: 0, lineHeight: 1.65, display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'pre-wrap' }}>
+                            {tip.content}
+                          </p>
+                          {praticien && (
+                            <Link href={`/praticiens/${praticien.slug}`} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', color: 'var(--f-text-3)', textDecoration: 'none', marginTop: 'auto' }}>
+                              @{praticien.slug}
+                            </Link>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </Marquee>
                 );
-              })}
+              })()}
             </div>
           </>
         )}
@@ -427,26 +432,26 @@ export default async function Home() {
                 Articles récents
               </p>
             </ScrollReveal>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '1rem', marginBottom: '1.75rem' }}>
-              {lastArticles.map((a, i) => (
-                <ScrollReveal key={a.slug} delay={i * 80}>
-                  <a href={a.external_url} className="f-card-link" target="_blank" rel="noreferrer" style={{ display: 'block', height: '100%' }}>
-                    <div className="f-card f-card-hover" style={{ padding: '1.25rem', height: '100%', display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
+            <div style={{ marginBottom: '1.75rem' }}>
+              <Marquee speed={35} gap={14}>
+                {lastArticles.map((a) => (
+                  <a key={a.slug} href={a.external_url} className="f-card-link" target="_blank" rel="noreferrer">
+                    <div className="f-card f-card-hover" style={{ padding: '1.1rem 1.25rem', width: 300, display: 'flex', flexDirection: 'column', gap: '.65rem' }}>
                       <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap' }}>
-                        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-sky)', border: '1px solid var(--f-sky-border)', background: 'var(--f-sky-bg)', padding: '2px 8px', borderRadius: 4 }}>{a.category}</span>
-                        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 8px', borderRadius: 4 }}>{a.source}</span>
+                        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-sky)', border: '1px solid var(--f-sky-border)', background: 'var(--f-sky-bg)', padding: '2px 7px', borderRadius: 4 }}>{a.category}</span>
+                        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 7px', borderRadius: 4 }}>{a.source}</span>
                       </div>
-                      <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '.94rem', fontWeight: 800, color: 'var(--f-text-1)', margin: 0, lineHeight: 1.4, letterSpacing: '-.01em', flex: 1 }}>{a.title}</h3>
+                      <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '.9rem', fontWeight: 800, color: 'var(--f-text-1)', margin: 0, lineHeight: 1.4, letterSpacing: '-.01em', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{a.title}</h3>
                       {a.excerpt && (
-                        <p style={{ fontSize: '.78rem', color: 'var(--f-text-2)', lineHeight: 1.65, margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{a.excerpt}</p>
+                        <p style={{ fontSize: '.75rem', color: 'var(--f-text-2)', lineHeight: 1.6, margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{a.excerpt}</p>
                       )}
-                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)' }}>
+                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', color: 'var(--f-text-3)', marginTop: 'auto' }}>
                         {a.author}{a.author_country ? ` · ${a.author_country}` : ''}
                       </span>
                     </div>
                   </a>
-                </ScrollReveal>
-              ))}
+                ))}
+              </Marquee>
             </div>
             <ScrollReveal>
               <Link href="/articles" className="arrow-link">

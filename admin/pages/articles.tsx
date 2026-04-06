@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import AuthGuard, { getToken } from '@/components/AuthGuard';
 import EditModal from '@/components/EditModal';
 import AddModal  from '@/components/AddModal';
+import { statusLabel, fmtDate } from '@/lib/utils';
 
 type Row = {
   id: string;
@@ -185,11 +186,11 @@ function ArticlesPage() {
                     </span>
                   </td>
                   <td>
-                    <span className={`badge badge-${r.status}`}>{r.status}</span>
+                    <span className={`badge badge-${r.status}`}>{statusLabel(r.status)}</span>
                   </td>
                   <td>
                     <span className="td-faint" style={{ whiteSpace: 'nowrap' }}>
-                      {r.date_published || '—'}
+                      {fmtDate(r.date_published)}
                     </span>
                   </td>
                   <td style={{ whiteSpace: 'nowrap' }}>

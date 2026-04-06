@@ -139,7 +139,7 @@ export default function EvenementsPage() {
       ) : (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1.25rem' }}>
-            {filtered.slice(0, visible).map((e, i) => {
+            {filtered.slice(0, visible).map((e) => {
               const types: string[] = (e as any).types?.length ? (e as any).types : [e.type];
               const primaryType = types[0] || 'autre';
               const typeColor = TYPE_COLOR[primaryType] || 'var(--f-text-3)';
@@ -152,7 +152,7 @@ export default function EvenementsPage() {
 
               return (
                 <article
-                  key={i}
+                  key={e.id}
                   className="f-card f-card-hover"
                   style={{
                     display: 'flex',

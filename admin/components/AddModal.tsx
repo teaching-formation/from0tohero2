@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getToken } from './AuthGuard';
 
+const OPTION_LABEL: Record<string, string> = {
+  pending:  'En attente',
+  approved: 'Approuvé',
+  rejected: 'Rejeté',
+};
+
 type Field = {
   key: string;
   label: string;
@@ -167,7 +173,7 @@ export default function AddModal({ table, fields, defaults = {}, autofill = fals
                 <option value="">— Choisir —</option>
                 {f.options?.map(o => o.startsWith('──') || o.startsWith('─')
                   ? <option key={o} disabled style={{ color: 'var(--text-4)', fontStyle: 'italic' }}>{o}</option>
-                  : <option key={o} value={o}>{o}</option>
+                  : <option key={o} value={o}>{OPTION_LABEL[o] ?? o}</option>
                 )}
               </select>
             ) : f.type === 'textarea' ? (

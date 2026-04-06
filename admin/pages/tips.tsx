@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import AuthGuard, { getToken } from '@/components/AuthGuard';
 import EditModal from '@/components/EditModal';
+import { statusLabel } from '@/lib/utils';
 
 type Row = {
   id: string;
@@ -114,7 +115,7 @@ function TipsPage() {
                     {row.category}
                   </span>
                   <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', padding: '2px 8px', borderRadius: 4, border: '1px solid var(--f-border)', color: row.status === 'approved' ? 'var(--f-green)' : row.status === 'rejected' ? '#f87171' : 'var(--f-orange)' }}>
-                    {row.status}
+                    {statusLabel(row.status)}
                   </span>
                 </div>
                 <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-text-1)', margin: '0 0 .4rem 0', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>

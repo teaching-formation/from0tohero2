@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import AuthGuard, { getToken } from '@/components/AuthGuard';
 import EditModal from '@/components/EditModal';
+import AddModal  from '@/components/AddModal';
+import { statusLabel } from '@/lib/utils';
 
 type CollectionItem = { id: string; title: string; url: string; description: string };
 type Row = {
@@ -26,12 +28,21 @@ const STATUS_FILTERS = ['all', 'approved', 'pending', 'rejected'];
 const STATUS_LABEL: Record<string, string> = { all: 'Tous', approved: 'Approuvées', pending: 'En attente', rejected: 'Rejetées' };
 const STATUS_CLASS: Record<string, string> = { approved: 'active-green', pending: 'active-orange', rejected: 'active-red', all: 'active-sky' };
 
+const ADD_FIELDS = [
+  { key: 'praticien_id', label: 'Praticien ID', required: true },
+  { key: 'title',        label: 'Titre',        required: true },
+  { key: 'description',  label: 'Description',  type: 'textarea' as const },
+  { key: 'ordre',        label: 'Ordre (entier)' },
+  { key: 'status',       label: 'Statut', type: 'select' as const, options: ['approved','pending','rejected'] },
+];
+
 function CollectionsPage() {
   const [rows, setRows]         = useState<Row[]>([]);
   const [loading, setLoading]   = useState(true);
   const [filter, setFilter]     = useState('all');
   const [search, setSearch]     = useState('');
   const [editing, setEditing]   = useState<Row | null>(null);
+  const [adding, setAdding]     = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
 
   async function deleteRow(id: string, title: string) {
@@ -62,6 +73,11 @@ function CollectionsPage() {
     setRows(prev => prev.map(r => r.id === updated.id ? { ...r, ...updated } as Row : r));
   }
 
+  function onAdded(created: Record<string, unknown>) {
+    setRows(prev => [created as Row, ...prev]);
+    setAdding(false);
+  }
+
   const counts = {
     all:      rows.length,
     approved: rows.filter(r => r.status === 'approved').length,
@@ -83,6 +99,9 @@ function CollectionsPage() {
         <div style={{ display: 'flex', gap: '.75rem', alignItems: 'center' }}>
           <input type="search" placeholder="Rechercher…" value={search}
             onChange={e => setSearch(e.target.value)} style={{ width: 220, fontSize: '.72rem' }} />
+          <button className="btn btn-primary btn-sm" onClick={() => setAdding(true)}>
+            + Nouvelle collection
+          </button>
         </div>
       </div>
 
@@ -150,7 +169,7 @@ function CollectionsPage() {
                     <span className="td-faint">{r.ordre ?? 0}</span>
                   </td>
                   <td>
-                    <span className={`badge badge-${r.status}`}>{r.status}</span>
+                    <span className={`badge badge-${r.status}`}>{statusLabel(r.status)}</span>
                   </td>
                   <td style={{ whiteSpace: 'nowrap' }}>
                     <button
@@ -183,6 +202,10 @@ function CollectionsPage() {
       {editing && (
         <EditModal table="collections" row={editing} fields={EDIT_FIELDS}
           onClose={() => setEditing(null)} onSaved={onSaved} />
+      )}
+      {adding && (
+        <AddModal table="collections" fields={ADD_FIELDS}
+          onClose={() => setAdding(false)} onAdded={onAdded} />
       )}
     </div>
   );

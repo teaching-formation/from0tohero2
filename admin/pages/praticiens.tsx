@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import AuthGuard, { getToken } from '@/components/AuthGuard';
 import EditModal from '@/components/EditModal';
 import AddModal  from '@/components/AddModal';
+import { statusLabel } from '@/lib/utils';
 
 const PAYS = [
   'Afrique du Sud','Algérie','Angola','Bénin','Botswana','Burkina Faso','Burundi',
@@ -193,7 +194,7 @@ function PraticiensPage() {
                     <span className="badge badge-sky">{r.category}</span>
                   </td>
                   <td>
-                    <span className={`badge badge-${r.status}`}>{r.status}</span>
+                    <span className={`badge badge-${r.status}`}>{statusLabel(r.status)}</span>
                   </td>
                   <td>
                     <span className="td-faint">

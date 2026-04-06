@@ -46,6 +46,7 @@ export default function PraticienPage({ params }: { params: Promise<{ slug: stri
       const praticien = praticienRaw as unknown as Praticien | null;
       if (!praticien) { notFound(); return; }
       setP(praticien);
+      document.title = `${praticien.name} · from0tohero`;
       const [{ data: reals }, { data: cols }, { data: tps }] = await Promise.all([
         supabase.from('realisations').select('*').eq('praticien_id', praticien.id).eq('status', 'approved'),
         supabase.from('collections').select('id, title, description, items, ordre').eq('praticien_id', praticien.id).eq('status', 'approved').order('ordre', { ascending: true }),

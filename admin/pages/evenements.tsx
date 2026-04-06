@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import AuthGuard, { getToken } from '@/components/AuthGuard';
 import EditModal from '@/components/EditModal';
 import AddModal  from '@/components/AddModal';
+import { statusLabel, fmtDate } from '@/lib/utils';
 
 const PAYS = [
   'Afrique du Sud','Algérie','Angola','Bénin','Botswana','Burkina Faso','Burundi',
@@ -215,9 +216,9 @@ function EvenementsPage() {
                   </td>
                   <td>
                     <span className="td-faint" style={{ whiteSpace: 'nowrap' }}>
-                      {r.date_debut}
+                      {fmtDate(r.date_debut)}
                       {r.date_fin && r.date_fin !== r.date_debut
-                        ? <><br /><span style={{ color: 'var(--text-4)' }}>→ {r.date_fin}</span></>
+                        ? <><br /><span style={{ color: 'var(--text-4)' }}>→ {fmtDate(r.date_fin)}</span></>
                         : null}
                     </span>
                   </td>
@@ -231,7 +232,7 @@ function EvenementsPage() {
                     </span>
                   </td>
                   <td>
-                    <span className={`badge badge-${r.status}`}>{r.status}</span>
+                    <span className={`badge badge-${r.status}`}>{statusLabel(r.status)}</span>
                   </td>
                   <td style={{ whiteSpace: 'nowrap' }}>
                     <button

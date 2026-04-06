@@ -95,6 +95,7 @@ export default function EditProfilClient({ praticien: p }: Props) {
   // ── Photo de profil ──
   const [photoFile,    setPhotoFile]    = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(String(p.photo_url || '') || null);
+  const [photoRemoved, setPhotoRemoved] = useState(false);
   const [photoError,   setPhotoError]   = useState('');
   const [cropSrc,      setCropSrc]      = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -121,6 +122,7 @@ export default function EditProfilClient({ praticien: p }: Props) {
     const croppedFile = new File([blob], 'avatar.jpg', { type: 'image/jpeg' });
     setPhotoFile(croppedFile);
     setPhotoPreview(URL.createObjectURL(croppedFile));
+    setPhotoRemoved(false);
   }
 
   function handleCropCancel() {
@@ -170,7 +172,12 @@ export default function EditProfilClient({ praticien: p }: Props) {
     setLoading(true);
 
     // ── Upload photo si un nouveau fichier a été choisi ──
-    let finalPhotoUrl: string | null = photoPreview && !photoPreview.startsWith('blob:') ? photoPreview : (p.photo_url ? String(p.photo_url) : null);
+    // photoRemoved=true → suppression explicite → null
+    // photoFile présent → nouvel upload (géré ci-dessous)
+    // sinon → conserver l'URL existante
+    let finalPhotoUrl: string | null = photoRemoved
+      ? null
+      : (photoPreview && !photoPreview.startsWith('blob:') ? photoPreview : (p.photo_url ? String(p.photo_url) : null));
     if (photoFile) {
       const fd = new FormData();
       fd.append('file', photoFile);
@@ -271,7 +278,7 @@ export default function EditProfilClient({ praticien: p }: Props) {
               </button>
               {photoPreview && (
                 <button type="button"
-                  onClick={() => { setPhotoFile(null); if (photoPreview?.startsWith('blob:')) URL.revokeObjectURL(photoPreview); setPhotoPreview(null); setPhotoError(''); }}
+                  onClick={() => { setPhotoFile(null); if (photoPreview?.startsWith('blob:')) URL.revokeObjectURL(photoPreview); setPhotoPreview(null); setPhotoRemoved(true); setPhotoError(''); }}
                   style={{ background: 'none', border: 'none', color: 'var(--f-text-3)', fontSize: '.68rem', cursor: 'pointer', fontFamily: "'Geist Mono', monospace" }}>
                   Retirer
                 </button>

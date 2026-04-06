@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import AuthGuard, { getToken } from '@/components/AuthGuard';
 import EditModal from '@/components/EditModal';
+import { statusLabel } from '@/lib/utils';
 
 type Row = {
   id: string;
@@ -190,7 +191,7 @@ function ChainesPage() {
                     <span className="td-faint">{r.ordre}</span>
                   </td>
                   <td>
-                    <span className={`badge badge-${r.status}`}>{r.status}</span>
+                    <span className={`badge badge-${r.status}`}>{statusLabel(r.status)}</span>
                   </td>
                   <td style={{ whiteSpace: 'nowrap' }}>
                     <button className="btn btn-ghost btn-sm" onClick={() => setEditing(r)}>
