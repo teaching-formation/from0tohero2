@@ -81,7 +81,7 @@ export type Article = {
   author: string
   author_country?: string
   praticien_id?: string
-  category: 'data' | 'devops' | 'cloud' | 'ia' | 'cyber' | 'frontend' | 'backend' | 'fullstack' | 'mobile' | 'web3' | 'embedded'
+  category: 'data' | 'devops' | 'cloud' | 'ia' | 'cyber' | 'frontend' | 'backend' | 'fullstack' | 'mobile' | 'web3' | 'embedded' | 'dev' | 'autre'
   source: 'medium' | 'linkedin' | 'devto' | 'substack' | 'blog' | 'youtube' | 'autre'
   source_label?: string
   external_url: string

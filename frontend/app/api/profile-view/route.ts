@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
-// POST /api/profile-view  { slug }  → enregistre une vue
+// POST /api/profile-view  { slug }  → enregistre une vue (sauf si c'est le propriétaire)
 export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const { slug } = await req.json().catch(() => ({}));
   if (!slug) return NextResponse.json({ ok: false });
 
   const { data: praticien } = await supabase
-    .from('praticiens').select('id').eq('slug', slug).maybeSingle();
+    .from('praticiens').select('id, user_id').eq('slug', slug).maybeSingle();
   if (!praticien) return NextResponse.json({ ok: false });
+
+  // Ne pas compter les visites du propriétaire sur son propre profil
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user && user.id === praticien.user_id) return NextResponse.json({ ok: false });
 
   await supabase.from('profile_views').insert({ praticien_id: praticien.id });
   return NextResponse.json({ ok: true });
