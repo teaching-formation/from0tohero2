@@ -46,11 +46,12 @@ export default function MonCompteClient({ user, praticien, articles, realisation
   const [tab, setTab]         = useState<Tab>(initialTab);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [viewStats, setViewStats] = useState({ week: 0, month: 0, total: 0 });
+  const [visitors, setVisitors] = useState<{ slug: string; name: string; photo_url: string | null; viewed_at: string }[]>([]);
 
   useEffect(() => {
     fetch('/api/profile-view')
       .then(r => r.json())
-      .then(d => setViewStats(d))
+      .then(d => { setViewStats(d); setVisitors(d.visitors ?? []); })
       .catch(() => {});
   }, []);
 
@@ -260,7 +261,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
             <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 1rem 0' }}>
               // vues de profil
             </p>
-            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', marginBottom: visitors.length > 0 ? '1.25rem' : 0 }}>
               {[
                 { label: '7 jours',  value: viewStats.week },
                 { label: '30 jours', value: viewStats.month },
@@ -272,6 +273,36 @@ export default function MonCompteClient({ user, praticien, articles, realisation
                 </div>
               ))}
             </div>
+
+            {/* Liste des visiteurs connectés */}
+            {visitors.length > 0 && (
+              <>
+                <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 .75rem 0' }}>
+                  // visiteurs récents
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                  {visitors.map((v, i) => (
+                    <a
+                      key={`${v.slug}-${i}`}
+                      href={`/praticiens/${v.slug}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ display: 'flex', alignItems: 'center', gap: '.6rem', textDecoration: 'none', padding: '.4rem .5rem', borderRadius: 6, transition: 'background .15s' }}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--f-bg)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <Avatar name={v.name} photoUrl={v.photo_url} size={28} radius={7} fontSize=".55rem" />
+                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-sky)', fontWeight: 600, flex: 1 }}>
+                        @{v.slug}
+                      </span>
+                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)' }}>
+                        {new Date(v.viewed_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
