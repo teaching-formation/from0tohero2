@@ -20,15 +20,6 @@ export const metadata: Metadata = {
   },
 };
 
-async function getBootcamps() {
-  const { data } = await supabase
-    .from('realisations')
-    .select('title, stack, excerpt, demo_url, repo_url')
-    .eq('type', 'bootcamp')
-    .eq('status', 'approved')
-    .order('created_at', { ascending: true });
-  return data ?? [];
-}
 
 async function getLastRealisations() {
   const { data } = await supabase
@@ -87,8 +78,8 @@ async function getLastArticles() {
 const STAT_ACCENT = ['--f-sky', '--f-orange', '--f-green', '--f-purple'];
 
 export default async function Home() {
-  const [stats, lastArticles, lastRealisations, bootcamps, latestTips] = await Promise.all([
-    getStats(), getLastArticles(), getLastRealisations(), getBootcamps(), getLatestTips(),
+  const [stats, lastArticles, lastRealisations, latestTips] = await Promise.all([
+    getStats(), getLastArticles(), getLastRealisations(), getLatestTips(),
   ]);
 
   const statItems = [
@@ -319,43 +310,9 @@ export default async function Home() {
             letterSpacing: '-.025em',
             lineHeight: 1.15,
           }}>
-            Apprendre par la pratique.
+            La communauté en action.
           </h2>
         </ScrollReveal>
-
-        {/* Bootcamps */}
-        {bootcamps.length > 0 && (
-          <>
-            <ScrollReveal>
-              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '.6rem' }}>
-                <span style={{ display: 'inline-block', width: 18, height: 1.5, background: 'var(--f-orange)', borderRadius: 2 }} />
-                Bootcamps
-              </p>
-            </ScrollReveal>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '1rem', marginBottom: '3.5rem' }}>
-              {bootcamps.map((b, i) => {
-                const isLive = !!b.demo_url;
-                const href   = b.demo_url || b.repo_url || '#';
-                const stack  = Array.isArray(b.stack) ? b.stack.join(' · ') : '';
-                return (
-                  <ScrollReveal key={b.title} delay={i * 80}>
-                    <a href={href} className="f-card-link" target="_blank" rel="noreferrer" style={{ display: 'block', height: '100%' }}>
-                      <div className={`f-card f-card-hover${isLive ? '' : ''}`} style={{ height: '100%', opacity: isLive ? 1 : .65 }}>
-                        {isLive
-                          ? <span className="badge-live" style={{ marginBottom: '1.25rem' }}><span className="dot" />live</span>
-                          : <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--f-text-3)', display: 'block', marginBottom: '1.25rem' }}>○ coming soon</span>
-                        }
-                        <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 800, color: 'var(--f-text-1)', margin: '0 0 .5rem 0', letterSpacing: '-.01em' }}>{b.title}</h3>
-                        {stack && <p style={{ fontSize: '.8rem', color: 'var(--f-text-2)', margin: '0 0 1rem 0', lineHeight: 1.6 }}>{stack}</p>}
-                        {b.excerpt && <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', lineHeight: 1.6 }}>{b.excerpt}</span>}
-                      </div>
-                    </a>
-                  </ScrollReveal>
-                );
-              })}
-            </div>
-          </>
-        )}
 
         {/* Réalisations récentes */}
         {lastRealisations.length > 0 && (
