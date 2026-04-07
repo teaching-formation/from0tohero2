@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const title = String(payload?.title || payload?.name || 'ta soumission');
     if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       await resend.emails.send({
-        from: 'from0tohero <onboarding@resend.dev>',
+        from: process.env.RESEND_FROM || 'from0tohero <onboarding@resend.dev>',
         to: email,
         subject: '[from0tohero] Ta soumission n\'a pas été retenue',
         html: `
@@ -95,6 +95,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const slug = slugify(payload.title);
       const { data: praticien } = await supabaseAdmin
         .from('praticiens').select('id, name').eq('slug', String(payload.username || '')).maybeSingle();
+      const collabsArticle: string[] = Array.isArray(payload.collaborateurs) ? payload.collaborateurs : [];
       const { error } = await supabaseAdmin.from('articles').insert({
         slug,
         title: payload.title,
@@ -107,6 +108,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         external_url: payload.external_url,
         excerpt: payload.excerpt || null,
         date_published: payload.date_published || null,
+        collaborateurs: collabsArticle,
         status: 'approved',
       });
       if (error) return res.status(500).json({ error: error.message });
@@ -115,6 +117,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const slug = slugify(payload.title);
       const { data: praticien } = await supabaseAdmin
         .from('praticiens').select('id').eq('slug', String(payload.username || '')).maybeSingle();
+      const collabsReal: string[] = Array.isArray(payload.collaborateurs) ? payload.collaborateurs : [];
       const { error } = await supabaseAdmin.from('realisations').insert({
         slug,
         title: payload.title,
@@ -129,6 +132,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         demo_url: payload.demo_url || null,
         repo_url: payload.repo_url || null,
         date_published: payload.date_published || null,
+        collaborateurs: collabsReal,
         status: 'approved',
       });
       if (error) return res.status(500).json({ error: error.message });

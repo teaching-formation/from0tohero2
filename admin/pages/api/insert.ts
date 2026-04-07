@@ -75,7 +75,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       country:        data.country || null,
       category:       data.category || 'data',
       category_label: data.category === 'autre' ? (data.category_label || null) : null,
-      categories:     [data.category || 'data'],
+      categories:     Array.isArray(data.categories) && data.categories.length > 0
+        ? data.categories
+        : [data.category || 'data'],
       bio:            data.bio || null,
       stack,
       badges:         [],

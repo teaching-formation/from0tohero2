@@ -22,7 +22,7 @@ const EDIT_FIELDS = [
   { key: 'url',         label: 'URL YouTube', type: 'url' as const },
   { key: 'subs',        label: 'Abonnés / info (ex: 100k+ abonnés)' },
   { key: 'ordre',       label: "Ordre d'affichage (1 = premier)" },
-  { key: 'active',      label: 'Active (true/false)' },
+  { key: 'active',      label: 'Visible sur le site', type: 'select' as const, options: ['true', 'false'] },
   { key: 'status',      label: 'Statut', type: 'select' as const, options: ['pending', 'approved', 'rejected'] },
 ];
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import AuthGuard, { getToken } from '@/components/AuthGuard';
 
 type UserRow = {
@@ -29,6 +30,7 @@ function fmtDatetime(iso: string | null) {
 }
 
 function UtilisateursPage() {
+  const router = useRouter();
   const [rows, setRows]       = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch]   = useState('');
@@ -153,7 +155,7 @@ function UtilisateursPage() {
                           href={`/praticiens`}
                           className="btn btn-ghost btn-sm"
                           style={{ textDecoration: 'none' }}
-                          onClick={e => { e.preventDefault(); window.location.href = `/praticiens?search=${r.praticien!.slug}`; }}
+                          onClick={e => { e.preventDefault(); router.push(`/praticiens?search=${r.praticien!.slug}`); }}
                         >
                           Voir profil
                         </a>
