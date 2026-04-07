@@ -84,9 +84,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const ghMatch = parsed.pathname.match(/^\/([^/]+)\/([^/]+)/);
     if (parsed.hostname === 'github.com' && ghMatch) {
       const [, owner, repo] = ghMatch;
+      const ghHeaders: Record<string, string> = {
+        Accept: 'application/vnd.github+json',
+        'User-Agent': 'from0tohero-admin',
+      };
+      if (process.env.GITHUB_TOKEN) ghHeaders['Authorization'] = `Bearer ${process.env.GITHUB_TOKEN}`;
       const ghRes = await fetch(
         `https://api.github.com/repos/${owner}/${repo.replace(/\.git$/, '')}`,
-        { headers: { Accept: 'application/vnd.github+json', 'User-Agent': 'from0tohero-admin' } }
+        { headers: ghHeaders }
       );
       if (!ghRes.ok) throw new Error('Repo GitHub introuvable ou privé');
       const data = await ghRes.json();

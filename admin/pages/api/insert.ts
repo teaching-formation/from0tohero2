@@ -13,6 +13,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (table === 'articles') {
     const slug = slugify(data.title || '');
+    const { data: existingArticle } = await supabaseAdmin.from('articles').select('id').eq('slug', slug).maybeSingle();
+    if (existingArticle) return res.status(409).json({ error: `Le slug "${slug}" est déjà utilisé.` });
     const { data: row, error } = await supabaseAdmin.from('articles').insert({
       slug,
       title:          data.title,
@@ -34,6 +36,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (table === 'realisations') {
     const slug = slugify(data.title || '');
+    const { data: existingReal } = await supabaseAdmin.from('realisations').select('id').eq('slug', slug).maybeSingle();
+    if (existingReal) return res.status(409).json({ error: `Le slug "${slug}" est déjà utilisé.` });
     const stack = typeof data.stack === 'string'
       ? data.stack.split(',').map((s: string) => s.trim()).filter(Boolean)
       : (data.stack || []);
@@ -91,6 +95,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (table === 'evenements') {
     const slug = slugify(data.title || '');
+    const { data: existingEvt } = await supabaseAdmin.from('evenements').select('id').eq('slug', slug).maybeSingle();
+    if (existingEvt) return res.status(409).json({ error: `Le slug "${slug}" est déjà utilisé.` });
     const evTypes: string[] = Array.isArray(data.types) && data.types.length > 0
       ? data.types
       : [data.type || 'autre'];

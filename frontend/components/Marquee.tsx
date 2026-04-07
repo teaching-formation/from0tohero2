@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 
 interface MarqueeProps {
   children: React.ReactNode[];
@@ -41,6 +41,11 @@ export default function Marquee({ children, speed = 30, gap = 16, itemWidth, ite
   const count   = children.length;
   const items   = [...children, ...children];
   const stepPx  = itemWidth + gap;
+
+  // Cleanup du timer au démontage
+  useEffect(() => {
+    return () => { if (resumeTimer.current) clearTimeout(resumeTimer.current); };
+  }, []);
 
   const scheduleResume = useCallback(() => {
     if (resumeTimer.current) clearTimeout(resumeTimer.current);

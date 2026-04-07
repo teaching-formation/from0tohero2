@@ -221,9 +221,12 @@ export async function POST(req: Request) {
     const title    = escHtml(String(payload.title || ''));
     const username = escHtml(String(payload.username || ''));
 
-    await resend.emails.send({
+    const adminEmail = process.env.ADMIN_EMAIL;
+    if (!adminEmail) {
+      console.warn('[submit] ADMIN_EMAIL non défini, email admin non envoyé');
+    } else await resend.emails.send({
       from: 'from0tohero <onboarding@resend.dev>',
-      to:   process.env.ADMIN_EMAIL!,
+      to:   adminEmail,
       subject: `[from0tohero] Nouvelle soumission — ${label}`,
       html: `
         <div style="font-family:monospace;max-width:520px;margin:0 auto;padding:2rem;background:#0d1117;color:#e6edf3;border-radius:8px;">
