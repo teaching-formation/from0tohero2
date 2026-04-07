@@ -6,15 +6,16 @@ import TypeWriter from '@/components/TypeWriter';
 import CountUp from '@/components/CountUp';
 import HeroParallax from '@/components/HeroParallax';
 import Marquee from '@/components/Marquee';
+import FlagImg from '@/components/FlagImg';
 
 export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'from0tohero.dev — Ce qu\'ils ont construit. Pas ce qu\'ils ont promis.',
-  description: 'Articles, réalisations et profils de praticiens tech francophones — Data, DevOps, Cloud, IA, Cybersécurité, Dev.',
+  description: 'Articles, réalisations et profils de praticiens tech — Data, DevOps, Cloud, IA, Cybersécurité, Dev.',
   openGraph: {
     title: 'from0tohero.dev — Ce qu\'ils ont construit. Pas ce qu\'ils ont promis.',
-    description: 'Articles, réalisations et profils de praticiens tech francophones.',
+    description: 'Articles, réalisations et profils de praticiens tech.',
     url: 'https://from0tohero.dev',
     images: [{ url: 'https://from0tohero.dev/og-banner.png' }],
   },
@@ -151,8 +152,8 @@ export default async function Home() {
           marginBottom: '3rem',
           position: 'relative', zIndex: 1,
         }}>
-          Profils, réalisations et ressources de praticiens tech
-          <br />francophones — Data, DevOps, Cloud, IA, Cyber, Dev.
+          Profils, réalisations et ressources de praticiens tech —
+          <br />Data, DevOps, Cloud, IA, Cyber, Dev.
         </p>
 
         {/* CTAs */}
@@ -433,7 +434,7 @@ export default async function Home() {
                         <p style={{ fontSize: '.75rem', color: 'var(--f-text-2)', lineHeight: 1.6, margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{a.excerpt}</p>
                       )}
                       <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', color: 'var(--f-text-3)', marginTop: 'auto' }}>
-                        {a.author}{a.author_country ? ` · ${a.author_country}` : ''}
+                        {a.author_country && <><FlagImg country={a.author_country} size={16} />{' '}</>}{a.author}
                       </span>
                     </div>
                   </a>
@@ -467,7 +468,7 @@ export default async function Home() {
                 letterSpacing: '-.025em',
               }}>
                 Une communauté de praticiens<br />
-                tech francophones qui construisent.
+                tech qui construisent.
               </h2>
               <p style={{ fontSize: '.92rem', color: 'var(--f-text-2)', lineHeight: 1.85, margin: 0 }}>
                 Construite autour de ceux qui font — pas de ceux qui parlent.

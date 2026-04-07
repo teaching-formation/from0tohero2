@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Praticiens — from0tohero.dev',
-  description: 'Profils de praticiens tech francophones — Data, DevOps, Cloud, IA, Cybersécurité, Dev.',
+  description: 'Profils de praticiens tech — Data, DevOps, Cloud, IA, Cybersécurité, Dev.',
   openGraph: {
     title: 'Praticiens — from0tohero.dev',
-    description: 'Profils de praticiens tech francophones.',
+    description: 'Profils de praticiens tech.',
     url: 'https://from0tohero.dev/praticiens',
   },
 };

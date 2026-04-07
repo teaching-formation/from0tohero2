@@ -56,12 +56,38 @@ export default async function PraticienPage({ params }: { params: Promise<{ slug
     ...(realsCollab ?? []).filter((r: Record<string,unknown>) => !ownedIds.has(r.id)),
   ];
 
+  const sameAs = [
+    praticien.linkedin_url,
+    praticien.github_url,
+    praticien.twitter_url,
+    praticien.youtube_url,
+    praticien.website_url,
+  ].filter((u): u is string => typeof u === 'string' && u.trim() !== '');
+
+  const jsonLd: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: praticien.name,
+    url: `https://from0tohero.dev/praticiens/${praticien.slug}`,
+    ...(praticien.role ? { jobTitle: praticien.role } : {}),
+    ...(praticien.bio ? { description: praticien.bio } : {}),
+    ...(praticien.photo_url ? { image: praticien.photo_url } : {}),
+    ...(sameAs.length > 0 ? { sameAs } : {}),
+    knowsAbout: Array.isArray(praticien.stack) ? praticien.stack : [],
+  };
+
   return (
-    <PraticienClient
-      praticien={praticien}
-      realisations={reals as Realisation[]}
-      collections={(cols ?? []) as Collection[]}
-      tips={(tps ?? []) as Tip[]}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <PraticienClient
+        praticien={praticien}
+        realisations={reals as Realisation[]}
+        collections={(cols ?? []) as Collection[]}
+        tips={(tps ?? []) as Tip[]}
+      />
+    </>
   );
 }

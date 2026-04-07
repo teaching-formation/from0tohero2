@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { supabase, type Article } from '@/lib/supabase';
 import { SkeletonArticleCard } from '@/components/SkeletonCard';
+import FlagImg from '@/components/FlagImg';
+import LikeButton from '@/components/LikeButton';
 
 const PAGE_SIZE = 12;
 
@@ -200,7 +202,7 @@ export default function ArticlesPage() {
                         opacity: .85,
                         letterSpacing: '.01em',
                       }}>
-                        {a.author_country && <span style={{ marginRight: '.3rem' }}>{a.author_country}</span>}
+                        {a.author_country && <span style={{ marginRight: '.3rem', verticalAlign: 'middle' }}><FlagImg country={a.author_country} size={16} /></span>}
                         {a.author}
                       </span>
                       {a.date_published && (
@@ -231,11 +233,14 @@ export default function ArticlesPage() {
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'flex-end',
+                      justifyContent: 'space-between',
                       paddingTop: '.75rem',
                       borderTop: '1px solid var(--f-border)',
                       marginTop: '.25rem',
                     }}>
+                      <div onClick={e => e.stopPropagation()}>
+                        <LikeButton contentType="article" contentId={a.id} initialCount={0} initialLiked={false} />
+                      </div>
                       <span style={{
                         fontFamily: "'Geist Mono', monospace",
                         fontSize: '.62rem',

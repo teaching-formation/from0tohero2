@@ -55,7 +55,7 @@ export default function OGImage() {
           fontSize: 24, color: '#8d96a0',
           marginTop: 36, lineHeight: 1.6,
         }}>
-          Articles · Réalisations · Praticiens tech francophones
+          Articles · Réalisations · Praticiens tech
         </p>
 
         {/* Tags */}

@@ -5,7 +5,11 @@ import { createClient } from '@/lib/supabase/client';
 import Avatar from '@/components/Avatar';
 import { getCountryDisplay } from '@/lib/countryFlag';
 import { BADGE_STYLES } from '@/lib/badges';
+import FlagImg from '@/components/FlagImg';
 import type { Praticien, Realisation } from '@/lib/supabase';
+import LikeButton from '@/components/LikeButton';
+import FollowButton from '@/components/FollowButton';
+import CommentSection from '@/components/CommentSection';
 
 type CollectionItem = { id: string; title: string; url: string; description: string };
 type Collection = { id: string; title: string; description?: string; items: CollectionItem[] };
@@ -21,6 +25,7 @@ type Props = {
 export default function PraticienClient({ praticien: p, realisations, collections, tips: tipsList }: Props) {
   const [isOwner, setIsOwner] = useState(false);
   const [contactLoading, setContactLoading] = useState(false);
+  const [isSelf, setIsSelf] = useState(false);
 
   useEffect(() => {
     const browserSupabase = createClient();
@@ -28,6 +33,28 @@ export default function PraticienClient({ praticien: p, realisations, collection
       if (user && p.user_id === user.id) setIsOwner(true);
     });
   }, [p.user_id]);
+
+  // Tracking vue profil (fire-and-forget)
+  useEffect(() => {
+    fetch('/api/profile-view', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug: p.slug }),
+    }).catch(() => {});
+  }, [p.slug]);
+
+  // Détection si c'est le propre profil de l'utilisateur connecté
+  useEffect(() => {
+    import('@/lib/supabase/client').then(({ createClient }) => {
+      const supabase = createClient();
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          supabase.from('praticiens').select('slug').eq('user_id', session.user.id).maybeSingle()
+            .then(({ data }) => { if (data?.slug === p.slug) setIsSelf(true); });
+        }
+      });
+    });
+  }, [p.slug]);
 
   async function handleContact() {
     setContactLoading(true);
@@ -77,7 +104,7 @@ export default function PraticienClient({ praticien: p, realisations, collection
           <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', flexWrap: 'wrap', marginBottom: '.5rem' }}>
             <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(1.5rem,3.5vw,2rem)', fontWeight: 800, color: 'var(--f-text-1)', margin: 0 }}>{p.name}</h1>
             <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', background: 'var(--f-surface)', padding: '2px 8px', borderRadius: 4 }}>
-              {(() => { const { flag, name } = getCountryDisplay(p.country); return <>{flag ? `${flag} ` : ''}{name || p.country}</>; })()}
+              {(() => { const { name } = getCountryDisplay(p.country); return <><FlagImg country={p.country} size={20} />{' '}{name || p.country}</>; })()}
             </span>
           </div>
           <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-sky)', margin: '0 0 .35rem 0', letterSpacing: '.04em' }}>{p.role}</p>
@@ -90,6 +117,9 @@ export default function PraticienClient({ praticien: p, realisations, collection
               })}
             </div>
           )}
+          <div style={{ marginBottom: '1rem' }}>
+            <FollowButton slug={p.slug} isSelf={isSelf} />
+          </div>
           {p.certifications && (
             <div style={{ marginBottom: '1rem' }}>
               <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '.4rem' }}>🎓 Certifications</p>
@@ -285,9 +315,15 @@ export default function PraticienClient({ praticien: p, realisations, collection
                       ))}
                     </div>
                   )}
-                  <div style={{ display: 'flex', gap: '.75rem' }}>
-                    {r.demo_url && <a href={r.demo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-sky)', textDecoration: 'none' }}>Demo →</a>}
-                    {r.repo_url && <a href={r.repo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', textDecoration: 'none' }}>Repo →</a>}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '.75rem', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: '.75rem' }}>
+                      {r.demo_url && <a href={r.demo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-sky)', textDecoration: 'none' }}>Demo →</a>}
+                      {r.repo_url && <a href={r.repo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', textDecoration: 'none' }}>Repo →</a>}
+                    </div>
+                    <LikeButton contentType="realisation" contentId={r.id} initialCount={0} initialLiked={false} />
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', paddingTop: '.75rem', borderTop: '1px solid var(--f-border)', flexWrap: 'wrap' }}>
+                    <CommentSection contentType="realisation" contentId={r.id} />
                   </div>
                 </div>
               );

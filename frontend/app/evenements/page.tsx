@@ -92,7 +92,7 @@ export default function EvenementsPage() {
           Conférences, meetups & hackathons
         </h1>
         <p style={{ color: 'var(--f-text-3)', fontSize: '.88rem', margin: '0 0 2.25rem 0', lineHeight: 1.7 }}>
-          Événements tech francophones — en ligne et en présentiel.
+          Événements tech — en ligne et en présentiel.
         </p>
 
         {/* Barre de recherche */}

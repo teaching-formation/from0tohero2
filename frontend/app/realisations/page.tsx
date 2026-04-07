@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { SkeletonArticleCard } from '@/components/SkeletonCard';
+import LikeButton from '@/components/LikeButton';
+import RealisationModal from '@/components/RealisationModal';
 
 const PAGE_SIZE = 12;
 
@@ -11,7 +13,7 @@ type RealisationWithPraticien = {
   category: string; type: string; stack: string[]; excerpt?: string;
   demo_url?: string; repo_url?: string; date_published?: string;
   status: string; created_at: string; collaborateurs?: string[];
-  praticiens: { name: string; slug: string } | null;
+  praticiens: { name: string; slug: string; photo_url?: string } | null;
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -58,18 +60,30 @@ export default function RealisationsPage() {
   const [activeCat, setActiveCat] = useState('all');
   const [search, setSearch] = useState('');
   const [visible, setVisible] = useState(PAGE_SIZE);
+  const [selected, setSelected] = useState<RealisationWithPraticien | null>(null);
+  const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
 
   useEffect(() => { setVisible(PAGE_SIZE); }, [activeType, activeCat, search]);
 
   useEffect(() => {
     supabase
       .from('realisations')
-      .select('*, praticiens(name, slug)')
+      .select('*, praticiens(name, slug, photo_url)')
       .eq('status', 'approved')
       .order('created_at', { ascending: false })
       .then(({ data }) => {
-        setRealisations((data as RealisationWithPraticien[]) ?? []);
+        const rows = (data as RealisationWithPraticien[]) ?? [];
+        setRealisations(rows);
         setLoading(false);
+        // Load comment counts for all realisations
+        rows.forEach(r => {
+          fetch(`/api/comment?type=realisation&id=${r.id}`)
+            .then(res => res.json())
+            .then(d => {
+              setCommentCounts(prev => ({ ...prev, [r.id]: (d.comments ?? []).length }));
+            })
+            .catch(() => {});
+        });
       });
   }, []);
 
@@ -161,10 +175,13 @@ export default function RealisationsPage() {
               const typeIcon = TYPE_ICONS[r.type] || '◦';
               const typeLabel = TYPE_LABELS[r.type] || r.type;
 
+              const commentCount = commentCounts[r.id] ?? 0;
+
               return (
                 <article
                   key={r.slug}
                   className="f-card f-card-hover realisation-card"
+                  onClick={() => setSelected(r)}
                   style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -173,6 +190,7 @@ export default function RealisationsPage() {
                     position: 'relative',
                     overflow: 'hidden',
                     height: '100%',
+                    cursor: 'pointer',
                   }}
                 >
                   {/* Bande couleur catégorie */}
@@ -281,7 +299,7 @@ export default function RealisationsPage() {
                     </div>
                   )}
 
-                  {/* Footer : liens + flèche */}
+                  {/* Footer : liens + like + commentaires */}
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -289,8 +307,9 @@ export default function RealisationsPage() {
                     paddingTop: '.75rem',
                     borderTop: '1px solid var(--f-border)',
                     marginTop: '.25rem',
+                    gap: '.5rem',
                   }}>
-                    <div style={{ display: 'flex', gap: '.5rem' }}>
+                    <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
                       {r.demo_url && (
                         <a
                           href={r.demo_url}
@@ -333,6 +352,29 @@ export default function RealisationsPage() {
                         </a>
                       )}
                     </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '.4rem' }}>
+                      {/* Compteur commentaires */}
+                      <button
+                        onClick={e => { e.stopPropagation(); setSelected(r); }}
+                        style={{
+                          display: 'inline-flex', alignItems: 'center', gap: '.3rem',
+                          background: 'none', border: '1px solid var(--f-border)',
+                          borderRadius: 6, padding: '3px 8px', cursor: 'pointer',
+                          color: 'var(--f-text-3)', fontFamily: "'Geist Mono', monospace",
+                          fontSize: '.6rem', transition: 'color .15s, border-color .15s',
+                          flexShrink: 0,
+                        }}
+                        title="Voir les commentaires"
+                      >
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                        {commentCount > 0 && <span>{commentCount}</span>}
+                      </button>
+                      <div onClick={e => e.stopPropagation()}>
+                        <LikeButton contentType="realisation" contentId={r.id} initialCount={0} initialLiked={false} />
+                      </div>
+                    </div>
                   </div>
 
                 </article>
@@ -359,6 +401,14 @@ export default function RealisationsPage() {
             {Math.min(visible, filtered.length)} / {filtered.length} réalisations
           </p>
         </>
+      )}
+
+      {/* Modal réalisation */}
+      {selected && (
+        <RealisationModal
+          realisation={selected}
+          onClose={() => setSelected(null)}
+        />
       )}
     </div>
   );

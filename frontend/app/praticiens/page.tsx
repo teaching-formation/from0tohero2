@@ -6,6 +6,7 @@ import Avatar from '@/components/Avatar';
 import { SkeletonPraticienCard } from '@/components/SkeletonCard';
 import { getCountryDisplay } from '@/lib/countryFlag';
 import { BADGE_STYLES } from '@/lib/badges';
+import FlagImg from '@/components/FlagImg';
 
 const PAGE_SIZE = 12;
 
@@ -164,8 +165,7 @@ export default function PraticiensPage() {
               const cats: string[] = (p as any).categories ?? (p.category ? [p.category] : []);
               const primaryCat = cats[0] || 'autre';
               const catColor = CAT_COLORS[primaryCat] || 'var(--f-text-3)';
-              const { flag, name: countryName } = getCountryDisplay(p.country);
-              const countryDisplay = flag || countryName || p.country;
+              const { name: countryName } = getCountryDisplay(p.country);
 
               return (
                 <Link key={p.slug} href={`/praticiens/${p.slug}`} className="f-card-link"
@@ -231,15 +231,7 @@ export default function PraticiensPage() {
                           }}>{p.role}</p>
                         </div>
                       </div>
-                      <span title={countryName || p.country} style={{
-                        fontSize: flag ? '1.15rem' : '.7rem',
-                        flexShrink: 0,
-                        fontFamily: flag ? 'inherit' : "'Geist Mono', monospace",
-                        color: flag ? 'inherit' : 'var(--f-text-3)',
-                        marginTop: '.1rem',
-                      }}>
-                        {countryDisplay}
-                      </span>
+                      <FlagImg country={p.country} size={20} />
                     </div>
 
                     {/* Badges */}

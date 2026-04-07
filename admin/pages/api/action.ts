@@ -5,6 +5,75 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// ─── Notification co-auteurs ───────────────────────────────────────────────
+async function notifyCollaborateurs({
+  slugs,
+  contentType,
+  contentTitle,
+  contentSlug,
+  authorName,
+}: {
+  slugs: string[];
+  contentType: 'article' | 'realisation';
+  contentTitle: string;
+  contentSlug: string;
+  authorName: string;
+}) {
+  if (slugs.length === 0) return;
+
+  // Récupérer email + name de chaque co-auteur
+  const { data: collabs } = await supabaseAdmin
+    .from('praticiens')
+    .select('name, email')
+    .in('slug', slugs);
+
+  if (!collabs || collabs.length === 0) return;
+
+  const siteUrl = 'https://from0tohero.dev';
+  const path = contentType === 'article' ? 'articles' : 'realisations';
+  const contentUrl = `${siteUrl}/${path}/${contentSlug}`;
+  const typeLabel = contentType === 'article' ? 'article' : 'réalisation';
+  const typeLabelCap = contentType === 'article' ? 'Article' : 'Réalisation';
+
+  const from = process.env.RESEND_FROM || 'from0tohero <onboarding@resend.dev>';
+
+  await Promise.all(
+    collabs
+      .filter((c): c is { name: string; email: string } => Boolean(c.email))
+      .map(({ name, email }) =>
+        resend.emails.send({
+          from,
+          to: email,
+          subject: `[from0tohero] Tu es crédité(e) sur un ${typeLabel} publié 🎉`,
+          html: `
+            <div style="font-family:monospace;max-width:520px;margin:0 auto;padding:2rem;background:#0d1117;color:#e6edf3;border-radius:8px;">
+              <h2 style="color:#34d399;font-size:1rem;margin:0 0 1.5rem 0;letter-spacing:.05em;">// CO-AUTEUR — ${typeLabelCap.toUpperCase()} PUBLIÉ</h2>
+              <p style="font-size:.85rem;color:#8b949e;line-height:1.7;margin:0 0 1rem 0;">
+                Bonjour <strong style="color:#e6edf3;">${name}</strong>,<br/>
+                Tu as été crédité(e) comme co-auteur(e) sur un ${typeLabel} publié sur <strong style="color:#f97316;">from0tohero.dev</strong>.
+              </p>
+              <div style="background:#161b22;border:1px solid #30363d;border-left:3px solid #34d399;border-radius:6px;padding:1rem;margin:1.25rem 0;">
+                <p style="font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:#656d76;margin:0 0 .5rem 0;">${typeLabelCap}</p>
+                <p style="font-size:.9rem;color:#e6edf3;font-weight:700;margin:0 0 .35rem 0;">${contentTitle}</p>
+                ${authorName ? `<p style="font-size:.72rem;color:#8b949e;margin:0;">par ${authorName}</p>` : ''}
+              </div>
+              <div style="margin-top:1.75rem;">
+                <a href="${contentUrl}" style="display:inline-block;background:#34d399;color:#0d1117;text-decoration:none;padding:.6rem 1.4rem;border-radius:4px;font-size:.8rem;font-weight:700;letter-spacing:.04em;">
+                  Voir le ${typeLabel} →
+                </a>
+              </div>
+              <div style="margin-top:2rem;padding-top:1.25rem;border-top:1px solid #21262d;">
+                <p style="font-size:.65rem;color:#656d76;margin:0;">
+                  from0tohero.dev · La communauté Data &amp; Tech africaine
+                </p>
+              </div>
+            </div>
+          `,
+        }).catch(() => {}) // ne pas bloquer si un email échoue
+      )
+  );
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end();
   if (req.headers.authorization !== `Bearer ${process.env.ADMIN_PASSWORD}`) {
@@ -113,10 +182,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
       if (error) return res.status(500).json({ error: error.message });
 
+      // Notifier les co-auteurs (ne bloque jamais l'approbation)
+      if (collabsArticle.length > 0) {
+        notifyCollaborateurs({
+          slugs: collabsArticle,
+          contentType: 'article',
+          contentTitle: String(payload.title),
+          contentSlug: slug,
+          authorName: praticien?.name || String(payload.name || ''),
+        }).catch(() => {});
+      }
+
     } else if (type === 'realisation') {
       const slug = slugify(payload.title);
       const { data: praticien } = await supabaseAdmin
-        .from('praticiens').select('id').eq('slug', String(payload.username || '')).maybeSingle();
+        .from('praticiens').select('id, name').eq('slug', String(payload.username || '')).maybeSingle();
       const collabsReal: string[] = Array.isArray(payload.collaborateurs) ? payload.collaborateurs : [];
       const { error } = await supabaseAdmin.from('realisations').insert({
         slug,
@@ -136,6 +216,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         status: 'approved',
       });
       if (error) return res.status(500).json({ error: error.message });
+
+      // Notifier les co-auteurs (ne bloque jamais l'approbation)
+      if (collabsReal.length > 0) {
+        notifyCollaborateurs({
+          slugs: collabsReal,
+          contentType: 'realisation',
+          contentTitle: String(payload.title),
+          contentSlug: slug,
+          authorName: praticien?.name || String(payload.name || ''),
+        }).catch(() => {});
+      }
 
     } else if (type === 'evenement') {
       const slug = slugify(payload.title);

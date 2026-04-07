@@ -12,7 +12,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const praticienUrls = (praticiens ?? []).map(p => ({
     url: `${BASE}/praticiens/${p.slug}`,
     lastModified: new Date(p.updated_at),
-    changeFrequency: 'monthly' as const,
+    changeFrequency: 'weekly' as const,
     priority: 0.8,
   }));
 
@@ -22,6 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/realisations`,    lastModified: new Date(), changeFrequency: 'daily',   priority: 0.8 },
     { url: `${BASE}/evenements`,      lastModified: new Date(), changeFrequency: 'daily',   priority: 0.8 },
     { url: `${BASE}/articles`,        lastModified: new Date(), changeFrequency: 'daily',   priority: 0.8 },
+    { url: `${BASE}/tips`,            lastModified: new Date(), changeFrequency: 'daily',   priority: 0.8 },
     { url: `${BASE}/soumettre`,       lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
     { url: `${BASE}/legal`,           lastModified: new Date(), changeFrequency: 'yearly',  priority: 0.3 },
     ...praticienUrls,

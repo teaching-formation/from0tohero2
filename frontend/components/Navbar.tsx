@@ -111,6 +111,21 @@ export default function Navbar() {
               {l.label}
             </Link>
           ))}
+          <Link href="/recherche" style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: pathname === '/recherche' ? 'var(--f-sky)' : 'var(--f-text-3)',
+            padding: '.4rem .6rem',
+            display: 'flex',
+            alignItems: 'center',
+            transition: 'color .15s',
+            textDecoration: 'none',
+          }} title="Rechercher">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+          </Link>
           <Link href="/soumettre" className="btn-f btn-f-primary" style={{ marginLeft: '1rem', fontSize: '.7rem', padding: '.5rem 1.1rem' }}>
             Soumettre
           </Link>
@@ -138,6 +153,18 @@ export default function Navbar() {
 
         {/* Mobile right — dark toggle + hamburger */}
         <div className="mobile-nav-right" style={{ display: 'none', alignItems: 'center', gap: '.5rem' }}>
+          <Link href="/recherche" style={{
+            color: pathname === '/recherche' ? 'var(--f-sky)' : 'var(--f-text-3)',
+            padding: '.25rem',
+            display: 'flex',
+            alignItems: 'center',
+            textDecoration: 'none',
+            transition: 'color .15s',
+          }} title="Rechercher">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+          </Link>
           <button onClick={toggleDark} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--f-text-3)', fontSize: '1rem', lineHeight: 1, padding: '.25rem' }}>
             {dark ? '☀️' : '🌙'}
           </button>

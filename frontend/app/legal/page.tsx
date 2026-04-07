@@ -36,7 +36,7 @@ export default function LegalPage() {
       {/* ── 2. OBJET DE LA PLATEFORME ── */}
       <h2 style={S.h2}>2. Objet de la plateforme</h2>
       <p style={S.p}>
-        from0tohero.dev est une plateforme communautaire gratuite qui répertorie les praticiens tech francophones
+        from0tohero.dev est une plateforme communautaire gratuite qui répertorie les praticiens tech
         (Data, DevOps, Cloud, IA, Cybersécurité, Dev) ainsi que leurs réalisations, articles et événements.
       </p>
       <p style={S.p}>

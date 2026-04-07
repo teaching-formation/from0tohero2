@@ -1,8 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Avatar from '@/components/Avatar';
+import FlagImg from '@/components/FlagImg';
+import { getCountryDisplay } from '@/lib/countryFlag';
 
 type User        = { id: string; email: string; name: string };
 type Praticien   = Record<string, unknown> | null;
@@ -43,6 +45,14 @@ export default function MonCompteClient({ user, praticien, articles, realisation
     : 'profil';
   const [tab, setTab]         = useState<Tab>(initialTab);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [viewStats, setViewStats] = useState({ week: 0, month: 0, total: 0 });
+
+  useEffect(() => {
+    fetch('/api/profile-view')
+      .then(r => r.json())
+      .then(d => setViewStats(d))
+      .catch(() => {});
+  }, []);
 
   async function deleteContent(table: 'articles' | 'realisations' | 'evenements', id: string, label: string) {
     if (!window.confirm(`Supprimer "${label}" ? Cette action est irréversible.`)) return;
@@ -133,6 +143,55 @@ export default function MonCompteClient({ user, praticien, articles, realisation
         </button>
       </div>
 
+      {/* Onboarding checklist — visible seulement si profil incomplet */}
+      {(() => {
+        const checks = [
+          { label: 'Profil créé',           done: true },
+          { label: 'Bio ajoutée',           done: !!p.bio },
+          { label: 'Stack renseignée',      done: Array.isArray(p.stack) && (p.stack as string[]).length > 0 },
+          { label: 'Photo de profil',       done: !!p.photo_url },
+          { label: 'Première réalisation',  done: realisations.length > 0 },
+        ];
+        const doneCount = checks.filter(c => c.done).length;
+        if (doneCount === checks.length) return null; // profil complet → masquer
+        const pct = Math.round((doneCount / checks.length) * 100);
+        return (
+          <div style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 10, padding: '1.25rem 1.5rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '.75rem', flexWrap: 'wrap', gap: '.5rem' }}>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-orange)', margin: 0 }}>
+                // complète ton profil
+              </p>
+              <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)' }}>
+                {doneCount}/{checks.length} · {pct}%
+              </span>
+            </div>
+            {/* Barre de progression */}
+            <div style={{ height: 4, background: 'var(--f-border)', borderRadius: 99, marginBottom: '1rem', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${pct}%`, background: 'var(--f-orange)', borderRadius: 99, transition: 'width .4s ease' }} />
+            </div>
+            {/* Checklist */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.4rem' }}>
+              {checks.map(c => (
+                <span key={c.label} style={{
+                  fontFamily: "'Geist Mono', monospace",
+                  fontSize: '.62rem',
+                  padding: '3px 10px',
+                  borderRadius: 99,
+                  border: `1px solid ${c.done ? 'rgba(52,211,153,.4)' : 'var(--f-border)'}`,
+                  background: c.done ? 'rgba(52,211,153,.08)' : 'transparent',
+                  color: c.done ? 'var(--f-green)' : 'var(--f-text-3)',
+                }}>
+                  {c.done ? '✓ ' : '○ '}{c.label}
+                </span>
+              ))}
+            </div>
+            <a href="/mon-compte/edit" style={{ display: 'inline-block', marginTop: '.85rem', fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-orange)', textDecoration: 'none' }}>
+              Compléter mon profil →
+            </a>
+          </div>
+        );
+      })()}
+
       {/* Tabs */}
       <div className="moncompte-tabs" style={{ display: 'flex', gap: '.5rem', borderBottom: '1px solid var(--f-border)', marginBottom: '2rem', overflowX: 'auto' }}>
         {([
@@ -169,16 +228,24 @@ export default function MonCompteClient({ user, praticien, articles, realisation
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
             {[
-              { label: 'Rôle',         value: p.role },
-              { label: 'Localisation', value: String(p.country || '') },
-              { label: 'Catégorie',    value: Array.isArray(p.categories) ? p.categories.join(', ') : String(p.category || '') },
-              { label: 'Stack',        value: Array.isArray(p.stack) ? (p.stack as string[]).slice(0, 6).join(', ') : '' },
+              { label: 'Rôle',      value: p.role },
+              { label: 'Catégorie', value: Array.isArray(p.categories) ? p.categories.join(', ') : String(p.category || '') },
+              { label: 'Stack',     value: Array.isArray(p.stack) ? (p.stack as string[]).slice(0, 6).join(', ') : '' },
             ].map(({ label, value }) => (
               <div key={label} style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1rem 1.25rem' }}>
                 <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 .4rem 0' }}>{label}</p>
                 <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-1)', margin: 0 }}>{String(value || '—')}</p>
               </div>
             ))}
+            {/* Localisation avec drapeau image */}
+            <div style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1rem 1.25rem' }}>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 .4rem 0' }}>Localisation</p>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-1)', margin: 0, display: 'flex', alignItems: 'center', gap: '.4rem' }}>
+                {p.country ? (
+                  <><FlagImg country={String(p.country)} size={16} />{getCountryDisplay(String(p.country)).name || String(p.country)}</>
+                ) : '—'}
+              </p>
+            </div>
           </div>
 
           {!!p.bio && (
@@ -187,6 +254,25 @@ export default function MonCompteClient({ user, praticien, articles, realisation
               <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-2)', lineHeight: 1.7, margin: 0 }}>{String(p.bio)}</p>
             </div>
           )}
+
+          {/* Analytics vues */}
+          <div style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1.25rem 1.5rem' }}>
+            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 1rem 0' }}>
+              // vues de profil
+            </p>
+            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+              {[
+                { label: '7 jours',  value: viewStats.week },
+                { label: '30 jours', value: viewStats.month },
+                { label: 'total',    value: viewStats.total },
+              ].map(({ label, value }) => (
+                <div key={label}>
+                  <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.6rem', fontWeight: 800, color: 'var(--f-sky)', margin: '0 0 .2rem 0', lineHeight: 1 }}>{value}</p>
+                  <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: 0 }}>{label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
 
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <a href={`/mon-compte/edit`} className="btn-f btn-f-primary">
