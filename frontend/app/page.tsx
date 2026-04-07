@@ -21,6 +21,10 @@ export const metadata: Metadata = {
 };
 
 
+function fallback<T>(promise: Promise<T>, def: T): Promise<T> {
+  return promise.catch(() => def);
+}
+
 async function getLastRealisations() {
   const { data } = await supabase
     .from('realisations')
@@ -79,7 +83,10 @@ const STAT_ACCENT = ['--f-sky', '--f-orange', '--f-green', '--f-purple'];
 
 export default async function Home() {
   const [stats, lastArticles, lastRealisations, latestTips] = await Promise.all([
-    getStats(), getLastArticles(), getLastRealisations(), getLatestTips(),
+    fallback(getStats(), { praticiens: 0, realisations: 0, evenements: 0, articles: 0 }),
+    fallback(getLastArticles(), []),
+    fallback(getLastRealisations(), []),
+    fallback(getLatestTips(), []),
   ]);
 
   const statItems = [

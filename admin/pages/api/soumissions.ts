@@ -8,8 +8,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const { status } = req.query;
+  const VALID_STATUSES = ['pending', 'approved', 'rejected'];
   let query = supabaseAdmin.from('soumissions').select('*').order('created_at', { ascending: false });
-  if (status && status !== 'all') query = query.eq('status', status);
+  if (status && status !== 'all') {
+    if (!VALID_STATUSES.includes(String(status))) {
+      return res.status(400).json({ error: 'Statut invalide' });
+    }
+    query = query.eq('status', status);
+  }
 
   const { data, error } = await query;
   if (error) return res.status(500).json({ error: error.message });

@@ -43,8 +43,8 @@ export default async function PraticienPage({ params }: { params: Promise<{ slug
   const praticien = praticienRaw as unknown as Praticien;
 
   const [{ data: realsOwned }, { data: realsCollab }, { data: cols }, { data: tps }] = await Promise.all([
-    supabase.from('realisations').select('*').eq('praticien_id', praticien.id).eq('status', 'approved'),
-    supabase.from('realisations').select('*').contains('collaborateurs', [slug]).eq('status', 'approved'),
+    supabase.from('realisations').select('*').eq('praticien_id', praticien.id).eq('status', 'approved').limit(50),
+    supabase.from('realisations').select('*').contains('collaborateurs', [slug]).eq('status', 'approved').limit(50),
     supabase.from('collections').select('id, title, description, items, ordre').eq('praticien_id', praticien.id).eq('status', 'approved').order('ordre', { ascending: true }),
     supabase.from('tips').select('id, content, type, category, stack, created_at').eq('praticien_id', praticien.id).eq('status', 'approved').order('created_at', { ascending: false }).limit(20),
   ]);

@@ -74,14 +74,14 @@ function TipsPage() {
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <h1 style={{ margin: 0, fontFamily: "'Syne', sans-serif", fontSize: '1.4rem', fontWeight: 700 }}>
-          💡 Tips &amp; TIL <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-3)', fontWeight: 400 }}>({rows.length})</span>
+          💡 Tips &amp; TIL <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--text-3)', fontWeight: 400 }}>({rows.length})</span>
         </h1>
         <input
           type="text"
           placeholder="Rechercher…"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          style={{ padding: '.45rem .85rem', borderRadius: 7, border: '1px solid var(--f-border)', background: 'var(--f-surface)', color: 'var(--f-text-1)', fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', width: 220 }}
+          style={{ padding: '.45rem .85rem', borderRadius: 7, border: '1px solid var(--border)', background: 'var(--surface)', color: 'var(--text-1)', fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', width: 220 }}
         />
       </div>
 
@@ -99,36 +99,36 @@ function TipsPage() {
       </div>
 
       {loading ? (
-        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.8rem', color: 'var(--f-text-3)' }}>Chargement…</p>
+        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.8rem', color: 'var(--text-3)' }}>Chargement…</p>
       ) : displayed.length === 0 ? (
-        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.8rem', color: 'var(--f-text-3)' }}>Aucun tip trouvé.</p>
+        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.8rem', color: 'var(--text-3)' }}>Aucun tip trouvé.</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
           {displayed.map(row => (
-            <div key={row.id} style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 10, padding: '1rem 1.25rem', display: 'flex', gap: '1rem', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap' }}>
+            <div key={row.id} style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, padding: '1rem 1.25rem', display: 'flex', gap: '1rem', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', gap: '.4rem', marginBottom: '.5rem', flexWrap: 'wrap' }}>
                   <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: TYPE_COLOR[row.type] ?? '#aaa', border: '1px solid currentColor', padding: '2px 8px', borderRadius: 4 }}>
                     {row.type}
                   </span>
-                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 8px', borderRadius: 4 }}>
+                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--text-3)', border: '1px solid var(--border)', padding: '2px 8px', borderRadius: 4 }}>
                     {row.category}
                   </span>
-                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', padding: '2px 8px', borderRadius: 4, border: '1px solid var(--f-border)', color: row.status === 'approved' ? 'var(--f-green)' : row.status === 'rejected' ? '#f87171' : 'var(--f-orange)' }}>
+                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', padding: '2px 8px', borderRadius: 4, border: '1px solid var(--border)', color: row.status === 'approved' ? 'var(--green)' : row.status === 'rejected' ? '#f87171' : 'var(--orange)' }}>
                     {statusLabel(row.status)}
                   </span>
                 </div>
-                <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-text-1)', margin: '0 0 .4rem 0', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--text-1)', margin: '0 0 .4rem 0', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
                   {row.content.length > 200 ? `${row.content.slice(0, 200)}…` : row.content}
                 </p>
-                <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', margin: 0 }}>
+                <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--text-3)', margin: 0 }}>
                   {new Date(row.created_at).toLocaleDateString('fr-FR')} · {row.praticien_id}
                 </p>
               </div>
               <div style={{ display: 'flex', gap: '.5rem', flexShrink: 0 }}>
                 <button
                   onClick={() => setEditing(row)}
-                  style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', padding: '.35rem .75rem', borderRadius: 6, border: '1px solid var(--f-border)', background: 'transparent', color: 'var(--f-text-2)', cursor: 'pointer' }}
+                  style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', padding: '.35rem .75rem', borderRadius: 6, border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-2)', cursor: 'pointer' }}
                 >
                   ✎
                 </button>
