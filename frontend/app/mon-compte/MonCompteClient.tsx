@@ -47,6 +47,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
   const [deleting, setDeleting] = useState<string | null>(null);
   const [viewStats, setViewStats] = useState({ week: 0, month: 0, total: 0 });
   const [visitors, setVisitors] = useState<{ slug: string; name: string; photo_url: string | null; viewed_at: string }[]>([]);
+  const [visitorsOpen, setVisitorsOpen] = useState(false);
 
   useEffect(() => {
     fetch('/api/profile-view')
@@ -258,10 +259,25 @@ export default function MonCompteClient({ user, praticien, articles, realisation
 
           {/* Analytics vues */}
           <div style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1.25rem 1.5rem' }}>
-            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 1rem 0' }}>
-              // vues de profil
-            </p>
-            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', marginBottom: visitors.length > 0 ? '1.25rem' : 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '.5rem' }}>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: 0 }}>
+                // vues de profil
+              </p>
+              {visitors.length > 0 && (
+                <button
+                  onClick={() => setVisitorsOpen(true)}
+                  style={{
+                    fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', fontWeight: 600,
+                    color: 'var(--f-sky)', background: 'var(--f-sky-bg, rgba(56,189,248,.08))',
+                    border: '1px solid rgba(56,189,248,.3)', borderRadius: 6,
+                    padding: '3px 10px', cursor: 'pointer',
+                  }}
+                >
+                  Visiteurs ({visitors.length}) →
+                </button>
+              )}
+            </div>
+            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
               {[
                 { label: '7 jours',  value: viewStats.week },
                 { label: '30 jours', value: viewStats.month },
@@ -273,37 +289,68 @@ export default function MonCompteClient({ user, praticien, articles, realisation
                 </div>
               ))}
             </div>
+          </div>
 
-            {/* Liste des visiteurs connectés */}
-            {visitors.length > 0 && (
-              <>
-                <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 .75rem 0' }}>
-                  // visiteurs récents
-                </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+          {/* Modal visiteurs */}
+          {visitorsOpen && (
+            <div
+              onClick={() => setVisitorsOpen(false)}
+              style={{
+                position: 'fixed', inset: 0, zIndex: 1000,
+                background: 'rgba(0,0,0,.72)', backdropFilter: 'blur(4px)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem',
+              }}
+            >
+              <div
+                onClick={e => e.stopPropagation()}
+                style={{
+                  background: 'var(--f-surface)', border: '1px solid var(--f-border)',
+                  borderRadius: 16, width: '100%', maxWidth: 480, maxHeight: '80vh',
+                  overflowY: 'auto', display: 'flex', flexDirection: 'column',
+                }}
+              >
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--f-border)' }}>
+                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)' }}>
+                    // visiteurs récents · {visitors.length}
+                  </span>
+                  <button
+                    onClick={() => setVisitorsOpen(false)}
+                    style={{ background: 'none', border: '1px solid var(--f-border)', borderRadius: 6, padding: '3px 8px', cursor: 'pointer', color: 'var(--f-text-3)', fontFamily: "'Geist Mono', monospace", fontSize: '.7rem' }}
+                  >✕</button>
+                </div>
+
+                {/* Liste */}
+                <div style={{ display: 'flex', flexDirection: 'column', padding: '.75rem' }}>
                   {visitors.map((v, i) => (
                     <a
-                      key={`${v.slug}-${i}`}
+                      key={i}
                       href={`/praticiens/${v.slug}`}
                       target="_blank"
                       rel="noreferrer"
-                      style={{ display: 'flex', alignItems: 'center', gap: '.6rem', textDecoration: 'none', padding: '.4rem .5rem', borderRadius: 6, transition: 'background .15s' }}
+                      style={{ display: 'flex', alignItems: 'center', gap: '.75rem', textDecoration: 'none', padding: '.6rem .75rem', borderRadius: 8, transition: 'background .15s' }}
                       onMouseEnter={e => (e.currentTarget.style.background = 'var(--f-bg)')}
                       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                     >
-                      <Avatar name={v.name} photoUrl={v.photo_url} size={28} radius={7} fontSize=".55rem" />
-                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-sky)', fontWeight: 600, flex: 1 }}>
-                        @{v.slug}
-                      </span>
-                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)' }}>
-                        {new Date(v.viewed_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
+                      <Avatar name={v.name} photoUrl={v.photo_url} size={32} radius={8} fontSize=".6rem" />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-sky)', fontWeight: 600, margin: '0 0 .15rem 0' }}>
+                          @{v.slug}
+                        </p>
+                        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', margin: 0 }}>
+                          {v.name}
+                        </p>
+                      </div>
+                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                        {new Date(v.viewed_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        {' '}{new Date(v.viewed_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </a>
                   ))}
                 </div>
-              </>
-            )}
-          </div>
+              </div>
+            </div>
+          )}
 
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <a href={`/mon-compte/edit`} className="btn-f btn-f-primary">
