@@ -5,7 +5,10 @@ import { createClient } from '@/lib/supabase/client';
 
 function ConnexionForm() {
   const searchParams = useSearchParams();
-  const next         = searchParams.get('next') || '/mon-compte';
+  const rawNext      = searchParams.get('next') || '/mon-compte';
+  const next         = rawNext.startsWith('/') && !rawNext.startsWith('//') && !rawNext.includes(':')
+    ? rawNext
+    : '/mon-compte';
   const hasError     = searchParams.get('error') === 'auth';
 
   const supabase = createClient();

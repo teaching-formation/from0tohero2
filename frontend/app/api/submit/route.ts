@@ -145,7 +145,7 @@ export async function POST(req: Request) {
           for (const collab of (collabPraticiens ?? [])) {
             if (!collab.email) continue;
             resend.emails.send({
-              from: 'from0tohero <onboarding@resend.dev>',
+              from: process.env.RESEND_FROM || 'from0tohero <onboarding@resend.dev>',
               to: collab.email,
               subject: `[from0tohero] Tu as été ajouté en co-auteur d'une réalisation`,
               html: `
@@ -225,7 +225,7 @@ export async function POST(req: Request) {
     if (!adminEmail) {
       console.warn('[submit] ADMIN_EMAIL non défini, email admin non envoyé');
     } else await resend.emails.send({
-      from: 'from0tohero <onboarding@resend.dev>',
+      from: process.env.RESEND_FROM || 'from0tohero <onboarding@resend.dev>',
       to:   adminEmail,
       subject: `[from0tohero] Nouvelle soumission — ${label}`,
       html: `
