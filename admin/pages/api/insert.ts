@@ -157,8 +157,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       url:         data.url,
       subs:        data.subs || null,
       ordre:       Number(data.ordre) || 0,
-      active:      false,
-      status:      data.status || 'pending',
+      active:      data.active === 'true' || data.active === true || false,
+      status:      data.status || 'approved',
     }).select().single();
     if (error) return res.status(500).json({ error: error.message });
     return res.json(row);
