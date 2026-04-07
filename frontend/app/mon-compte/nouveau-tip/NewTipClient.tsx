@@ -32,11 +32,12 @@ const INSPIRATIONS = [
 export default function NewTipClient() {
   const router = useRouter();
 
-  const [content,  setContent]  = useState('');
-  const [type,     setType]     = useState<typeof TYPES[number]>('tip');
-  const [category, setCategory] = useState('');
-  const [stack,    setStack]    = useState('');
-  const [errors,   setErrors]   = useState<Record<string,string>>({});
+  const [content,       setContent]       = useState('');
+  const [type,          setType]          = useState<typeof TYPES[number]>('tip');
+  const [category,      setCategory]      = useState('');
+  const [categoryLabel, setCategoryLabel] = useState('');
+  const [stack,         setStack]         = useState('');
+  const [errors,        setErrors]        = useState<Record<string,string>>({});
   const [loading,  setLoading]  = useState(false);
   const [success,  setSuccess]  = useState(false);
 
@@ -64,6 +65,7 @@ export default function NewTipClient() {
           content: content.trim(),
           type,
           category,
+          category_label: category === 'autre' ? categoryLabel.trim() || null : null,
           stack: stack.split(',').map(s => s.trim()).filter(Boolean),
         }),
       });
@@ -177,6 +179,16 @@ export default function NewTipClient() {
               </button>
             ))}
           </div>
+          {category === 'autre' && (
+            <input
+              className="f-input"
+              type="text"
+              placeholder="Précise la catégorie (ex: GameDev, Robotique…)"
+              value={categoryLabel}
+              onChange={e => setCategoryLabel(e.target.value)}
+              style={{ maxWidth: '100%', marginTop: '.25rem' }}
+            />
+          )}
           {errors.category && (
             <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{errors.category}</span>
           )}

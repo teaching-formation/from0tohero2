@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
 
     const body = await req.json();
-    const { content, type, category, stack } = body;
+    const { content, type, category, category_label, stack } = body;
 
     if (!content || typeof content !== 'string' || content.trim().length === 0) {
       return NextResponse.json({ error: 'Contenu requis' }, { status: 400 });
@@ -45,12 +45,13 @@ export async function POST(req: Request) {
     const { data: tip, error } = await supabaseAdmin
       .from('tips')
       .insert({
-        praticien_id: praticien.id,
-        content:      content.trim(),
+        praticien_id:   praticien.id,
+        content:        content.trim(),
         type,
         category,
-        stack:        cleanStack,
-        status:       'approved',
+        category_label: category === 'autre' && category_label ? String(category_label).slice(0, 60) : null,
+        stack:          cleanStack,
+        status:         'approved',
       })
       .select('id')
       .single();
