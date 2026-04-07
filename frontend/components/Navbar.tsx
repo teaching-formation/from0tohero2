@@ -8,7 +8,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [dark, setDark] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // null = chargement
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -126,6 +126,7 @@ export default function Navbar() {
               textDecoration: 'none',
               transition: 'border-color .15s, color .15s',
               whiteSpace: 'nowrap',
+              visibility: isLoggedIn === null ? 'hidden' : 'visible',
             }}
           >
             {isLoggedIn ? 'Mon espace' : 'Connexion'}
@@ -192,6 +193,7 @@ export default function Navbar() {
                 textDecoration: 'none',
                 flex: 1,
                 textAlign: 'center',
+                visibility: isLoggedIn === null ? 'hidden' : 'visible',
               }}
             >
               {isLoggedIn ? 'Mon espace' : 'Connexion'}

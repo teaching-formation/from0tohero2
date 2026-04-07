@@ -20,6 +20,7 @@ function Dashboard() {
   const [counts, setCounts]           = useState<ContentCounts>({ praticiens: 0, articles: 0, realisations: 0, evenements: 0 });
   const [recent, setRecent]           = useState<Soumission[]>([]);
   const [loading, setLoading]         = useState(true);
+  const [loadError, setLoadError]     = useState(false);
 
   useEffect(() => {
     const token = getToken();
@@ -48,7 +49,7 @@ function Dashboard() {
         evenements:   Array.isArray(evts) ? evts.filter((r: { status: string }) => r.status === 'approved').length : 0,
       });
       setLoading(false);
-    }).catch(() => setLoading(false));
+    }).catch(() => { setLoading(false); setLoadError(true); });
   }, []);
 
   const TYPE_COLOR: Record<string, string> = {
@@ -75,6 +76,10 @@ function Dashboard() {
 
       {loading ? (
         <div className="loading-state"><Spinner />Chargement des données…</div>
+      ) : loadError ? (
+        <div className="card" style={{ color: 'var(--red)', fontFamily: "'Geist Mono', monospace", fontSize: '.8rem' }}>
+          ⚠ Impossible de charger les données. Vérifie ta connexion et recharge la page.
+        </div>
       ) : (
         <>
           {/* Soumissions stats */}

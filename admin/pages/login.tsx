@@ -23,7 +23,8 @@ export default function LoginPage() {
       sessionStorage.setItem('admin_token', password);
       router.push('/');
     } else {
-      setError('Mot de passe incorrect. Réessayez.');
+      const data = await res.json().catch(() => ({}));
+      setError(data.error || 'Mot de passe incorrect.');
     }
     setLoading(false);
   }
@@ -59,7 +60,7 @@ export default function LoginPage() {
               value={password}
               onChange={e => { setPassword(e.target.value); setError(''); }}
               autoFocus
-              autoComplete="current-password"
+              autoComplete="off"
               style={{ fontSize: '.85rem', letterSpacing: '.08em' }}
             />
           </div>
