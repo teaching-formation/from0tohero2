@@ -30,13 +30,19 @@ async function getBootcamps() {
   return data ?? [];
 }
 
-async function getYoutubeChannels() {
+async function getLastRealisations() {
   const { data } = await supabase
-    .from('chaines_youtube')
-    .select('name, description, url, subs')
+    .from('realisations')
+    .select('slug, title, category, type, stack, excerpt, demo_url, repo_url, praticiens(slug, name)')
     .eq('status', 'approved')
-    .order('ordre', { ascending: true });
-  return data ?? [];
+    .neq('type', 'bootcamp')
+    .order('created_at', { ascending: false })
+    .limit(10);
+  return (data ?? []) as unknown as Array<{
+    slug: string; title: string; category: string; type: string;
+    stack: string[]; excerpt: string | null; demo_url: string | null; repo_url: string | null;
+    praticiens: { slug: string; name: string } | null;
+  }>;
 }
 
 async function getStats() {
@@ -81,8 +87,8 @@ async function getLastArticles() {
 const STAT_ACCENT = ['--f-sky', '--f-orange', '--f-green', '--f-purple'];
 
 export default async function Home() {
-  const [stats, lastArticles, youtubeChannels, bootcamps, latestTips] = await Promise.all([
-    getStats(), getLastArticles(), getYoutubeChannels(), getBootcamps(), getLatestTips(),
+  const [stats, lastArticles, lastRealisations, bootcamps, latestTips] = await Promise.all([
+    getStats(), getLastArticles(), getLastRealisations(), getBootcamps(), getLatestTips(),
   ]);
 
   const statItems = [
@@ -351,33 +357,50 @@ export default async function Home() {
           </>
         )}
 
-        {/* Chaînes YouTube */}
-        <ScrollReveal>
-          <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '.6rem' }}>
-            <span style={{ display: 'inline-block', width: 18, height: 1.5, background: '#ef4444', borderRadius: 2 }} />
-            Chaînes YouTube francophones
-          </p>
-        </ScrollReveal>
-        <div style={{ marginBottom: '3.5rem' }}>
-          <Marquee speed={28} gap={14} itemWidth={230} itemHeight={150}>
-            {youtubeChannels.map((ch) => (
-              <a key={ch.name} href={ch.url} className="f-card-link" target="_blank" rel="noreferrer" style={{ display: 'flex', height: '100%' }}>
-                <div className="f-card f-card-hover" style={{ padding: '1.1rem 1.25rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '.55rem', marginBottom: '.7rem' }}>
-                    <span style={{
-                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                      width: 26, height: 26, borderRadius: '50%',
-                      background: 'rgba(239,68,68,.12)', color: '#ef4444', fontSize: '.7rem', flexShrink: 0,
-                    }}>▶</span>
-                    <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: '.85rem', color: 'var(--f-text-1)', letterSpacing: '-.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ch.name}</span>
-                  </div>
-                  <p style={{ fontSize: '.75rem', color: 'var(--f-text-2)', lineHeight: 1.6, margin: '0 0 .7rem 0', flex: 1, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{ch.description}</p>
-                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', color: 'var(--f-text-3)', marginTop: 'auto' }}>{ch.subs}</span>
-                </div>
-              </a>
-            ))}
-          </Marquee>
-        </div>
+        {/* Réalisations récentes */}
+        {lastRealisations.length > 0 && (
+          <>
+            <ScrollReveal>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '.6rem' }}>
+                <span style={{ display: 'inline-block', width: 18, height: 1.5, background: 'var(--f-green)', borderRadius: 2 }} />
+                Réalisations récentes
+              </p>
+            </ScrollReveal>
+            <div style={{ marginBottom: '3.5rem' }}>
+              <Marquee speed={32} gap={14} itemWidth={270} itemHeight={180}>
+                {lastRealisations.map((r) => {
+                  const href = r.demo_url || r.repo_url || `/realisations`;
+                  const isExternal = !!(r.demo_url || r.repo_url);
+                  const stack = Array.isArray(r.stack) ? r.stack.slice(0, 4).join(' · ') : '';
+                  return (
+                    <Link key={r.slug} href={href} {...(isExternal ? { target: '_blank', rel: 'noreferrer' } : {})} className="f-card-link" style={{ display: 'flex', height: '100%' }}>
+                      <div className="f-card f-card-hover" style={{ padding: '1.1rem 1.25rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                        <div style={{ display: 'flex', gap: '.35rem', flexWrap: 'wrap' }}>
+                          <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-green)', border: '1px solid var(--f-green-border, var(--f-border))', background: 'rgba(52,211,153,.08)', padding: '2px 7px', borderRadius: 4 }}>{r.category}</span>
+                          <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 7px', borderRadius: 4 }}>{r.type}</span>
+                        </div>
+                        <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '.9rem', fontWeight: 800, color: 'var(--f-text-1)', margin: 0, lineHeight: 1.4, letterSpacing: '-.01em', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{r.title}</h3>
+                        {stack && (
+                          <p style={{ fontSize: '.72rem', color: 'var(--f-text-2)', lineHeight: 1.5, margin: 0, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{stack}</p>
+                        )}
+                        {r.praticiens && (
+                          <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', color: 'var(--f-text-3)', marginTop: 'auto' }}>
+                            @{r.praticiens.slug}
+                          </span>
+                        )}
+                      </div>
+                    </Link>
+                  );
+                })}
+              </Marquee>
+            </div>
+            <ScrollReveal>
+              <Link href="/realisations" className="arrow-link" style={{ marginBottom: '3.5rem', display: 'inline-block' }}>
+                Voir toutes les réalisations <span>→</span>
+              </Link>
+            </ScrollReveal>
+          </>
+        )}
 
         {/* Tips & TIL */}
         {latestTips.length > 0 && (
