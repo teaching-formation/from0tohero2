@@ -168,7 +168,7 @@ export default function RealisationModal({ realisation, onClose }: Props) {
     setSavingEdit(false);
     if (!res.ok) return;
     const { comment } = await res.json();
-    setComments(cs => cs.map(c => c.id === id ? { ...c, content: comment.content } : c));
+    setComments(cs => cs.map(c => c.id === id ? { ...c, ...comment } : c));
     setEditingId(null);
     setEditText('');
   }
