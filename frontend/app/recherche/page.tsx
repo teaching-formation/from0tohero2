@@ -137,10 +137,10 @@ export default function RecherchePage() {
 
       {/* ── Header / Input ── */}
       <div style={{ marginBottom: '3rem', textAlign: 'center' }}>
-        <span className="f-label" style={{ marginBottom: '.6rem', display: 'block' }}>// recherche</span>
+        <span className="f-label" style={{ marginBottom: '.75rem', display: 'block' }}>// recherche</span>
         <h1 style={{
           fontFamily: "'Syne', sans-serif",
-          fontSize: 'clamp(1.8rem, 4vw, 2.6rem)',
+          fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
           fontWeight: 800,
           color: 'var(--f-text-1)',
           margin: '.4rem 0 1.75rem 0',
@@ -150,50 +150,74 @@ export default function RecherchePage() {
           Recherche globale
         </h1>
 
-        <div style={{ position: 'relative', maxWidth: 640, margin: '0 auto' }}>
+        <div style={{ position: 'relative', maxWidth: 780, margin: '0 auto' }}>
           {/* Icône loupe */}
           <span style={{
-            position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)',
-            color: 'var(--f-text-3)', display: 'flex', alignItems: 'center', pointerEvents: 'none',
+            position: 'absolute', left: '1.1rem', top: '50%', transform: 'translateY(-50%)',
+            color: 'var(--f-sky)', display: 'flex', alignItems: 'center', pointerEvents: 'none',
           }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>
           </span>
           <input
             ref={inputRef}
-            className="f-input"
             type="search"
-            placeholder="Chercher un praticien, une réalisation, un article..."
+            placeholder="Chercher un praticien, une stack, un projet..."
             value={query}
             onChange={e => setQuery(e.target.value)}
             style={{
               width: '100%',
-              paddingLeft: '2.75rem',
-              fontSize: '1rem',
-              height: 52,
+              paddingLeft: '3rem',
+              paddingRight: '3rem',
+              fontSize: '.92rem',
+              height: 54,
               boxSizing: 'border-box',
+              fontFamily: "'Geist Mono', monospace",
+              background: 'var(--f-surface)',
+              border: `1.5px solid ${query.length >= 2 ? 'var(--f-sky)' : 'var(--f-border)'}`,
+              borderRadius: 12,
+              color: 'var(--f-text-1)',
+              outline: 'none',
+              transition: 'border-color .15s',
             }}
+            onFocus={e => { (e.target as HTMLInputElement).style.borderColor = 'var(--f-sky)'; }}
+            onBlur={e => { if (query.length < 2) (e.target as HTMLInputElement).style.borderColor = 'var(--f-border)'; }}
           />
-          {loading && (
+          {loading ? (
             <span style={{
               position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)',
-              color: 'var(--f-text-3)', fontFamily: "'Geist Mono', monospace", fontSize: '.7rem',
+              color: 'var(--f-sky)', fontFamily: "'Geist Mono', monospace", fontSize: '.65rem',
+              letterSpacing: '.1em',
             }}>
-              ...
+              ···
             </span>
+          ) : query.length >= 2 && (
+            <button
+              onClick={() => setQuery('')}
+              style={{
+                position: 'absolute', right: '.85rem', top: '50%', transform: 'translateY(-50%)',
+                background: 'none', border: 'none', cursor: 'pointer',
+                color: 'var(--f-text-3)', padding: '.2rem', display: 'flex',
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
           )}
         </div>
       </div>
 
       {/* ── État vide (query < 2) ── */}
       {query.length < 2 && (
-        <div style={{ textAlign: 'center', padding: '3rem 0' }}>
+        <div style={{ padding: '2rem 0', textAlign: 'center' }}>
           <p style={{
-            fontFamily: "'Geist Mono', monospace", fontSize: '.85rem',
-            color: 'var(--f-text-3)', marginBottom: '1.5rem', lineHeight: 1.7,
+            fontFamily: "'Geist Mono', monospace", fontSize: '.68rem',
+            letterSpacing: '.1em', textTransform: 'uppercase',
+            color: 'var(--f-text-3)', marginBottom: '1rem',
           }}>
-            Cherche un praticien, une stack, un projet...
+            // suggestions
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem', justifyContent: 'center' }}>
             {SUGGESTIONS.map(s => (
@@ -203,22 +227,24 @@ export default function RecherchePage() {
                 style={{
                   fontFamily: "'Geist Mono', monospace",
                   fontSize: '.72rem',
-                  letterSpacing: '.06em',
-                  padding: '.45rem 1rem',
-                  borderRadius: 99,
-                  border: '1.5px solid var(--f-border)',
+                  letterSpacing: '.05em',
+                  padding: '.4rem 1rem',
+                  borderRadius: 8,
+                  border: '1px solid var(--f-border)',
                   background: 'var(--f-surface)',
                   color: 'var(--f-text-2)',
                   cursor: 'pointer',
-                  transition: 'border-color .15s, color .15s',
+                  transition: 'border-color .15s, color .15s, background .15s',
                 }}
                 onMouseEnter={e => {
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--f-sky)';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(56,189,248,.4)';
                   (e.currentTarget as HTMLButtonElement).style.color = 'var(--f-sky)';
+                  (e.currentTarget as HTMLButtonElement).style.background = 'rgba(56,189,248,.07)';
                 }}
                 onMouseLeave={e => {
                   (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--f-border)';
                   (e.currentTarget as HTMLButtonElement).style.color = 'var(--f-text-2)';
+                  (e.currentTarget as HTMLButtonElement).style.background = 'var(--f-surface)';
                 }}
               >
                 {s}

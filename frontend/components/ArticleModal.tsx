@@ -70,6 +70,7 @@ export default function ArticleModal({ article, onClose }: Props) {
   const [editText, setEditText] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   // Close on Escape
@@ -84,6 +85,11 @@ export default function ArticleModal({ article, onClose }: Props) {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
   }, []);
+
+  // Reset scroll to top on open
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [article?.id]);
 
   // Load session slug
   useEffect(() => {
@@ -185,6 +191,7 @@ export default function ArticleModal({ article, onClose }: Props) {
       }}
     >
       <div
+        ref={scrollRef}
         onClick={e => e.stopPropagation()}
         style={{
           background: 'var(--f-surface)',
