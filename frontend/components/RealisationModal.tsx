@@ -96,10 +96,14 @@ export default function RealisationModal({ realisation, onClose }: Props) {
     return () => { document.body.style.overflow = ''; };
   }, []);
 
-  // Reset scroll to top on open
+  // Reset scroll to top after comments load (cross-platform fix)
   useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = 0;
-  }, [realisation?.id]);
+    if (!loadingComments && scrollRef.current) {
+      requestAnimationFrame(() => {
+        if (scrollRef.current) scrollRef.current.scrollTop = 0;
+      });
+    }
+  }, [loadingComments]);
 
   // Load session slug
   useEffect(() => {
