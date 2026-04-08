@@ -228,7 +228,7 @@ export default function TipsPage() {
 
           {/* Spacer + résultats + reset */}
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '.65rem' }}>
-            {!loading && (
+            {!loading && hasFilters && (
               <span style={{
                 fontFamily: "'Geist Mono', monospace",
                 fontSize: '.65rem',
