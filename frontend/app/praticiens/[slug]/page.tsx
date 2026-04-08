@@ -42,11 +42,17 @@ export default async function PraticienPage({ params }: { params: Promise<{ slug
   if (!praticienRaw) notFound();
   const praticien = praticienRaw as unknown as Praticien;
 
-  const [{ data: realsOwned }, { data: realsCollab }, { data: cols }, { data: tps }] = await Promise.all([
+  const praticienStack = Array.isArray(praticienRaw.stack) ? (praticienRaw.stack as string[]) : [];
+
+  const [{ data: realsOwned }, { data: realsCollab }, { data: cols }, { data: tps }, { data: similaires }] = await Promise.all([
     supabase.from('realisations').select('*').eq('praticien_id', praticien.id).eq('status', 'approved').limit(50),
     supabase.from('realisations').select('*').contains('collaborateurs', [slug]).eq('status', 'approved').limit(50),
     supabase.from('collections').select('id, title, description, items, ordre').eq('praticien_id', praticien.id).eq('status', 'approved').order('ordre', { ascending: true }),
     supabase.from('tips').select('id, content, type, category, stack, created_at').eq('praticien_id', praticien.id).eq('status', 'approved').order('created_at', { ascending: false }).limit(20),
+    // Praticiens avec stack similaire
+    praticienStack.length > 0
+      ? supabase.from('praticiens').select('id, slug, name, role, photo_url, stack, country').eq('status', 'approved').neq('id', praticien.id).overlaps('stack', praticienStack).limit(4)
+      : Promise.resolve({ data: [] }),
   ]);
 
   // Fusionner réalisations possédées + en tant que co-auteur (sans doublons)
@@ -87,6 +93,7 @@ export default async function PraticienPage({ params }: { params: Promise<{ slug
         realisations={reals as Realisation[]}
         collections={(cols ?? []) as Collection[]}
         tips={(tps ?? []) as Tip[]}
+        similaires={(similaires ?? []) as { id: string; slug: string; name: string; role: string; photo_url?: string; stack: string[]; country: string }[]}
       />
     </>
   );

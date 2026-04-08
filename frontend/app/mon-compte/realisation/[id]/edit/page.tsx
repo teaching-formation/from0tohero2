@@ -11,13 +11,15 @@ export default async function EditRealisationPage({ params }: { params: Promise<
   if (!user) redirect('/connexion?next=/mon-compte');
 
   const { data: praticien } = await supabaseAdmin
-    .from('praticiens').select('id').eq('user_id', user.id).maybeSingle();
+    .from('praticiens').select('id, slug').eq('user_id', user.id).maybeSingle();
   if (!praticien) redirect('/mon-compte');
 
   const { data: realisation } = await supabaseAdmin
     .from('realisations').select('*').eq('id', id).maybeSingle();
 
-  if (!realisation || realisation.praticien_id !== praticien.id) redirect('/mon-compte');
+  const isOwner = realisation?.praticien_id === praticien.id;
+  const isCoAuthor = Array.isArray(realisation?.collaborateurs) && realisation.collaborateurs.includes(praticien.slug);
+  if (!realisation || (!isOwner && !isCoAuthor)) redirect('/mon-compte');
 
   return (
     <div style={{ maxWidth: 720, margin: '0 auto', padding: '2.5rem 1.5rem' }}>

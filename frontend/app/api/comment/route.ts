@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createNotification } from '@/lib/createNotification';
 
 // GET /api/comment?type=realisation&id=xxx → { comments: [...] }
 export async function GET(req: NextRequest) {
@@ -47,6 +48,23 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Notifier le propriétaire du contenu (fire-and-forget)
+  const table = content_type === 'realisation' ? 'realisations' : 'articles';
+  supabase.from(table).select('praticien_id, title').eq('id', content_id).maybeSingle()
+    .then(({ data: owner }) => {
+      if (owner) {
+        createNotification({
+          praticien_id: owner.praticien_id,
+          type: 'comment',
+          actor_id: praticien.id,
+          content_type,
+          content_id,
+          content_title: (owner as any).title ?? null,
+        }).catch(() => {});
+      }
+    });
+
   return NextResponse.json({ comment: data });
 }
 

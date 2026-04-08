@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createNotification } from '@/lib/createNotification';
 
 // GET /api/follow?slug=diakite → { following: bool, count: number }
 export async function GET(req: NextRequest) {
@@ -65,6 +66,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ following: false });
   } else {
     await supabase.from('follows').insert({ follower_id: follower.id, following_id: target.id });
+
+    // Notifier le praticien suivi
+    createNotification({
+      praticien_id: target.id,
+      type: 'follow',
+      actor_id: follower.id,
+    }).catch(() => {});
+
     return NextResponse.json({ following: true });
   }
 }

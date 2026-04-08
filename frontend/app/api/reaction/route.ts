@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createNotification } from '@/lib/createNotification';
 
 export async function GET(req: NextRequest) {
   const supabase = await createClient();
@@ -58,6 +59,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ liked: false });
   } else {
     await supabase.from('reactions').insert({ praticien_id: praticien.id, content_type, content_id });
+
+    // Notifier le propriétaire du contenu
+    const { data: content } = await supabase
+      .from(content_type === 'realisation' ? 'realisations' : content_type === 'article' ? 'articles' : 'tips')
+      .select('praticien_id, title').eq('id', content_id).maybeSingle();
+    if (content) {
+      createNotification({
+        praticien_id: content.praticien_id,
+        type: 'like',
+        actor_id: praticien.id,
+        content_type,
+        content_id,
+        content_title: (content as any).title ?? null,
+      }).catch(() => {});
+    }
+
     return NextResponse.json({ liked: true });
   }
 }

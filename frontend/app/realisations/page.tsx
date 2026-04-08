@@ -58,12 +58,13 @@ export default function RealisationsPage() {
   const [loading, setLoading] = useState(true);
   const [activeType, setActiveType] = useState('all');
   const [activeCat, setActiveCat] = useState('all');
+  const [activeStack, setActiveStack] = useState('');
   const [search, setSearch] = useState('');
   const [visible, setVisible] = useState(PAGE_SIZE);
   const [selected, setSelected] = useState<RealisationWithPraticien | null>(null);
   const [commentCounts, setCommentCounts] = useState<Record<string, number>>({});
 
-  useEffect(() => { setVisible(PAGE_SIZE); }, [activeType, activeCat, search]);
+  useEffect(() => { setVisible(PAGE_SIZE); }, [activeType, activeCat, activeStack, search]);
 
   useEffect(() => {
     supabase
@@ -90,6 +91,7 @@ export default function RealisationsPage() {
   const filtered = realisations.filter(r => {
     if (activeType !== 'all' && r.type !== activeType) return false;
     if (activeCat !== 'all' && r.category !== activeCat) return false;
+    if (activeStack && !(r.stack ?? []).map(s => s.toLowerCase()).includes(activeStack.toLowerCase())) return false;
     if (search) {
       const q = search.toLowerCase();
       if (!r.title.toLowerCase().includes(q) && !(r.praticiens?.name || '').toLowerCase().includes(q) && !(r.excerpt || '').toLowerCase().includes(q)) return false;
@@ -291,7 +293,15 @@ export default function RealisationsPage() {
                   {r.stack?.length > 0 && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.3rem' }}>
                       {r.stack.slice(0, 5).map(s => (
-                        <span key={s} className="f-tag">{s}</span>
+                        <button
+                          key={s}
+                          onClick={e => { e.stopPropagation(); setActiveStack(activeStack === s ? '' : s); }}
+                          className="f-tag"
+                          style={{
+                            cursor: 'pointer', border: 'none', background: activeStack === s ? 'var(--f-sky)' : undefined,
+                            color: activeStack === s ? '#0d1117' : undefined, fontWeight: activeStack === s ? 700 : undefined,
+                          }}
+                        >{s}</button>
                       ))}
                       {r.stack.length > 5 && (
                         <span className="f-tag" style={{ color: 'var(--f-text-3)' }}>+{r.stack.length - 5}</span>
@@ -399,6 +409,9 @@ export default function RealisationsPage() {
             letterSpacing: '.06em',
           }}>
             {Math.min(visible, filtered.length)} / {filtered.length} réalisations
+            {activeStack && (
+              <> · filtre stack : <button onClick={() => setActiveStack('')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Geist Mono', monospace", fontSize: '.63rem', color: 'var(--f-sky)', padding: 0 }}>{activeStack} ✕</button></>
+            )}
           </p>
         </>
       )}

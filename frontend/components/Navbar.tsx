@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import NotificationBell from '@/components/NotificationBell';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -129,6 +130,7 @@ export default function Navbar() {
           <Link href="/soumettre" className="btn-f btn-f-primary" style={{ marginLeft: '1rem', fontSize: '.7rem', padding: '.5rem 1.1rem' }}>
             Soumettre
           </Link>
+          {isLoggedIn && <NotificationBell />}
           <Link
             href={isLoggedIn ? '/mon-compte' : '/connexion'}
             style={{
@@ -153,6 +155,7 @@ export default function Navbar() {
 
         {/* Mobile right — dark toggle + hamburger */}
         <div className="mobile-nav-right" style={{ display: 'none', alignItems: 'center', gap: '.5rem' }}>
+          {isLoggedIn && <NotificationBell />}
           <Link href="/recherche" style={{
             color: pathname === '/recherche' ? 'var(--f-sky)' : 'var(--f-text-3)',
             padding: '.25rem',

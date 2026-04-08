@@ -444,29 +444,41 @@ export default function MonCompteClient({ user, praticien, articles, realisation
                 + Ajouter ma première réalisation
               </a>
             </div>
-          ) : (realisations as Record<string, unknown>[]).map((r) => (
-            <div key={String(r.id)} style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-              <div>
-                <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-text-1)', margin: '0 0 .25rem 0', fontWeight: 500 }}>{String(r.title)}</p>
-                <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', margin: 0 }}>
-                  {TYPE_LABEL[String(r.type)] || String(r.type)} · {Array.isArray(r.stack) ? (r.stack as string[]).slice(0, 3).join(', ') : ''}
-                </p>
+          ) : (realisations as Record<string, unknown>[]).map((r) => {
+            const isCoAuthor = r._isCoAuthor === true;
+            return (
+              <div key={String(r.id)} style={{ background: 'var(--f-surface)', border: `1px solid ${isCoAuthor ? 'rgba(56,189,248,.35)' : 'var(--f-border)'}`, borderRadius: 8, padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginBottom: '.25rem', flexWrap: 'wrap' }}>
+                    <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-text-1)', margin: 0, fontWeight: 500 }}>{String(r.title)}</p>
+                    {isCoAuthor && (
+                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', letterSpacing: '.07em', textTransform: 'uppercase', color: 'var(--f-sky)', background: 'rgba(56,189,248,.1)', border: '1px solid rgba(56,189,248,.3)', padding: '1px 7px', borderRadius: 99 }}>
+                        co-auteur
+                      </span>
+                    )}
+                  </div>
+                  <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', margin: 0 }}>
+                    {TYPE_LABEL[String(r.type)] || String(r.type)} · {Array.isArray(r.stack) ? (r.stack as string[]).slice(0, 3).join(', ') : ''}
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '.5rem', flexShrink: 0 }}>
+                  <a href={`/mon-compte/realisation/${String(r.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem' }}>
+                    ✎ Modifier
+                  </a>
+                  {!isCoAuthor && (
+                    <button
+                      onClick={() => deleteContent('realisations', String(r.id), String(r.title))}
+                      disabled={deleting === String(r.id)}
+                      className="btn-f btn-f-danger"
+                      style={{ fontSize: '.68rem' }}
+                    >
+                      {deleting === String(r.id) ? '…' : '✕'}
+                    </button>
+                  )}
+                </div>
               </div>
-              <div style={{ display: 'flex', gap: '.5rem', flexShrink: 0 }}>
-                <a href={`/mon-compte/realisation/${String(r.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem' }}>
-                  ✎ Modifier
-                </a>
-                <button
-                  onClick={() => deleteContent('realisations', String(r.id), String(r.title))}
-                  disabled={deleting === String(r.id)}
-                  className="btn-f btn-f-danger"
-                  style={{ fontSize: '.68rem' }}
-                >
-                  {deleting === String(r.id) ? '…' : '✕'}
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

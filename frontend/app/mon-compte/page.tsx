@@ -42,18 +42,29 @@ export default async function MonComptePage() {
   let tips:         Record<string, unknown>[] = [];
 
   if (praticien) {
-    const [{ data: arts }, { data: reals }, { data: evts }, { data: cols }, { data: tps }] = await Promise.all([
+    const [{ data: arts }, { data: ownedReals }, { data: coReals }, { data: evts }, { data: cols }, { data: tps }] = await Promise.all([
       supabase.from('articles').select('id, slug, title, source, date_published, status, category').eq('praticien_id', praticien.id).order('created_at', { ascending: false }),
       supabase.from('realisations').select('id, slug, title, type, stack, status, category').eq('praticien_id', praticien.id).order('created_at', { ascending: false }),
+      // Réalisations où le praticien est co-auteur
+      supabase.from('realisations').select('id, slug, title, type, stack, status, category').contains('collaborateurs', [praticien.slug]).order('created_at', { ascending: false }),
       supabase.from('evenements').select('id, slug, title, type, type_label, date_debut, date_fin, pays, online, status').eq('praticien_id', praticien.id).order('date_debut', { ascending: true }),
       supabase.from('collections').select('id, title, description, items, ordre, status').eq('praticien_id', praticien.id).order('ordre', { ascending: true }),
       supabase.from('tips').select('id, content, type, category, stack, status, created_at').eq('praticien_id', praticien.id).order('created_at', { ascending: false }),
     ]);
-    articles     = (arts  ?? []) as Record<string, unknown>[];
-    realisations = (reals ?? []) as Record<string, unknown>[];
-    evenements   = (evts  ?? []) as Record<string, unknown>[];
-    collections  = (cols  ?? []) as Record<string, unknown>[];
-    tips         = (tps   ?? []) as Record<string, unknown>[];
+    articles   = (arts ?? []) as Record<string, unknown>[];
+    evenements = (evts ?? []) as Record<string, unknown>[];
+    collections = (cols ?? []) as Record<string, unknown>[];
+    tips       = (tps  ?? []) as Record<string, unknown>[];
+
+    // Fusionner réalisations propres + co-auteur (sans doublons)
+    const ownedIds = new Set((ownedReals ?? []).map(r => r.id));
+    const coAuthored = (coReals ?? [])
+      .filter(r => !ownedIds.has(r.id))
+      .map(r => ({ ...r, _isCoAuthor: true }));
+    realisations = [
+      ...(ownedReals ?? []),
+      ...coAuthored,
+    ] as Record<string, unknown>[];
   }
 
   return (

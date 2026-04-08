@@ -10,19 +10,23 @@ import type { Praticien, Realisation } from '@/lib/supabase';
 import LikeButton from '@/components/LikeButton';
 import FollowButton from '@/components/FollowButton';
 import CommentSection from '@/components/CommentSection';
+import ShareButton from '@/components/ShareButton';
 
 type CollectionItem = { id: string; title: string; url: string; description: string };
 type Collection = { id: string; title: string; description?: string; items: CollectionItem[] };
 type Tip = { id: string; content: string; type: string; category: string; stack: string[]; created_at: string };
+
+type SimilairePraticien = { id: string; slug: string; name: string; role: string; photo_url?: string; stack: string[]; country: string };
 
 type Props = {
   praticien: Praticien;
   realisations: Realisation[];
   collections: Collection[];
   tips: Tip[];
+  similaires?: SimilairePraticien[];
 };
 
-export default function PraticienClient({ praticien: p, realisations, collections, tips: tipsList }: Props) {
+export default function PraticienClient({ praticien: p, realisations, collections, tips: tipsList, similaires = [] }: Props) {
   const [isOwner, setIsOwner] = useState(false);
   const [contactLoading, setContactLoading] = useState(false);
   const [isSelf, setIsSelf] = useState(false);
@@ -77,6 +81,8 @@ export default function PraticienClient({ praticien: p, realisations, collection
     <div style={{ padding: '3.5rem 6vw', maxWidth: 900, margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <Link href="/praticiens" className="link-back" style={{ display: 'inline-flex' }}>← Praticiens</Link>
+        <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
+          <ShareButton url={`https://from0tohero.dev/praticiens/${p.slug}`} title={`${p.name} · from0tohero`} text={p.role} />
         {isOwner && (
           <Link href="/mon-compte/edit" style={{
             fontFamily: "'Geist Mono', monospace",
@@ -95,6 +101,7 @@ export default function PraticienClient({ praticien: p, realisations, collection
             Modifier mon profil
           </Link>
         )}
+        </div>
       </div>
 
       {/* HEADER */}
@@ -328,6 +335,36 @@ export default function PraticienClient({ praticien: p, realisations, collection
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+      {/* Praticiens similaires */}
+      {similaires.length > 0 && (
+        <div style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid var(--f-border)' }}>
+          <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 1.25rem 0' }}>
+            // praticiens avec un stack similaire
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1rem' }}>
+            {similaires.map(s => (
+              <a key={s.slug} href={`/praticiens/${s.slug}`} style={{ textDecoration: 'none' }}>
+                <div className="f-card f-card-hover" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem' }}>
+                    <Avatar name={s.name} photoUrl={s.photo_url ?? null} size={32} radius={8} fontSize=".6rem" />
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '.8rem', fontWeight: 700, color: 'var(--f-text-1)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.name}</p>
+                      <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.role}</p>
+                    </div>
+                  </div>
+                  {s.stack?.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.25rem' }}>
+                      {s.stack.slice(0, 3).map(t => (
+                        <span key={t} className="f-tag" style={{ fontSize: '.55rem', padding: '1px 6px' }}>{t}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </a>
+            ))}
           </div>
         </div>
       )}
