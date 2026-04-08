@@ -130,21 +130,8 @@ export default function RealisationsPage() {
           style={{ maxWidth: '100%', marginBottom: '1.25rem' }}
         />
 
-        {/* Filtres type */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem', marginBottom: '.75rem' }}>
-          {['all', 'pipeline', 'dashboard', 'api', 'bootcamp', 'youtube', 'app', 'cours', 'autre'].map(t => (
-            <button
-              key={t}
-              className={`filter-pill${activeType === t ? ' active' : ''}`}
-              onClick={() => setActiveType(t)}
-            >
-              {t === 'all' ? 'Tous les types' : `${TYPE_ICONS[t] || ''} ${TYPE_LABELS[t] || t}`}
-            </button>
-          ))}
-        </div>
-
         {/* Filtres catégorie */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem', marginBottom: '.75rem' }}>
           {['all', 'data', 'devops', 'cloud', 'ia', 'cyber', 'frontend', 'backend', 'fullstack', 'mobile', 'web3', 'embedded', 'autre'].map(c => (
             <button
               key={c}
@@ -152,6 +139,19 @@ export default function RealisationsPage() {
               onClick={() => setActiveCat(c)}
             >
               {c === 'all' ? 'Toutes catégories' : CAT_LABEL[c] || c}
+            </button>
+          ))}
+        </div>
+
+        {/* Filtres type */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
+          {['all', 'pipeline', 'dashboard', 'api', 'bootcamp', 'youtube', 'app', 'cours', 'autre'].map(t => (
+            <button
+              key={t}
+              className={`filter-pill${activeType === t ? ' active' : ''}`}
+              onClick={() => setActiveType(t)}
+            >
+              {t === 'all' ? 'Tous les types' : `${TYPE_ICONS[t] || ''} ${TYPE_LABELS[t] || t}`}
             </button>
           ))}
         </div>
