@@ -71,6 +71,7 @@ export default function ArticleModal({ article, onClose }: Props) {
   const [savingEdit, setSavingEdit] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const topRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   // Close on Escape
@@ -86,12 +87,19 @@ export default function ArticleModal({ article, onClose }: Props) {
     return () => { document.body.style.overflow = ''; };
   }, []);
 
-  // Reset scroll to top after comments load (cross-platform fix)
+  // Focus top sentinel on open — prevents browser from auto-scrolling to textarea (all browsers/OS)
   useEffect(() => {
-    if (!loadingComments && scrollRef.current) {
-      requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (topRef.current) topRef.current.focus();
+    });
+  }, [article?.id]);
+
+  // Reset scroll to top after comments load (double rAF for paint guarantee)
+  useEffect(() => {
+    if (!loadingComments) {
+      requestAnimationFrame(() => requestAnimationFrame(() => {
         if (scrollRef.current) scrollRef.current.scrollTop = 0;
-      });
+      }));
     }
   }, [loadingComments]);
 
@@ -210,6 +218,9 @@ export default function ArticleModal({ article, onClose }: Props) {
           position: 'relative',
         }}
       >
+        {/* Focus sentinel — keeps scroll at top on all browsers/OS */}
+        <div ref={topRef} tabIndex={-1} style={{ outline: 'none', height: 0, overflow: 'hidden' }} aria-hidden />
+
         {/* Bande couleur */}
         <div style={{
           position: 'absolute', top: 0, left: 0, right: 0, height: 3,
