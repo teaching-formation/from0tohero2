@@ -64,8 +64,24 @@ export default function TipsPage() {
       .eq('status', 'approved')
       .order('created_at', { ascending: false })
       .then(({ data }) => {
-        setTips((data as unknown as Tip[]) ?? []);
+        const loaded = (data as unknown as Tip[]) ?? [];
+        setTips(loaded);
         setLoading(false);
+
+        // Si on arrive avec un hash #tip-xxx, scroller vers ce tip
+        const hash = window.location.hash;
+        if (hash.startsWith('#tip-')) {
+          const targetId = hash.slice(1); // "tip-xxx"
+          const idx = loaded.findIndex(t => `tip-${t.id}` === targetId);
+          if (idx !== -1) {
+            // S'assurer que le tip est dans la tranche visible
+            setVisible(Math.max(PAGE_SIZE, idx + 1));
+            setTimeout(() => {
+              const el = document.getElementById(targetId);
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+          }
+        }
       });
   }, []);
 
@@ -280,7 +296,7 @@ export default function TipsPage() {
             {filtered.slice(0, visible).map(tip => {
               const meta = TYPE_META[tip.type];
               return (
-                <div key={tip.id} className="f-card" style={{ padding: '1.1rem 1.35rem', borderLeft: meta ? `3px solid ${meta.color}` : undefined }}>
+                <div key={tip.id} id={`tip-${tip.id}`} className="f-card" style={{ padding: '1.1rem 1.35rem', borderLeft: meta ? `3px solid ${meta.color}` : undefined }}>
                   {/* Header : badges + date/heure */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', marginBottom: '.65rem', flexWrap: 'wrap' }}>
                     <div style={{ display: 'flex', gap: '.35rem', flexWrap: 'wrap', alignItems: 'center' }}>

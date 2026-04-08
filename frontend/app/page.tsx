@@ -7,6 +7,7 @@ import CountUp from '@/components/CountUp';
 import HeroParallax from '@/components/HeroParallax';
 import Marquee from '@/components/Marquee';
 import FlagImg from '@/components/FlagImg';
+import TipCard from '@/components/TipCard';
 
 export const revalidate = 60;
 
@@ -384,24 +385,15 @@ export default async function Home() {
                     {latestTips.map((tip) => {
                       const praticien = tip.praticiens;
                       return (
-                        <div key={tip.id} className="f-card" style={{ padding: '1.1rem 1.25rem', height: '100%', display: 'flex', flexDirection: 'column', gap: '.55rem' }}>
-                          <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap' }}>
-                            <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', letterSpacing: '.08em', color: TYPE_COLOR[tip.type] ?? 'var(--f-text-3)', border: `1px solid currentColor`, padding: '2px 7px', borderRadius: 4 }}>
-                              {tip.type}
-                            </span>
-                            <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 7px', borderRadius: 4 }}>
-                              {tip.category}
-                            </span>
-                          </div>
-                          <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.76rem', color: 'var(--f-text-1)', margin: 0, lineHeight: 1.65, display: '-webkit-box', WebkitLineClamp: 4, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'pre-wrap' }}>
-                            {tip.content}
-                          </p>
-                          {praticien && (
-                            <Link href={`/praticiens/${praticien.slug}`} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', color: 'var(--f-text-3)', textDecoration: 'none', marginTop: 'auto' }}>
-                              @{praticien.slug}
-                            </Link>
-                          )}
-                        </div>
+                        <TipCard
+                          key={tip.id}
+                          tipId={tip.id}
+                          type={tip.type}
+                          category={tip.category}
+                          content={tip.content}
+                          typeColor={TYPE_COLOR[tip.type] ?? 'var(--f-text-3)'}
+                          praticienSlug={praticien?.slug}
+                        />
                       );
                     })}
                   </Marquee>
