@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -35,6 +36,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           `
         }} />
       </head>
+      <Script src="https://www.googletagmanager.com/gtag/js?id=G-X97KF9BC91" strategy="afterInteractive" />
+      <Script id="gtag-init" strategy="afterInteractive" dangerouslySetInnerHTML={{
+        __html: `
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-X97KF9BC91');
+        `
+      }} />
       <body style={{ margin: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--f-bg)' }}>
         <CursorGlow />
         <Navbar />
