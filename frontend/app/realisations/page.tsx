@@ -16,42 +16,7 @@ type RealisationWithPraticien = {
   praticiens: { name: string; slug: string; photo_url?: string } | null;
 };
 
-const TYPE_LABELS: Record<string, string> = {
-  pipeline: 'Pipeline', dashboard: 'Dashboard', api: 'API',
-  bootcamp: 'Bootcamp', youtube: 'YouTube', app: 'App',
-  cours: 'Cours', podcast: 'Podcast', newsletter: 'Newsletter',
-  blog: 'Blog', autre: 'Autre',
-};
-
-const TYPE_ICONS: Record<string, string> = {
-  pipeline: '⬡', dashboard: '◧', api: '◈', bootcamp: '◎',
-  youtube: '▷', app: '⬟', cours: '◉', podcast: '◌',
-  newsletter: '◫', blog: '◪', autre: '◦',
-};
-
-const CAT_COLOR: Record<string, string> = {
-  data: 'var(--f-sky)',
-  devops: '#a78bfa',
-  cloud: 'var(--f-sky)',
-  ia: 'var(--f-orange)',
-  cyber: '#f87171',
-  frontend: 'var(--f-green)',
-  backend: '#a78bfa',
-  fullstack: 'var(--f-orange)',
-  mobile: 'var(--f-green)',
-  web3: '#a78bfa',
-  embedded: 'var(--f-sky)',
-  mlops: '#fb923c',
-  dev: '#f472b6',
-  autre: 'var(--f-text-3)',
-};
-
-const CAT_LABEL: Record<string, string> = {
-  data: 'Data', devops: 'DevOps', cloud: 'Cloud', ia: 'IA',
-  cyber: 'Cybersécurité', frontend: 'Frontend', backend: 'Backend',
-  fullstack: 'Full-Stack', mobile: 'Mobile', web3: 'Web3',
-  embedded: 'Embedded / IoT', mlops: 'MLOps', dev: 'Dev', autre: 'Autre',
-};
+import { CAT_COLOR, CAT_LABEL, REAL_TYPE_LABELS, REAL_TYPE_ICONS } from '@/lib/constants';
 
 export default function RealisationsPage() {
   const [realisations, setRealisations] = useState<RealisationWithPraticien[]>([]);
@@ -151,7 +116,7 @@ export default function RealisationsPage() {
               className={`filter-pill${activeType === t ? ' active' : ''}`}
               onClick={() => setActiveType(t)}
             >
-              {t === 'all' ? 'Tous les types' : `${TYPE_ICONS[t] || ''} ${TYPE_LABELS[t] || t}`}
+              {t === 'all' ? 'Tous les types' : `${REAL_TYPE_ICONS[t] || ''} ${REAL_TYPE_LABELS[t] || t}`}
             </button>
           ))}
         </div>
@@ -174,8 +139,8 @@ export default function RealisationsPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1.25rem' }}>
             {filtered.slice(0, visible).map(r => {
               const catColor = CAT_COLOR[r.category] || 'var(--f-text-3)';
-              const typeIcon = TYPE_ICONS[r.type] || '◦';
-              const typeLabel = TYPE_LABELS[r.type] || r.type;
+              const typeIcon = REAL_TYPE_ICONS[r.type] || '◦';
+              const typeLabel = REAL_TYPE_LABELS[r.type] || r.type;
 
               const commentCount = commentCounts[r.id] ?? 0;
 

@@ -17,12 +17,7 @@ const FILTER_LABELS: Record<string,string> = {
   fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT', autre:'Autre',
 };
 
-const CAT_COLORS: Record<string, string> = {
-  data: 'var(--f-sky)', devops: '#a78bfa', cloud: 'var(--f-sky)',
-  ia: 'var(--f-orange)', cyber: '#f87171', frontend: 'var(--f-green)',
-  backend: '#a78bfa', fullstack: 'var(--f-orange)', mobile: 'var(--f-green)',
-  web3: '#a78bfa', embedded: 'var(--f-sky)', autre: 'var(--f-text-3)',
-};
+import { CAT_COLOR as CAT_COLORS } from '@/lib/constants';
 
 export default function PraticiensPage() {
   const [praticiens, setPraticiens] = useState<Praticien[]>([]);

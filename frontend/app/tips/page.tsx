@@ -15,25 +15,10 @@ type Tip = {
   praticiens: { slug: string; name: string } | null;
 };
 
-const TYPE_META: Record<string, { label: string; color: string; bg: string; icon: string }> = {
-  tip:     { label: 'Tip',     color: 'var(--f-orange)', bg: 'rgba(251,146,60,.12)',  icon: '💡' },
-  TIL:     { label: 'TIL',     color: 'var(--f-sky)',    bg: 'rgba(56,189,248,.12)',  icon: '🧠' },
-  snippet: { label: 'Snippet', color: 'var(--f-green)',  bg: 'rgba(52,211,153,.12)',  icon: '</>' },
-};
+import { CAT_LABEL, TIP_TYPE_META } from '@/lib/constants';
+import { fmtDate, fmtTime } from '@/lib/utils';
 
-const CAT_LABEL: Record<string, string> = {
-  data: 'Data', devops: 'DevOps', cloud: 'Cloud', ia: 'IA',
-  cyber: 'Cyber', frontend: 'Frontend', backend: 'Backend',
-  fullstack: 'Full-Stack', mobile: 'Mobile', web3: 'Web3',
-  embedded: 'Embedded', autre: 'Autre',
-};
-
-function fmtDate(iso: string) {
-  return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
-}
-function fmtTime(iso: string) {
-  return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-}
+const TYPE_META = TIP_TYPE_META;
 
 export default function TipsPage() {
   const [tips, setTips]         = useState<Tip[]>([]);

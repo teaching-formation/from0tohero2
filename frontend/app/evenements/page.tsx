@@ -4,25 +4,11 @@ import { supabase, type Evenement } from '@/lib/supabase';
 
 const PAGE_SIZE = 18;
 
-const TYPE_LABELS: Record<string, string> = {
-  conference: 'Conférence', meetup: 'Meetup', hackathon: 'Hackathon',
-  webinaire: 'Webinaire', bootcamp: 'Bootcamp', atelier: 'Atelier', autre: 'Autre',
-};
+import { EVENT_TYPE_LABELS, EVENT_TYPE_COLOR, EVENT_TYPE_ICON } from '@/lib/constants';
 
-const TYPE_COLOR: Record<string, string> = {
-  conference: '#60a5fa',
-  meetup: 'var(--f-green)',
-  hackathon: '#f87171',
-  webinaire: '#a78bfa',
-  bootcamp: 'var(--f-sky)',
-  atelier: '#fb923c',
-  autre: 'var(--f-text-3)',
-};
-
-const TYPE_ICON: Record<string, string> = {
-  conference: '◎', meetup: '◉', hackathon: '⚡', webinaire: '◈',
-  bootcamp: '⬡', atelier: '◧', autre: '◦',
-};
+const TYPE_LABELS  = EVENT_TYPE_LABELS;
+const TYPE_COLOR   = EVENT_TYPE_COLOR;
+const TYPE_ICON    = EVENT_TYPE_ICON;
 
 function getEventStatus(e: Evenement): 'upcoming' | 'ongoing' | 'past' {
   const today = new Date(); today.setHours(0, 0, 0, 0);

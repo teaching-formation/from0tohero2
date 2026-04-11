@@ -8,33 +8,7 @@ import ArticleModal from '@/components/ArticleModal';
 
 const PAGE_SIZE = 12;
 
-const CAT_COLOR: Record<string, string> = {
-  data: 'var(--f-sky)',
-  devops: '#a78bfa',
-  cloud: 'var(--f-sky)',
-  ia: 'var(--f-orange)',
-  cyber: '#f87171',
-  frontend: 'var(--f-green)',
-  backend: '#a78bfa',
-  fullstack: 'var(--f-orange)',
-  mobile: 'var(--f-green)',
-  web3: '#a78bfa',
-  embedded: 'var(--f-sky)',
-  dev: '#f472b6',
-  autre: 'var(--f-text-3)',
-};
-
-const CAT_LABEL: Record<string, string> = {
-  data: 'Data', devops: 'DevOps', cloud: 'Cloud', ia: 'IA',
-  cyber: 'Cybersécurité', frontend: 'Frontend', backend: 'Backend',
-  fullstack: 'Full-Stack', mobile: 'Mobile', web3: 'Web3',
-  embedded: 'Embedded / IoT', dev: 'Dev', autre: 'Autre',
-};
-
-const SOURCE_ICON: Record<string, string> = {
-  medium: 'M', linkedin: 'in', devto: 'DEV', hashnode: 'H',
-  substack: '◎', youtube: '▷', autre: '◦',
-};
+import { CAT_COLOR, CAT_LABEL, SOURCE_ICON } from '@/lib/constants';
 
 export default function ArticlesPage() {
   const [articles, setArticles] = useState<Article[]>([]);

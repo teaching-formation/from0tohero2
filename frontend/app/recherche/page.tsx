@@ -5,22 +5,11 @@ import { supabase } from '@/lib/supabase';
 import Avatar from '@/components/Avatar';
 import FlagImg from '@/components/FlagImg';
 
-/* ── Couleurs catégorie ─────────────────────────────────────── */
-const CAT_COLOR: Record<string, string> = {
-  data: 'var(--f-sky)', devops: '#a78bfa', cloud: 'var(--f-sky)',
-  ia: 'var(--f-orange)', cyber: '#f87171', frontend: 'var(--f-green)',
-  backend: '#a78bfa', fullstack: 'var(--f-orange)', mobile: 'var(--f-green)',
-  web3: '#a78bfa', embedded: 'var(--f-sky)', mlops: '#f472b6', autre: 'var(--f-text-3)',
-};
+import { CAT_COLOR, SOURCE_ICON, TIP_TYPE_META } from '@/lib/constants';
 
-const SOURCE_ICON: Record<string, string> = {
-  medium: 'M', linkedin: 'in', devto: 'DEV', hashnode: 'H',
-  substack: '◎', youtube: '▷', blog: '◧', autre: '◦',
-};
-
-const TYPE_COLOR: Record<string, string> = {
-  tip: 'var(--f-sky)', TIL: 'var(--f-green)', snippet: 'var(--f-orange)',
-};
+const TYPE_COLOR: Record<string, string> = Object.fromEntries(
+  Object.entries(TIP_TYPE_META).map(([k, v]) => [k, v.color])
+);
 
 const SUGGESTIONS = ['kafka', 'python', 'data engineering', 'devops', 'dashboard'];
 

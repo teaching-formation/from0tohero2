@@ -25,49 +25,9 @@ type Props = {
   onClose: () => void;
 };
 
-const CAT_COLOR: Record<string, string> = {
-  data: 'var(--f-sky)', devops: '#a78bfa', cloud: 'var(--f-sky)',
-  ia: 'var(--f-orange)', cyber: '#f87171', frontend: 'var(--f-green)',
-  backend: '#a78bfa', fullstack: 'var(--f-orange)', mobile: 'var(--f-green)',
-  web3: '#a78bfa', embedded: 'var(--f-sky)', mlops: '#fb923c',
-  dev: '#f472b6', autre: 'var(--f-text-3)',
-};
+import { CAT_COLOR, CAT_LABEL, REAL_TYPE_LABELS, REAL_TYPE_ICONS } from '@/lib/constants';
+import { formatDateTime, timeAgo } from '@/lib/utils';
 
-const CAT_LABEL: Record<string, string> = {
-  data: 'Data', devops: 'DevOps', cloud: 'Cloud', ia: 'IA',
-  cyber: 'Cybersécurité', frontend: 'Frontend', backend: 'Backend',
-  fullstack: 'Full-Stack', mobile: 'Mobile', web3: 'Web3',
-  embedded: 'Embedded / IoT', mlops: 'MLOps', dev: 'Dev', autre: 'Autre',
-};
-
-const TYPE_LABELS: Record<string, string> = {
-  pipeline: 'Pipeline', dashboard: 'Dashboard', api: 'API',
-  bootcamp: 'Bootcamp', youtube: 'YouTube', app: 'App',
-  cours: 'Cours', podcast: 'Podcast', newsletter: 'Newsletter',
-  blog: 'Blog', autre: 'Autre',
-};
-
-const TYPE_ICONS: Record<string, string> = {
-  pipeline: '⬡', dashboard: '◧', api: '◈', bootcamp: '◎',
-  youtube: '▷', app: '⬟', cours: '◉', podcast: '◌',
-  newsletter: '◫', blog: '◪', autre: '◦',
-};
-
-function formatDateTime(date: string) {
-  const d = new Date(date);
-  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
-    + ' à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-}
-
-function timeAgo(date: string) {
-  const diff = Date.now() - new Date(date).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `il y a ${mins}min`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `il y a ${hrs}h`;
-  const days = Math.floor(hrs / 24);
-  return `il y a ${days}j`;
-}
 
 export default function RealisationModal({ realisation, onClose }: Props) {
   const [comments, setComments] = useState<Comment[]>([]);
@@ -146,8 +106,8 @@ export default function RealisationModal({ realisation, onClose }: Props) {
   if (!realisation) return null;
 
   const catColor = CAT_COLOR[realisation.category] || 'var(--f-text-3)';
-  const typeIcon = TYPE_ICONS[realisation.type] || '◦';
-  const typeLabel = TYPE_LABELS[realisation.type] || realisation.type;
+  const typeIcon = REAL_TYPE_ICONS[realisation.type] || '◦';
+  const typeLabel = REAL_TYPE_LABELS[realisation.type] || realisation.type;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
