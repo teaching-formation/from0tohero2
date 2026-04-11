@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { notifyFollowers } from '@/lib/createNotification';
 
 const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded','autre'];
 const TYPES      = ['tip','TIL','snippet'];
@@ -57,6 +58,15 @@ export async function POST(req: Request) {
       .single();
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    // Notifier les followers de l'auteur
+    notifyFollowers({
+      praticien_id:  praticien.id,
+      content_type:  'tip',
+      content_id:    tip.id,
+      content_title: content.trim().slice(0, 80),
+    }).catch(() => {});
+
     return NextResponse.json({ ok: true, id: tip.id });
   } catch (err) {
     console.error('[tip POST]', err);

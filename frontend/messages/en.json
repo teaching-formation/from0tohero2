@@ -385,6 +385,7 @@
     "typeCommente": "commented on",
     "typeSuit": "is now following you",
     "typeCoauteur": "you are credited as co-author",
+    "typeNewContent": "published",
     "timeNow": "just now",
     "timeMin": "{count}min",
     "timeHour": "{count}h",

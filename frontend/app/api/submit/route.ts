@@ -3,6 +3,7 @@ import { Resend } from 'resend';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { createClient } from '@/lib/supabase/server';
 import { slugify } from '@/lib/slugify';
+import { notifyFollowers, createNotification } from '@/lib/createNotification';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -72,7 +73,7 @@ export async function POST(req: Request) {
         ? await supabaseAdmin.from('praticiens').select('id, name').eq('user_id', user.id).maybeSingle()
         : await supabaseAdmin.from('praticiens').select('id, name').eq('slug', String(payload.username || '')).maybeSingle();
 
-      const { error } = await supabaseAdmin.from('articles').insert({
+      const { data: newArticle, error } = await supabaseAdmin.from('articles').insert({
         slug,
         title:          payload.title,
         author:         praticien?.name || String(payload.name || 'Inconnu'),
@@ -86,8 +87,18 @@ export async function POST(req: Request) {
         date_published: payload.date_published || null,
         collaborateurs:  Array.isArray(payload.collaborateurs) ? payload.collaborateurs : [],
         status:         'approved',
-      });
+      }).select('id').single();
       if (error) insertError = error.message;
+
+      // Notifier les followers de l'auteur
+      if (!error && praticien?.id && newArticle?.id) {
+        notifyFollowers({
+          praticien_id:  praticien.id,
+          content_type:  'article',
+          content_id:    newArticle.id,
+          content_title: payload.title,
+        }).catch(() => {});
+      }
 
     } else if (type === 'realisation') {
 
@@ -117,7 +128,7 @@ export async function POST(req: Request) {
         if (!praticien) return NextResponse.json({ error: 'Profil praticien introuvable.' }, { status: 403 });
 
         const collabs: string[] = Array.isArray(payload.collaborateurs) ? payload.collaborateurs : [];
-        const { error } = await supabaseAdmin.from('realisations').insert({
+        const { data: newRealisation, error } = await supabaseAdmin.from('realisations').insert({
           slug,
           title:          payload.title,
           praticien_id:   praticien?.id || null,
@@ -133,17 +144,38 @@ export async function POST(req: Request) {
           date_published:  payload.date_published || null,
           collaborateurs:  collabs,
           status:          'approved',
-        });
+        }).select('id').single();
         if (error) insertError = error.message;
+
+        // ── Notifier les followers de l'auteur ────────────────────────────
+        if (!error && praticien?.id && newRealisation?.id) {
+          notifyFollowers({
+            praticien_id:  praticien.id,
+            content_type:  'realisation',
+            content_id:    newRealisation.id,
+            content_title: payload.title,
+          }).catch(() => {});
+        }
 
         // ── Notifier les co-auteurs par email ─────────────────────────────
         if (!error && collabs.length > 0) {
           const { data: collabPraticiens } = await supabaseAdmin
-            .from('praticiens').select('name, email, slug').in('slug', collabs);
+            .from('praticiens').select('id, name, email, slug').in('slug', collabs);
           const { data: submitter } = await supabaseAdmin
             .from('praticiens').select('name, slug').eq('id', praticien.id).maybeSingle();
           for (const collab of (collabPraticiens ?? [])) {
             if (!collab.email) continue;
+            // Notif in-app co-auteur
+            if (collab.id && newRealisation?.id) {
+              createNotification({
+                praticien_id:  collab.id,
+                type:          'coauteur',
+                actor_id:      praticien.id,
+                content_type:  'realisation',
+                content_id:    newRealisation.id,
+                content_title: payload.title,
+              }).catch(() => {});
+            }
             resend.emails.send({
               from: process.env.RESEND_FROM || 'from0tohero <onboarding@resend.dev>',
               to: collab.email,
@@ -180,7 +212,7 @@ export async function POST(req: Request) {
         ? payload.types
         : [payload.type || 'autre'];
       const evType = evTypes[0] || 'autre';
-      const { error } = await supabaseAdmin.from('evenements').insert({
+      const { data: newEvenement, error } = await supabaseAdmin.from('evenements').insert({
         slug,
         title:        payload.title,
         type:         evType,
@@ -196,8 +228,18 @@ export async function POST(req: Request) {
         excerpt:      payload.excerpt  || null,
         praticien_id: praticienEvt?.id || null,
         status:       'approved',
-      });
+      }).select('id').single();
       if (error) insertError = error.message;
+
+      // Notifier les followers de l'organisateur
+      if (!error && praticienEvt?.id && newEvenement?.id) {
+        notifyFollowers({
+          praticien_id:  praticienEvt.id,
+          content_type:  'evenement',
+          content_id:    newEvenement.id,
+          content_title: payload.title,
+        }).catch(() => {});
+      }
     }
 
     if (insertError) {

@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 
 type Notif = {
   id: string;
-  type: 'like' | 'comment' | 'follow' | 'coauteur';
+  type: 'like' | 'comment' | 'follow' | 'coauteur' | 'new_content';
   read: boolean;
   content_type?: string;
   content_id?: string;
@@ -14,15 +14,16 @@ type Notif = {
 };
 
 const TYPE_ICON: Record<string, string> = {
-  like: '♥', comment: '💬', follow: '＋', coauteur: '✦',
+  like: '♥', comment: '💬', follow: '＋', coauteur: '✦', new_content: '📢',
 };
 
 function getTypeLabel(type: string, t: (key: string) => string): string {
   const map: Record<string, string> = {
-    like:     t('typeAime'),
-    comment:  t('typeCommente'),
-    follow:   t('typeSuit'),
-    coauteur: t('typeCoauteur'),
+    like:        t('typeAime'),
+    comment:     t('typeCommente'),
+    follow:      t('typeSuit'),
+    coauteur:    t('typeCoauteur'),
+    new_content: t('typeNewContent'),
   };
   return map[type] || type;
 }
@@ -153,7 +154,8 @@ export default function NotificationBell() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     background: n.type === 'like' ? 'rgba(248,113,113,.15)' :
                                 n.type === 'comment' ? 'rgba(56,189,248,.15)' :
-                                n.type === 'follow' ? 'rgba(52,211,153,.15)' : 'rgba(251,146,60,.15)',
+                                n.type === 'follow' ? 'rgba(52,211,153,.15)' :
+                                n.type === 'new_content' ? 'rgba(139,92,246,.15)' : 'rgba(251,146,60,.15)',
                     fontSize: '.75rem',
                   }}>
                     {TYPE_ICON[n.type]}
