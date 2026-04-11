@@ -8,6 +8,7 @@ import HeroParallax from '@/components/HeroParallax';
 import Marquee from '@/components/Marquee';
 import FlagImg from '@/components/FlagImg';
 import TipCard from '@/components/TipCard';
+import { getTranslations } from 'next-intl/server';
 
 export const revalidate = 60;
 
@@ -84,18 +85,19 @@ async function getLastArticles() {
 const STAT_ACCENT = ['--f-sky', '--f-orange', '--f-green', '--f-purple'];
 
 export default async function Home() {
-  const [stats, lastArticles, lastRealisations, latestTips] = await Promise.all([
+  const [stats, lastArticles, lastRealisations, latestTips, t] = await Promise.all([
     fallback(getStats(), { praticiens: 0, realisations: 0, evenements: 0, articles: 0 }),
     fallback(getLastArticles(), []),
     fallback(getLastRealisations(), []),
     fallback(getLatestTips(), []),
+    getTranslations('home'),
   ]);
 
   const statItems = [
-    { n: stats.praticiens,   l: 'Praticiens',   icon: '◈' },
-    { n: stats.realisations, l: 'Réalisations',  icon: '⬡' },
-    { n: stats.articles,     l: 'Articles',      icon: '◧' },
-    { n: stats.evenements,   l: 'Événements',    icon: '◎' },
+    { n: stats.praticiens,   l: t('statPraticiens'),   icon: '◈' },
+    { n: stats.realisations, l: t('statRealisations'),  icon: '⬡' },
+    { n: stats.articles,     l: t('statArticles'),      icon: '◧' },
+    { n: stats.evenements,   l: t('statEvenements'),    icon: '◎' },
   ];
 
   return (
@@ -132,16 +134,14 @@ export default async function Home() {
           position: 'relative', zIndex: 1,
           maxWidth: 820,
         }}>
-          Ce qu&apos;ils ont{' '}
-          <TypeWriter text="construit." speed={75} startDelay={400} />
+          <TypeWriter text={t('tagline1')} speed={75} startDelay={400} />
           <br />
-          Pas ce qu&apos;ils ont{' '}
           <span style={{
             background: 'linear-gradient(135deg, var(--f-orange) 0%, #fb923c 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
-          }}>promis.</span>
+          }}>{t('tagline2')}</span>
         </h1>
 
         {/* Sous-titre */}
@@ -153,17 +153,17 @@ export default async function Home() {
           marginBottom: '3rem',
           position: 'relative', zIndex: 1,
         }}>
-          Profils, réalisations et ressources de praticiens tech —
-          <br />Data, DevOps, Cloud, IA, Cyber, Dev.
+          {t('subtitle')}
+          <br />{t('subtitleLine2')}
         </p>
 
         {/* CTAs */}
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
           <Link href="/praticiens" className="btn-f btn-f-primary">
-            Voir les praticiens →
+            {t('cta1')}
           </Link>
           <Link href="/soumettre" className="btn-f btn-f-secondary">
-            Soumettre mon profil
+            {t('cta2')}
           </Link>
         </div>
 
@@ -252,7 +252,7 @@ export default async function Home() {
       {/* ── COMMENT ÇA MARCHE ────────────────────────────────────── */}
       <section style={{ padding: '6rem 6vw', maxWidth: 1200, margin: '0 auto', overflow: 'hidden' }}>
         <ScrollReveal>
-          <span className="f-label" style={{ marginBottom: '.6rem' }}>// comment ça marche</span>
+          <span className="f-label" style={{ marginBottom: '.6rem' }}>{t('howLabel')}</span>
           <h2 style={{
             fontFamily: "'Syne', sans-serif",
             fontSize: 'clamp(1.75rem, 3.5vw, 2.6rem)',
@@ -262,16 +262,16 @@ export default async function Home() {
             letterSpacing: '-.025em',
             lineHeight: 1.15,
           }}>
-            Figurer sur from0tohero.dev<br />
-            <span style={{ color: 'var(--f-text-3)', fontWeight: 700, fontSize: '80%' }}>en 3 étapes.</span>
+            {t('howTitle')}<br />
+            <span style={{ color: 'var(--f-text-3)', fontWeight: 700, fontSize: '80%' }}>{t('howTitleHighlight')}</span>
           </h2>
         </ScrollReveal>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '1.25rem' }}>
           {[
-            { num: '01', title: 'Crée ton profil', desc: "Nom, rôle, stack, bio et liens. C'est l'étape fondatrice — elle ancre tout le reste sur la plateforme.", sub: '⏱ ~2 minutes', done: false },
-            { num: '02', title: 'Soumets une réalisation, un article ou un événement', desc: "Pipeline, dashboard, API, bootcamp, article Medium ou LinkedIn, conférence, meetup — ce que tu as vraiment construit ou organisé.", sub: 'Optionnel · illimité', done: false },
-            { num: '03', title: 'Publication instantanée', desc: "Ton profil, tes réalisations et tes événements apparaissent sur la plateforme. Visibles par des milliers de praticiens et recruteurs.", sub: '✓ Publication instantanée', done: true },
+            { num: '01', title: t('step1Title'), desc: t('step1Desc'), sub: t('step1Time'), done: false },
+            { num: '02', title: t('step2Title'), desc: t('step2Desc'), sub: t('step2Time'), done: false },
+            { num: '03', title: t('step3Title'), desc: t('step3Desc'), sub: t('step3Badge'), done: true },
           ].map((s, i) => (
             <ScrollReveal key={s.num} delay={i * 120} style={{ height: '100%' }}>
               <div className="step-card" style={{ height: '100%' }}>
@@ -309,7 +309,7 @@ export default async function Home() {
       <section style={{ background: 'var(--f-surface)', padding: '6rem 6vw', borderTop: '1px solid var(--f-border)', borderBottom: '1px solid var(--f-border)' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <ScrollReveal>
-          <span className="f-label" style={{ marginBottom: '.6rem' }}>// ressources</span>
+          <span className="f-label" style={{ marginBottom: '.6rem' }}>{t('resourcesLabel')}</span>
           <h2 style={{
             fontFamily: "'Syne', sans-serif",
             fontSize: 'clamp(1.75rem, 3.5vw, 2.6rem)',
@@ -319,7 +319,7 @@ export default async function Home() {
             letterSpacing: '-.025em',
             lineHeight: 1.15,
           }}>
-            La communauté en action.
+            {t('resourcesTitle')}
           </h2>
         </ScrollReveal>
 
@@ -329,7 +329,7 @@ export default async function Home() {
             <ScrollReveal>
               <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '.6rem' }}>
                 <span style={{ display: 'inline-block', width: 18, height: 1.5, background: 'var(--f-green)', borderRadius: 2 }} />
-                Réalisations récentes
+                {t('realisationsTitle')}
               </p>
             </ScrollReveal>
             <div style={{ marginBottom: '3.5rem' }}>
@@ -362,7 +362,7 @@ export default async function Home() {
             </div>
             <ScrollReveal>
               <Link href="/realisations" className="arrow-link" style={{ marginBottom: '3.5rem', display: 'inline-block' }}>
-                Voir toutes les réalisations <span>→</span>
+                {t('realisationsCta')}
               </Link>
             </ScrollReveal>
           </>
@@ -374,7 +374,7 @@ export default async function Home() {
             <ScrollReveal>
               <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '.6rem' }}>
                 <span style={{ display: 'inline-block', width: 18, height: 1.5, background: 'var(--f-orange)', borderRadius: 2 }} />
-                Tips &amp; TIL
+                {t('tipsTitle')}
               </p>
             </ScrollReveal>
             <div style={{ marginBottom: '3.5rem' }}>
@@ -409,7 +409,7 @@ export default async function Home() {
             <ScrollReveal>
               <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--f-text-3)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '.6rem' }}>
                 <span style={{ display: 'inline-block', width: 18, height: 1.5, background: 'var(--f-sky)', borderRadius: 2 }} />
-                Articles récents
+                {t('articlesTitle')}
               </p>
             </ScrollReveal>
             <div style={{ marginBottom: '1.75rem' }}>
@@ -435,7 +435,7 @@ export default async function Home() {
             </div>
             <ScrollReveal>
               <Link href="/articles" className="arrow-link">
-                Voir tous les articles <span>→</span>
+                {t('articlesCta')}
               </Link>
             </ScrollReveal>
           </>
@@ -449,7 +449,7 @@ export default async function Home() {
         <ScrollReveal>
           <div className="community-cta" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '2rem', flexWrap: 'wrap' }}>
             <div style={{ maxWidth: 580 }}>
-              <span className="f-label" style={{ marginBottom: '.75rem' }}>// la communauté</span>
+              <span className="f-label" style={{ marginBottom: '.75rem' }}>{t('communityLabel')}</span>
               <h2 style={{
                 fontFamily: "'Syne', sans-serif",
                 fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
@@ -459,15 +459,15 @@ export default async function Home() {
                 lineHeight: 1.2,
                 letterSpacing: '-.025em',
               }}>
-                Une communauté de praticiens<br />
-                tech qui construisent.
+                {t('communityTitle')}<br />
+                {t('communityTitleHighlight')}
               </h2>
               <p style={{ fontSize: '.92rem', color: 'var(--f-text-2)', lineHeight: 1.85, margin: 0 }}>
-                Construite autour de ceux qui font — pas de ceux qui parlent.
+                {t('communitySubtitle')}
               </p>
             </div>
             <Link href="/praticiens" className="btn-f btn-f-primary" style={{ flexShrink: 0, fontSize: '.78rem' }}>
-              Voir la communauté →
+              {t('communityCta')}
             </Link>
           </div>
         </ScrollReveal>

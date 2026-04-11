@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { createClient } from '@/lib/supabase/client';
 import FormProfil      from '@/components/forms/FormProfil';
 import FormArticle     from '@/components/forms/FormArticle';
@@ -11,6 +12,7 @@ type FormType = 'profil' | 'article' | 'realisation' | 'evenement' | null;
 type GateState = 'idle' | 'checking' | 'found' | 'not_found';
 
 export default function SoumettreePage() {
+  const t = useTranslations('soumettre');
   const router = useRouter();
   const [activeForm, setActiveForm] = useState<FormType>(null);
   const [showForm, setShowForm]     = useState(false);
@@ -110,10 +112,10 @@ export default function SoumettreePage() {
   }
 
   const CARDS = [
-    { type: 'profil' as FormType, icon: '👤', num: '01', title: 'Mon profil', desc: hasProfil ? 'Modifier mon profil existant →' : "Figurer dans l'annuaire des praticiens.", iconBg: 'rgba(14,165,233,.1)' },
-    { type: 'article'     as FormType, icon: '✍️', num: '02', title: 'Un article',      desc: "Medium, LinkedIn, Dev.to, Substack…",      iconBg: 'rgba(249,115,22,.1)' },
-    { type: 'realisation' as FormType, icon: '🚀', num: '03', title: 'Une réalisation', desc: "Pipeline, dashboard, API, bootcamp, YT…",  iconBg: 'rgba(16,185,129,.1)' },
-    { type: 'evenement'   as FormType, icon: '📅', num: '04', title: 'Un événement',    desc: "Conférence, meetup, hackathon, webinaire…", iconBg: 'rgba(167,139,250,.1)' },
+    { type: 'profil'      as FormType, icon: '👤', num: '01', title: t('profile'),     desc: hasProfil ? t('profileCta') : t('profileDesc'),  iconBg: 'rgba(14,165,233,.1)' },
+    { type: 'article'     as FormType, icon: '✍️', num: '02', title: t('article'),     desc: t('articleDesc'),                                 iconBg: 'rgba(249,115,22,.1)' },
+    { type: 'realisation' as FormType, icon: '🚀', num: '03', title: t('realisation'), desc: t('realisationDesc'),                             iconBg: 'rgba(16,185,129,.1)' },
+    { type: 'evenement'   as FormType, icon: '📅', num: '04', title: t('evenement'),   desc: t('evenementDesc'),                               iconBg: 'rgba(167,139,250,.1)' },
   ];
 
   return (
@@ -121,12 +123,12 @@ export default function SoumettreePage() {
 
       {/* HEADER */}
       <div style={{ marginBottom: '3.5rem' }}>
-        <span className="f-label" style={{ marginBottom: '.6rem' }}>// soumettre</span>
+        <span className="f-label" style={{ marginBottom: '.6rem' }}>{t('label')}</span>
         <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: 'clamp(1.9rem,4vw,2.8rem)', fontWeight: 800, color: 'var(--f-text-1)', margin: '.4rem 0 .8rem 0' }}>
-          Montre ce que tu construis.
+          {t('title')}
         </h1>
         <p style={{ color: 'var(--f-text-3)', fontSize: '.95rem', lineHeight: 1.85, maxWidth: 500, margin: 0 }}>
-          Tu es praticien tech ? Soumets ton profil, un article, une réalisation ou un événement.
+          {t('subtitle')}
         </p>
       </div>
 
@@ -162,16 +164,14 @@ export default function SoumettreePage() {
               <span style={{ fontSize: '1.5rem' }}>✅</span>
               <div>
                 <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .25rem 0' }}>
-                  {activeForm === 'profil' ? 'Profil créé !' : 'Soumission reçue !'}
+                  {activeForm === 'profil' ? t('profileCreated') : t('submitted')}
                 </p>
                 <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-text-3)', margin: '0 0 .5rem 0' }}>
-                  {activeForm === 'profil'
-                    ? 'Ton profil est maintenant en ligne et visible dans l\'annuaire.'
-                    : 'Contenu publié instantanément.'}
+                  {activeForm === 'profil' ? t('profileOnline') : t('published')}
                 </p>
                 {activeForm === 'profil' && (
                   <a href="/mon-compte" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-sky)', textDecoration: 'none' }}>
-                    → Accéder à mon espace pour soumettre des articles, réalisations et événements
+                    {t('goToSpace')}
                   </a>
                 )}
               </div>
@@ -182,7 +182,7 @@ export default function SoumettreePage() {
           {authLoading && activeForm && activeForm !== 'profil' && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', padding: '1.5rem 0', color: 'var(--f-text-3)', fontFamily: "'Geist Mono', monospace", fontSize: '.75rem' }}>
               <span className="spinner" style={{ width: 14, height: 14, borderWidth: 2 }} />
-              Vérification de ton compte…
+              {t('checking')}
             </div>
           )}
 
@@ -190,10 +190,10 @@ export default function SoumettreePage() {
           {(activeForm === 'article' || activeForm === 'realisation' || activeForm === 'evenement') && !showForm && !submitted && !authLoading && (
             <div className="gate-box">
               <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.05rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .4rem 0' }}>
-                Vérifions ton profil
+                {t('verifyProfile')}
               </h3>
               <p style={{ fontSize: '.83rem', color: 'var(--f-text-3)', margin: '0 0 1.5rem 0' }}>
-                Entre ton username — on vérifie que tu es déjà dans l&apos;annuaire.
+                {t('verifyDesc')}
               </p>
 
               <div style={{ display: 'flex', gap: '.75rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
@@ -201,7 +201,7 @@ export default function SoumettreePage() {
                   <input
                     className="f-input"
                     type="text"
-                    placeholder="Ex: mamadou-diakite"
+                    placeholder={t('usernamePlaceholder')}
                     value={usernameInput}
                     onChange={e => { setUsernameInput(e.target.value); setGateState('idle'); }}
                     style={{ maxWidth: '100%' }}
@@ -212,7 +212,7 @@ export default function SoumettreePage() {
                   onClick={checkUsername}
                   disabled={gateState === 'checking' || !usernameInput.trim()}
                   style={{ fontSize: '.72rem' }}>
-                  {gateState === 'checking' ? 'Vérification…' : 'Vérifier →'}
+                  {gateState === 'checking' ? t('verifying') : t('verify')}
                 </button>
               </div>
 
@@ -220,10 +220,10 @@ export default function SoumettreePage() {
               {gateState === 'found' && (
                 <div style={{ marginTop: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', background: 'var(--f-green-bg)', border: '1px solid var(--f-green-border)', borderRadius: 10, padding: '1rem 1.25rem' }}>
                   <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-green)', margin: 0 }}>
-                    ✓ Profil trouvé — <strong>{praticienName}</strong>
+                    ✓ {praticienName}
                   </p>
                   <button className="btn-f btn-f-primary" onClick={() => setShowForm(true)} style={{ fontSize: '.72rem' }}>
-                    Continuer →
+                    {t('continue')}
                   </button>
                 </div>
               )}
@@ -232,13 +232,13 @@ export default function SoumettreePage() {
               {gateState === 'not_found' && (
                 <div style={{ marginTop: '1.25rem', background: 'rgba(249,115,22,.06)', border: '1px solid rgba(249,115,22,.2)', borderRadius: 10, padding: '1rem 1.25rem' }}>
                   <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-orange)', margin: '0 0 .75rem 0' }}>
-                    ✗ Aucun profil trouvé avec ce username.
+                    {t('notFound')}
                   </p>
                   <p style={{ fontSize: '.82rem', color: 'var(--f-text-2)', margin: '0 0 1rem 0' }}>
-                    Soumets d&apos;abord ton profil — publication instantanée.
+                    {t('submitFirst')}
                   </p>
                   <button className="btn-f btn-f-secondary" onClick={() => { setActiveForm('profil'); setShowForm(true); }} style={{ fontSize: '.72rem' }}>
-                    Soumettre mon profil →
+                    {t('submitProfileCta')}
                   </button>
                 </div>
               )}
@@ -258,7 +258,7 @@ export default function SoumettreePage() {
       )}
 
       <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', marginTop: '3rem', lineHeight: 1.8 }}>
-        Publication instantanée.
+        {t('instantPublication')}
       </p>
     </div>
   );
