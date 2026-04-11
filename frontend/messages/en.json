@@ -430,6 +430,25 @@
     },
     "evenement": {
       "successEdit": "✓ Event updated — redirecting…"
+    },
+    "saveChanges": "Save changes →",
+    "collection": {
+      "titleLabel": "Title",
+      "descLabel": "Description",
+      "resourcesLabel": "Resources ({count})",
+      "emptyResources": "No resources yet — add one below.",
+      "addResource": "+ Add a resource",
+      "itemTitlePlaceholder": "Title *",
+      "itemUrlPlaceholder": "URL (optional)",
+      "itemDescPlaceholder": "Short description (optional)",
+      "addBtn": "+ Add",
+      "titleRequired": "Title is required.",
+      "creating": "Creating…",
+      "createBtn": "Create collection →",
+      "deleteBtn": "✕ Delete",
+      "confirmDelete": "Delete \"{title}\"? This action is irreversible.",
+      "successNew": "✓ Collection created — redirecting…",
+      "successEdit": "✓ Collection updated — redirecting…"
     }
   }
 }

@@ -63,6 +63,7 @@ type Props = { praticien: Record<string, unknown> };
 export default function EditProfilClient({ praticien: p }: Props) {
   const router = useRouter();
   const t = useTranslations('forms');
+  const tMC = useTranslations('monCompte');
 
   const initStack   = Array.isArray(p.stack)      ? (p.stack      as string[]) : [];
   const initCats    = Array.isArray(p.categories) ? (p.categories as string[]) : p.category ? [String(p.category)] : [];
@@ -527,9 +528,9 @@ export default function EditProfilClient({ praticien: p }: Props) {
 
       <div style={{ display: 'flex', gap: '1rem', paddingTop: '.5rem' }}>
         <button type="submit" className="btn-f btn-f-primary" disabled={loading}>
-          {loading ? 'Enregistrement…' : 'Enregistrer les modifications →'}
+          {loading ? tMC('saving') : tMC('saveChanges')}
         </button>
-        <a href="/mon-compte" className="btn-f btn-f-secondary">Annuler</a>
+        <a href="/mon-compte" className="btn-f btn-f-secondary">{tMC('cancel')}</a>
       </div>
     </form>
     </>

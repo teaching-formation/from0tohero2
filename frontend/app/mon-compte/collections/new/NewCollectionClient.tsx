@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 type Item = { id: string; title: string; url: string; description: string };
 
@@ -8,6 +9,9 @@ function uid() { return Math.random().toString(36).slice(2); }
 
 export default function NewCollectionClient() {
   const router = useRouter();
+  const t = useTranslations('forms');
+  const tMC = useTranslations('monCompte');
+
   const [title,       setTitle]       = useState('');
   const [description, setDescription] = useState('');
   const [items,       setItems]       = useState<Item[]>([]);
@@ -29,7 +33,7 @@ export default function NewCollectionClient() {
   function removeItem(id: string) { setItems(its => its.filter(i => i.id !== id)); }
 
   async function save() {
-    if (!title.trim()) { setError('Le titre est requis.'); return; }
+    if (!title.trim()) { setError(tMC('collection.titleRequired')); return; }
     setSaving(true); setError('');
     const res = await fetch('/api/collection', {
       method: 'POST',
@@ -37,7 +41,7 @@ export default function NewCollectionClient() {
       body: JSON.stringify({ title: title.trim(), description: description.trim(), items }),
     });
     setSaving(false);
-    if (!res.ok) { const d = await res.json(); setError(d.error || 'Erreur'); return; }
+    if (!res.ok) { const d = await res.json(); setError(d.error || t('serverError')); return; }
     router.push('/mon-compte?tab=collections');
     router.refresh();
   }
@@ -47,13 +51,13 @@ export default function NewCollectionClient() {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
           <label style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-2)' }}>
-            Titre <span style={{ color: 'var(--f-orange)' }}>*</span>
+            {tMC('collection.titleLabel')} <span style={{ color: 'var(--f-orange)' }}>*</span>
           </label>
           <input className="f-input" placeholder="Ex: Mes livres Data, Outils DevOps, Cours recommandés…" value={title} onChange={e => setTitle(e.target.value)} style={{ maxWidth: '100%' }} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
           <label style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-2)' }}>
-            Description
+            {tMC('collection.descLabel')}
           </label>
           <input className="f-input" placeholder="Ex: Les ressources qui ont changé ma façon de travailler" value={description} onChange={e => setDescription(e.target.value)} style={{ maxWidth: '100%' }} />
         </div>
@@ -62,7 +66,7 @@ export default function NewCollectionClient() {
       {items.length > 0 && (
         <div>
           <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-2)', marginBottom: '.75rem' }}>
-            Ressources ({items.length})
+            {tMC('collection.resourcesLabel', { count: items.length })}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
             {items.map((item, i) => (
@@ -91,16 +95,16 @@ export default function NewCollectionClient() {
 
       <div style={{ background: 'var(--f-surface)', border: '1px dashed var(--f-border)', borderRadius: 10, padding: '1rem 1.25rem' }}>
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', fontWeight: 600, color: 'var(--f-text-2)', marginBottom: '.85rem' }}>
-          + Ajouter une ressource
+          {tMC('collection.addResource')}
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '.6rem' }}>
-          <input className="f-input" placeholder="Titre *" value={newTitle} onChange={e => setNewTitle(e.target.value)}
+          <input className="f-input" placeholder={tMC('collection.itemTitlePlaceholder')} value={newTitle} onChange={e => setNewTitle(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addItem())} style={{ maxWidth: '100%' }} />
-          <input className="f-input" placeholder="URL (optionnel)" value={newUrl} onChange={e => setNewUrl(e.target.value)} style={{ maxWidth: '100%' }} />
-          <input className="f-input" placeholder="Description courte (optionnel)" value={newDesc} onChange={e => setNewDesc(e.target.value)}
+          <input className="f-input" placeholder={tMC('collection.itemUrlPlaceholder')} value={newUrl} onChange={e => setNewUrl(e.target.value)} style={{ maxWidth: '100%' }} />
+          <input className="f-input" placeholder={tMC('collection.itemDescPlaceholder')} value={newDesc} onChange={e => setNewDesc(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addItem())} style={{ maxWidth: '100%' }} />
           <button type="button" className="btn-f btn-f-secondary" onClick={addItem} disabled={!newTitle.trim()} style={{ alignSelf: 'flex-start', fontSize: '.72rem' }}>
-            + Ajouter
+            {tMC('collection.addBtn')}
           </button>
         </div>
       </div>
@@ -109,9 +113,9 @@ export default function NewCollectionClient() {
 
       <div style={{ display: 'flex', gap: '1rem' }}>
         <button className="btn-f btn-f-primary" onClick={save} disabled={saving}>
-          {saving ? 'Création…' : 'Créer la collection →'}
+          {saving ? tMC('collection.creating') : tMC('collection.createBtn')}
         </button>
-        <a href="/mon-compte?tab=collections" className="btn-f btn-f-secondary">Annuler</a>
+        <a href="/mon-compte?tab=collections" className="btn-f btn-f-secondary">{tMC('cancel')}</a>
       </div>
     </div>
   );

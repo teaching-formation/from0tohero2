@@ -430,6 +430,25 @@
     },
     "evenement": {
       "successEdit": "✓ Événement mis à jour — redirection…"
+    },
+    "saveChanges": "Enregistrer les modifications →",
+    "collection": {
+      "titleLabel": "Titre",
+      "descLabel": "Description",
+      "resourcesLabel": "Ressources ({count})",
+      "emptyResources": "Aucune ressource encore — ajoute-en ci-dessous.",
+      "addResource": "+ Ajouter une ressource",
+      "itemTitlePlaceholder": "Titre *",
+      "itemUrlPlaceholder": "URL (optionnel)",
+      "itemDescPlaceholder": "Description courte (optionnel)",
+      "addBtn": "+ Ajouter",
+      "titleRequired": "Le titre est requis.",
+      "creating": "Création…",
+      "createBtn": "Créer la collection →",
+      "deleteBtn": "✕ Supprimer",
+      "confirmDelete": "Supprimer \"{title}\" ? Cette action est irréversible.",
+      "successNew": "✓ Collection créée — redirection…",
+      "successEdit": "✓ Collection mise à jour — redirection…"
     }
   }
 }
