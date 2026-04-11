@@ -32,6 +32,7 @@ function formatDate(dateStr: string, dateFinStr?: string) {
 
 export default function EvenementsPage() {
   const t = useTranslations('evenements');
+  const tET = useTranslations('eventTypes');
   const [evenements, setEvenements] = useState<Evenement[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeStatut, setActiveStatut] = useState('upcoming');
@@ -119,7 +120,7 @@ export default function EvenementsPage() {
               className={`filter-pill${activeType === typ ? ' active' : ''}`}
               onClick={() => setActiveType(typ)}
             >
-              {typ === 'all' ? t('allTypes') : `${TYPE_ICON[typ] || ''} ${TYPE_LABELS[typ] || typ}`}
+              {typ === 'all' ? t('allTypes') : `${TYPE_ICON[typ] || ''} ${tET(typ as Parameters<typeof tET>[0]) || typ}`}
             </button>
           ))}
         </div>
@@ -193,7 +194,7 @@ export default function EvenementsPage() {
                           padding: '3px 9px',
                           borderRadius: 99,
                           fontWeight: 600,
-                        }}>{TYPE_ICON[typ]} {TYPE_LABELS[typ] || typ}</span>
+                        }}>{TYPE_ICON[typ]} {tET(typ as Parameters<typeof tET>[0]) || typ}</span>
                       ))}
                       {e.gratuit && (
                         <span style={{

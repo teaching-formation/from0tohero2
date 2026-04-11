@@ -204,6 +204,15 @@
     "copyright": "© 2026 from0tohero.dev",
     "builtBy": "Construit par des praticiens · Pour des praticiens"
   },
+  "eventTypes": {
+    "conference": "Conférence",
+    "meetup": "Meetup",
+    "hackathon": "Hackathon",
+    "webinaire": "Webinaire",
+    "bootcamp": "Bootcamp",
+    "atelier": "Atelier",
+    "autre": "Autre"
+  },
   "cats": {
     "data": "Data",
     "devops": "DevOps",

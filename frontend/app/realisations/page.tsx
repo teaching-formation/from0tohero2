@@ -21,6 +21,7 @@ import { CAT_COLOR, CAT_LABEL, REAL_TYPE_LABELS, REAL_TYPE_ICONS } from '@/lib/c
 
 export default function RealisationsPage() {
   const t = useTranslations('realisations');
+  const tCats = useTranslations('cats');
   const [realisations, setRealisations] = useState<RealisationWithPraticien[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeType, setActiveType] = useState('all');
@@ -105,7 +106,7 @@ export default function RealisationsPage() {
               className={`filter-pill${activeCat === c ? ' active' : ''}`}
               onClick={() => setActiveCat(c)}
             >
-              {c === 'all' ? t('allCategories') : CAT_LABEL[c] || c}
+              {c === 'all' ? t('allCategories') : (tCats(c as Parameters<typeof tCats>[0]) || c)}
             </button>
           ))}
         </div>
@@ -185,7 +186,7 @@ export default function RealisationsPage() {
                       padding: '3px 9px',
                       borderRadius: 99,
                       fontWeight: 600,
-                    }}>{CAT_LABEL[r.category] || r.category}</span>
+                    }}>{tCats(r.category as Parameters<typeof tCats>[0]) || r.category}</span>
                     <span style={{
                       fontFamily: "'Geist Mono', monospace",
                       fontSize: '.58rem',

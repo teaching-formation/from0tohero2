@@ -13,6 +13,7 @@ import { CAT_COLOR, CAT_LABEL, SOURCE_ICON } from '@/lib/constants';
 
 export default function ArticlesPage() {
   const t = useTranslations('articles');
+  const tCats = useTranslations('cats');
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
@@ -92,7 +93,7 @@ export default function ArticlesPage() {
               className={`filter-pill${activeFilter === f ? ' active' : ''}`}
               onClick={() => setActiveFilter(f)}
             >
-              {f === 'all' ? t('all') : CAT_LABEL[f] || f}
+              {f === 'all' ? t('all') : (tCats(f as Parameters<typeof tCats>[0]) || f)}
             </button>
           ))}
         </div>
@@ -158,7 +159,7 @@ export default function ArticlesPage() {
                       padding: '3px 9px',
                       borderRadius: 99,
                       fontWeight: 600,
-                    }}>{CAT_LABEL[a.category] || a.category}</span>
+                    }}>{tCats(a.category as Parameters<typeof tCats>[0]) || a.category}</span>
 
                     {srcLabel && (
                       <span style={{

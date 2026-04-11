@@ -23,6 +23,7 @@ const TYPE_META = TIP_TYPE_META;
 
 export default function TipsPage() {
   const t = useTranslations('tips');
+  const tCats = useTranslations('cats');
   const [tips, setTips]         = useState<Tip[]>([]);
   const [loading, setLoading]   = useState(true);
   const [activeType, setActiveType] = useState('all');
@@ -208,7 +209,7 @@ export default function TipsPage() {
                     fontWeight: isActive ? 700 : 400,
                   }}
                 >
-                  {c === 'all' ? t('allCategories') : CAT_LABEL[c] || c}
+                  {c === 'all' ? t('allCategories') : (tCats(c as Parameters<typeof tCats>[0]) || c)}
                 </button>
               );
             })}
@@ -303,7 +304,7 @@ export default function TipsPage() {
                         </span>
                       )}
                       <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 9px', borderRadius: 4 }}>
-                        {CAT_LABEL[tip.category] || tip.category}
+                        {tCats(tip.category as Parameters<typeof tCats>[0]) || tip.category}
                       </span>
                       {tip.stack?.slice(0, 3).map(s => (
                         <span key={s} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 9px', borderRadius: 4 }}>{s}</span>
