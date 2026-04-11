@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Avatar from '@/components/Avatar';
+import { useTranslations } from 'next-intl';
 
 type Comment = {
   id: string;
@@ -16,6 +17,7 @@ type Props = {
 };
 
 export default function CommentSection({ contentType, contentId }: Props) {
+  const t = useTranslations('comments');
   const [open, setOpen] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [count, setCount] = useState(0);
@@ -76,7 +78,7 @@ export default function CommentSection({ contentType, contentId }: Props) {
 
     if (!res.ok) {
       const d = await res.json().catch(() => ({}));
-      setError(d.error || 'Erreur lors de l\'envoi.');
+      setError(d.error || t('sendError'));
       return;
     }
     const { comment } = await res.json();
@@ -115,11 +117,11 @@ export default function CommentSection({ contentType, contentId }: Props) {
   const timeAgo = (date: string) => {
     const diff = Date.now() - new Date(date).getTime();
     const mins = Math.floor(diff / 60000);
-    if (mins < 60) return `il y a ${mins}min`;
+    if (mins < 60) return t('timeAgoMin', { count: mins });
     const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `il y a ${hrs}h`;
+    if (hrs < 24) return t('timeAgoHour', { count: hrs });
     const days = Math.floor(hrs / 24);
-    return `il y a ${days}j`;
+    return t('timeAgoDay', { count: days });
   };
 
   return (
@@ -142,7 +144,7 @@ export default function CommentSection({ contentType, contentId }: Props) {
           transition: 'color .15s, border-color .15s',
           flexShrink: 0,
         }}
-        title={open ? 'Fermer les commentaires' : 'Voir les commentaires'}
+        title={open ? t('closeComments') : t('viewComments')}
       >
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -163,7 +165,7 @@ export default function CommentSection({ contentType, contentId }: Props) {
           {/* Liste */}
           {comments.length === 0 ? (
             <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', margin: 0 }}>
-              Sois le premier à commenter.
+              {t('beFirst')}
             </p>
           ) : (
             comments.map(c => {
@@ -191,7 +193,7 @@ export default function CommentSection({ contentType, contentId }: Props) {
                               padding: '1px 6px', cursor: 'pointer',
                               fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', color: 'var(--f-text-3)',
                             }}
-                          >Modifier</button>
+                          >{t('edit')}</button>
                           <button
                             onClick={() => deleteComment(c.id)}
                             style={{
@@ -199,7 +201,7 @@ export default function CommentSection({ contentType, contentId }: Props) {
                               padding: '1px 6px', cursor: 'pointer',
                               fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', color: '#f87171',
                             }}
-                          >Suppr.</button>
+                          >{t('delete')}</button>
                         </div>
                       )}
                     </div>
@@ -227,7 +229,7 @@ export default function CommentSection({ contentType, contentId }: Props) {
                               padding: '2px 8px', cursor: 'pointer',
                               fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', color: 'var(--f-text-3)',
                             }}
-                          >Annuler</button>
+                          >{t('cancel')}</button>
                           <button
                             onClick={() => saveEdit(c.id)}
                             disabled={savingEdit || editText.trim().length < 2}
@@ -237,7 +239,7 @@ export default function CommentSection({ contentType, contentId }: Props) {
                               background: editText.trim().length >= 2 ? 'var(--f-sky)' : 'var(--f-border)',
                               color: editText.trim().length >= 2 ? '#0d1117' : 'var(--f-text-3)',
                             }}
-                          >{savingEdit ? '…' : 'Sauvegarder'}</button>
+                          >{savingEdit ? '…' : t('save')}</button>
                         </div>
                       </div>
                     ) : (
@@ -257,7 +259,7 @@ export default function CommentSection({ contentType, contentId }: Props) {
               ref={inputRef}
               value={text}
               onChange={e => setText(e.target.value)}
-              placeholder="Ajouter un commentaire…"
+              placeholder={t('placeholder')}
               maxLength={500}
               rows={2}
               style={{
@@ -292,7 +294,7 @@ export default function CommentSection({ contentType, contentId }: Props) {
                 fontWeight: 600,
               }}
             >
-              {sending ? '...' : 'Envoyer →'}
+              {sending ? '...' : t('send')}
             </button>
           </form>
         </div>

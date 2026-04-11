@@ -11,6 +11,7 @@ import LikeButton from '@/components/LikeButton';
 import FollowButton from '@/components/FollowButton';
 import CommentSection from '@/components/CommentSection';
 import ShareButton from '@/components/ShareButton';
+import { useTranslations } from 'next-intl';
 
 type CollectionItem = { id: string; title: string; url: string; description: string };
 type Collection = { id: string; title: string; description?: string; items: CollectionItem[] };
@@ -27,6 +28,7 @@ type Props = {
 };
 
 export default function PraticienClient({ praticien: p, realisations, collections, tips: tipsList, similaires = [] }: Props) {
+  const t = useTranslations('profil');
   const [isOwner, setIsOwner] = useState(false);
   const [contactLoading, setContactLoading] = useState(false);
   const [isSelf, setIsSelf] = useState(false);
@@ -80,7 +82,7 @@ export default function PraticienClient({ praticien: p, realisations, collection
   return (
     <div style={{ padding: '3.5rem 6vw', maxWidth: 900, margin: '0 auto' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <Link href="/praticiens" className="link-back" style={{ display: 'inline-flex' }}>← Praticiens</Link>
+        <Link href="/praticiens" className="link-back" style={{ display: 'inline-flex' }}>{t('backTo')}</Link>
         <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
           <ShareButton url={`https://from0tohero.dev/praticiens/${p.slug}`} title={`${p.name} · from0tohero`} text={p.role} />
         {isOwner && (
@@ -98,7 +100,7 @@ export default function PraticienClient({ praticien: p, realisations, collection
             transition: 'border-color .15s, color .15s',
           }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            Modifier mon profil
+            {t('editProfile')}
           </Link>
         )}
         </div>
@@ -192,7 +194,7 @@ export default function PraticienClient({ praticien: p, realisations, collection
               style={{ marginTop: '1.25rem', fontSize: '.78rem', display: 'inline-flex', alignItems: 'center', gap: '.45rem' }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-              {contactLoading ? 'Chargement…' : 'Contacter'}
+              {contactLoading ? t('contactLoading') : t('contact')}
             </button>
           )}
         </div>
@@ -201,7 +203,7 @@ export default function PraticienClient({ praticien: p, realisations, collection
       {/* COMPÉTENCES */}
       {Array.isArray(p.skills) && p.skills.length > 0 && (
         <div style={{ margin: '3rem 0' }}>
-          <span className="f-label" style={{ marginBottom: '1.75rem' }}>// compétences techniques</span>
+          <span className="f-label" style={{ marginBottom: '1.75rem' }}>{t('skillsLabel')}</span>
           {(p.skills as { category?: string; label?: string; items: string[] }[]).map((sec, i) => {
             const title = sec.category ?? sec.label ?? '';
             return (
@@ -221,7 +223,7 @@ export default function PraticienClient({ praticien: p, realisations, collection
       {/* COLLECTIONS */}
       {collections.length > 0 && (
         <div style={{ marginBottom: '2.5rem' }}>
-          <span className="f-label" style={{ marginBottom: '1.25rem' }}>// collections & ressources</span>
+          <span className="f-label" style={{ marginBottom: '1.25rem' }}>{t('collectionsLabel')}</span>
           <div style={{ marginTop: '.75rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {collections.map(col => (
               <div key={col.id} style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 12, padding: '1.25rem 1.5rem' }}>
@@ -259,7 +261,7 @@ export default function PraticienClient({ praticien: p, realisations, collection
       {/* TIPS & TIL */}
       {tipsList.length > 0 && (
         <div style={{ marginBottom: '2.5rem' }}>
-          <span className="f-label" style={{ marginBottom: '1.25rem' }}>// tips & TIL</span>
+          <span className="f-label" style={{ marginBottom: '1.25rem' }}>{t('tipsLabel')}</span>
           <div style={{ marginTop: '.75rem', display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
             {tipsList.map(tip => {
               const TYPE_COLOR: Record<string,string> = { tip:'var(--f-orange)', TIL:'var(--f-sky)', snippet:'var(--f-green)' };
@@ -289,7 +291,7 @@ export default function PraticienClient({ praticien: p, realisations, collection
       {/* RÉALISATIONS */}
       {praticienRealisations.length > 0 && (
         <div>
-          <span className="f-label" style={{ marginBottom: '1.25rem' }}>// réalisations</span>
+          <span className="f-label" style={{ marginBottom: '1.25rem' }}>{t('realisationsLabel')}</span>
           <div style={{ marginTop: '.75rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {praticienRealisations.map(r => {
               const CAT_COLORS: Record<string,{color:string,border:string,bg:string}> = {
@@ -314,7 +316,7 @@ export default function PraticienClient({ praticien: p, realisations, collection
                   </div>
                   {Array.isArray(r.collaborateurs) && (r.collaborateurs as string[]).length > 0 && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginBottom: '.85rem' }}>
-                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>avec</span>
+                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>{t('with')}</span>
                       {(r.collaborateurs as string[]).map(c => (
                         <a key={c} href={`/praticiens/${c}`} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-sky)', textDecoration: 'none', border: '1px solid var(--f-sky-border)', background: 'var(--f-sky-bg)', padding: '1px 7px', borderRadius: 99 }}>
                           @{c}
@@ -324,8 +326,8 @@ export default function PraticienClient({ praticien: p, realisations, collection
                   )}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '.75rem', flexWrap: 'wrap' }}>
                     <div style={{ display: 'flex', gap: '.75rem' }}>
-                      {r.demo_url && <a href={r.demo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-sky)', textDecoration: 'none' }}>Demo →</a>}
-                      {r.repo_url && <a href={r.repo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', textDecoration: 'none' }}>Repo →</a>}
+                      {r.demo_url && <a href={r.demo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-sky)', textDecoration: 'none' }}>{t('demo')}</a>}
+                      {r.repo_url && <a href={r.repo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', textDecoration: 'none' }}>{t('repo')}</a>}
                     </div>
                     <LikeButton contentType="realisation" contentId={r.id} initialCount={0} initialLiked={false} />
                   </div>
@@ -342,7 +344,7 @@ export default function PraticienClient({ praticien: p, realisations, collection
       {similaires.length > 0 && (
         <div style={{ marginTop: '3rem', paddingTop: '2rem', borderTop: '1px solid var(--f-border)' }}>
           <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 1.25rem 0' }}>
-            // praticiens avec un stack similaire
+            {t('similarLabel')}
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '1rem' }}>
             {similaires.map(s => (

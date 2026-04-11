@@ -451,7 +451,7 @@ export default function ArticleModal({ article, onClose }: Props) {
                                   color: 'var(--f-sky)', padding: 0,
                                 }}
                               >
-                                {isShowingOriginal ? t('translate') : t('showOriginal')}
+                                {isShowingOriginal ? t('showTranslation') : t('showOriginal')}
                               </button>
                             )}
                           </div>

@@ -153,6 +153,7 @@
     "send": "Envoyer →",
     "translate": "Traduire",
     "showOriginal": "Voir l'original",
+    "showTranslation": "Voir la traduction",
     "translating": "Traduction…"
   },
   "connexion": {
@@ -198,6 +199,35 @@
     "submitFirst": "Soumets d'abord ton profil — publication instantanée.",
     "submitProfileCta": "Soumettre mon profil →",
     "instantPublication": "Publication instantanée."
+  },
+  "profil": {
+    "backTo": "← Praticiens",
+    "editProfile": "Modifier mon profil",
+    "contact": "Contacter",
+    "contactLoading": "Chargement…",
+    "skillsLabel": "// compétences techniques",
+    "collectionsLabel": "// collections & ressources",
+    "tipsLabel": "// tips & TIL",
+    "realisationsLabel": "// réalisations",
+    "with": "avec",
+    "demo": "Demo →",
+    "repo": "Repo →",
+    "similarLabel": "// praticiens avec un stack similaire"
+  },
+  "comments": {
+    "beFirst": "Sois le premier à commenter.",
+    "placeholder": "Ajouter un commentaire…",
+    "send": "Envoyer →",
+    "edit": "Modifier",
+    "delete": "Suppr.",
+    "cancel": "Annuler",
+    "save": "Sauvegarder",
+    "viewComments": "Voir les commentaires",
+    "closeComments": "Fermer les commentaires",
+    "sendError": "Erreur lors de l'envoi.",
+    "timeAgoMin": "il y a {count}min",
+    "timeAgoHour": "il y a {count}h",
+    "timeAgoDay": "il y a {count}j"
   },
   "footer": {
     "tagline1": "Ce qu'ils ont construit.",

@@ -152,6 +152,7 @@
     "sendError": "Error while sending.",
     "send": "Send →",
     "translate": "Translate",
+    "showTranslation": "Show translation",
     "showOriginal": "Show original",
     "translating": "Translating…"
   },
@@ -198,6 +199,35 @@
     "submitFirst": "Submit your profile first — instant publication.",
     "submitProfileCta": "Submit my profile →",
     "instantPublication": "Instant publication."
+  },
+  "profil": {
+    "backTo": "← Practitioners",
+    "editProfile": "Edit my profile",
+    "contact": "Contact",
+    "contactLoading": "Loading…",
+    "skillsLabel": "// technical skills",
+    "collectionsLabel": "// collections & resources",
+    "tipsLabel": "// tips & TIL",
+    "realisationsLabel": "// projects",
+    "with": "with",
+    "demo": "Demo →",
+    "repo": "Repo →",
+    "similarLabel": "// practitioners with a similar stack"
+  },
+  "comments": {
+    "beFirst": "Be the first to comment.",
+    "placeholder": "Add a comment…",
+    "send": "Send →",
+    "edit": "Edit",
+    "delete": "Del.",
+    "cancel": "Cancel",
+    "save": "Save",
+    "viewComments": "View comments",
+    "closeComments": "Close comments",
+    "sendError": "Error sending.",
+    "timeAgoMin": "{count}min ago",
+    "timeAgoHour": "{count}h ago",
+    "timeAgoDay": "{count}d ago"
   },
   "footer": {
     "tagline1": "What they built.",
