@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import Avatar from '@/components/Avatar';
 import FlagImg from '@/components/FlagImg';
+import { useTranslations } from 'next-intl';
 
 import { CAT_COLOR, SOURCE_ICON, TIP_TYPE_META } from '@/lib/constants';
 
@@ -41,6 +42,7 @@ type Results = {
 
 /* ══════════════════════════════════════════════════════════════ */
 export default function RecherchePage() {
+  const t = useTranslations('recherche');
   const [query, setQuery]     = useState('');
   const [results, setResults] = useState<Results | null>(null);
   const [loading, setLoading] = useState(false);
@@ -126,7 +128,7 @@ export default function RecherchePage() {
 
       {/* ── Header / Input ── */}
       <div style={{ marginBottom: '3rem', textAlign: 'center' }}>
-        <span className="f-label" style={{ marginBottom: '.75rem', display: 'block' }}>// recherche</span>
+        <span className="f-label" style={{ marginBottom: '.75rem', display: 'block' }}>{t('label')}</span>
         <h1 style={{
           fontFamily: "'Syne', sans-serif",
           fontSize: 'clamp(1.8rem, 4vw, 2.8rem)',
@@ -136,7 +138,7 @@ export default function RecherchePage() {
           letterSpacing: '-.03em',
           lineHeight: 1.1,
         }}>
-          Recherche globale
+          {t('title')}
         </h1>
 
         <div style={{ position: 'relative', maxWidth: 780, margin: '0 auto' }}>
@@ -152,7 +154,7 @@ export default function RecherchePage() {
           <input
             ref={inputRef}
             type="search"
-            placeholder="Chercher un praticien, une stack, un projet..."
+            placeholder={t('placeholder')}
             value={query}
             onChange={e => setQuery(e.target.value)}
             style={{
@@ -206,7 +208,7 @@ export default function RecherchePage() {
             letterSpacing: '.1em', textTransform: 'uppercase',
             color: 'var(--f-text-3)', marginBottom: '1rem',
           }}>
-            // suggestions
+            {t('suggestionsLabel')}
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem', justifyContent: 'center' }}>
             {SUGGESTIONS.map(s => (
@@ -270,7 +272,7 @@ export default function RecherchePage() {
 
           {/* ── Praticiens ── */}
           {results.praticiens.length > 0 && (
-            <Section title="Praticiens" count={results.praticiens.length}>
+            <Section title={t('sectionPraticiens')} count={results.praticiens.length}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1rem' }}>
                 {results.praticiens.map(p => {
                   const primaryCat = p.categories?.[0] || 'autre';
@@ -319,7 +321,7 @@ export default function RecherchePage() {
 
           {/* ── Réalisations ── */}
           {results.realisations.length > 0 && (
-            <Section title="Réalisations" count={results.realisations.length}>
+            <Section title={t('sectionRealisations')} count={results.realisations.length}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1rem' }}>
                 {results.realisations.map(r => {
                   const catColor = CAT_COLOR[r.category] || 'var(--f-text-3)';
@@ -390,7 +392,7 @@ export default function RecherchePage() {
 
           {/* ── Articles ── */}
           {results.articles.length > 0 && (
-            <Section title="Articles" count={results.articles.length}>
+            <Section title={t('sectionArticles')} count={results.articles.length}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: '1rem' }}>
                 {results.articles.map(a => {
                   const catColor = CAT_COLOR[a.category] || 'var(--f-text-3)';
@@ -455,12 +457,12 @@ export default function RecherchePage() {
 
           {/* ── Tips ── */}
           {results.tips.length > 0 && (
-            <Section title="Tips" count={results.tips.length}>
+            <Section title={t('sectionTips')} count={results.tips.length}>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '1rem' }}>
-                {results.tips.map(t => {
-                  const typeColor = TYPE_COLOR[t.type] || 'var(--f-sky)';
+                {results.tips.map(tip => {
+                  const typeColor = TYPE_COLOR[tip.type] || 'var(--f-sky)';
                   return (
-                    <article key={t.id} className="f-card" style={{
+                    <article key={tip.id} className="f-card" style={{
                       display: 'flex', flexDirection: 'column', gap: '.75rem',
                       padding: '1.25rem', position: 'relative', overflow: 'hidden',
                     }}>
@@ -478,12 +480,12 @@ export default function RecherchePage() {
                           color: typeColor, border: `1px solid ${typeColor}33`,
                           background: `${typeColor}0d`, padding: '3px 9px',
                           borderRadius: 99, fontWeight: 600,
-                        }}>{t.type}</span>
-                        {t.category && (
+                        }}>{tip.type}</span>
+                        {tip.category && (
                           <span style={{
                             fontFamily: "'Geist Mono', monospace", fontSize: '.55rem',
                             color: 'var(--f-text-3)', letterSpacing: '.07em',
-                          }}>{t.category}</span>
+                          }}>{tip.category}</span>
                         )}
                       </div>
                       {/* Contenu (2 lignes max) */}
@@ -495,15 +497,15 @@ export default function RecherchePage() {
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
                         flex: 1,
-                      }}>{t.content}</p>
+                      }}>{tip.content}</p>
                       {/* Auteur */}
-                      {t.praticiens && (
-                        <Link href={`/praticiens/${t.praticiens.slug}`} style={{
+                      {tip.praticiens && (
+                        <Link href={`/praticiens/${tip.praticiens.slug}`} style={{
                           fontFamily: "'Geist Mono', monospace", fontSize: '.63rem',
                           color: typeColor, opacity: .8, textDecoration: 'none',
                           letterSpacing: '.03em',
                         }}>
-                          @{t.praticiens.name}
+                          @{tip.praticiens.name}
                         </Link>
                       )}
                     </article>
@@ -521,7 +523,7 @@ export default function RecherchePage() {
             }}>
               <p style={{ marginBottom: '1rem' }}>Aucun résultat pour « {query} »</p>
               <p style={{ fontSize: '.72rem', opacity: .7 }}>
-                Essaie un autre terme ou explore les sections ci-dessous.
+                {t('noResultsHint')}
               </p>
               <div style={{ display: 'flex', gap: '.5rem', justifyContent: 'center', marginTop: '1.5rem', flexWrap: 'wrap' }}>
                 {SUGGESTIONS.filter(s => s !== query).slice(0, 4).map(s => (

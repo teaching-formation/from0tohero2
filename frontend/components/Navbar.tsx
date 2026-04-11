@@ -4,6 +4,8 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import NotificationBell from '@/components/NotificationBell';
+import LocaleSwitcher from '@/components/LocaleSwitcher';
+import { useTranslations } from 'next-intl';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -11,6 +13,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); // null = chargement
   const [scrolled, setScrolled] = useState(false);
+  const t = useTranslations('nav');
 
   useEffect(() => {
     const saved = localStorage.getItem('theme');
@@ -47,11 +50,11 @@ export default function Navbar() {
   };
 
   const links = [
-    { href: '/praticiens',   label: 'Praticiens' },
-    { href: '/realisations', label: 'Réalisations' },
-    { href: '/articles',     label: 'Articles' },
-    { href: '/evenements',   label: 'Événements' },
-    { href: '/tips',         label: 'Tips' },
+    { href: '/praticiens',   label: t('praticiens') },
+    { href: '/realisations', label: t('realisations') },
+    { href: '/articles',     label: t('articles') },
+    { href: '/evenements',   label: t('evenements') },
+    { href: '/tips',         label: t('tips') },
   ];
 
   return (
@@ -122,13 +125,13 @@ export default function Navbar() {
             alignItems: 'center',
             transition: 'color .15s',
             textDecoration: 'none',
-          }} title="Rechercher">
+          }} title={t('rechercher')}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>
           </Link>
           <Link href="/soumettre" className="btn-f btn-f-primary" style={{ marginLeft: '1rem', fontSize: '.7rem', padding: '.5rem 1.1rem' }}>
-            Soumettre
+            {t('soumettre')}
           </Link>
           {isLoggedIn && <NotificationBell />}
           <Link
@@ -146,8 +149,9 @@ export default function Navbar() {
               visibility: isLoggedIn === null ? 'hidden' : 'visible',
             }}
           >
-            {isLoggedIn ? 'Mon espace' : 'Connexion'}
+            {isLoggedIn ? t('monEspace') : t('connexion')}
           </Link>
+          <LocaleSwitcher />
           <button onClick={toggleDark} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--f-text-3)', marginLeft: '.25rem', fontSize: '1rem', lineHeight: 1 }}>
             {dark ? '☀️' : '🌙'}
           </button>
@@ -163,7 +167,7 @@ export default function Navbar() {
             alignItems: 'center',
             textDecoration: 'none',
             transition: 'color .15s',
-          }} title="Rechercher">
+          }} title={t('rechercher')}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>
@@ -207,9 +211,9 @@ export default function Navbar() {
               {l.label}
             </Link>
           ))}
-          <div style={{ display: 'flex', gap: '.75rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '.75rem', marginTop: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
             <Link href="/soumettre" className="btn-f btn-f-primary" style={{ fontSize: '.72rem', padding: '.6rem 1.2rem', flex: 1, justifyContent: 'center' }}>
-              Soumettre
+              {t('soumettre')}
             </Link>
             <Link
               href={isLoggedIn ? '/mon-compte' : '/connexion'}
@@ -226,8 +230,9 @@ export default function Navbar() {
                 visibility: isLoggedIn === null ? 'hidden' : 'visible',
               }}
             >
-              {isLoggedIn ? 'Mon espace' : 'Connexion'}
+              {isLoggedIn ? t('monEspace') : t('connexion')}
             </Link>
+            <LocaleSwitcher />
           </div>
         </div>
       )}

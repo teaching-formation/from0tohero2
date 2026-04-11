@@ -5,6 +5,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CursorGlow from '@/components/CursorGlow';
 import PageTransition from '@/components/PageTransition';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://from0tohero.dev'),
@@ -17,9 +19,12 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{
           __html: `
@@ -46,12 +51,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `
       }} />
       <body style={{ margin: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--f-bg)' }}>
-        <CursorGlow />
-        <Navbar />
-        <main style={{ flex: 1 }}>
-          <PageTransition>{children}</PageTransition>
-        </main>
-        <Footer />
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <CursorGlow />
+          <Navbar />
+          <main style={{ flex: 1 }}>
+            <PageTransition>{children}</PageTransition>
+          </main>
+          <Footer />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

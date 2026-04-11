@@ -5,12 +5,14 @@ import { SkeletonArticleCard } from '@/components/SkeletonCard';
 import FlagImg from '@/components/FlagImg';
 import LikeButton from '@/components/LikeButton';
 import ArticleModal from '@/components/ArticleModal';
+import { useTranslations } from 'next-intl';
 
 const PAGE_SIZE = 12;
 
 import { CAT_COLOR, CAT_LABEL, SOURCE_ICON } from '@/lib/constants';
 
 export default function ArticlesPage() {
+  const t = useTranslations('articles');
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
@@ -56,7 +58,7 @@ export default function ArticlesPage() {
 
       {/* ── Header ── */}
       <div style={{ marginBottom: '3rem' }}>
-        <span className="f-label" style={{ marginBottom: '.6rem' }}>// articles</span>
+        <span className="f-label" style={{ marginBottom: '.6rem' }}>{t('label')}</span>
         <h1 style={{
           fontFamily: "'Syne', sans-serif",
           fontSize: 'clamp(2rem, 4.5vw, 3rem)',
@@ -66,17 +68,17 @@ export default function ArticlesPage() {
           letterSpacing: '-.03em',
           lineHeight: 1.1,
         }}>
-          Ce que les praticiens écrivent
+          {t('title')}
         </h1>
         <p style={{ color: 'var(--f-text-3)', fontSize: '.88rem', margin: '0 0 2.25rem 0', lineHeight: 1.7 }}>
-          Medium · LinkedIn · Dev.to · Hashnode — agrégés ici.
+          {t('subtitle')}
         </p>
 
         {/* Barre de recherche */}
         <input
           className="f-input"
           type="search"
-          placeholder="Rechercher un article, un auteur…"
+          placeholder={t('searchPlaceholder')}
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{ maxWidth: '100%', marginBottom: '1.25rem' }}
@@ -90,7 +92,7 @@ export default function ArticlesPage() {
               className={`filter-pill${activeFilter === f ? ' active' : ''}`}
               onClick={() => setActiveFilter(f)}
             >
-              {f === 'all' ? 'Tous' : CAT_LABEL[f] || f}
+              {f === 'all' ? t('all') : CAT_LABEL[f] || f}
             </button>
           ))}
         </div>
@@ -106,7 +108,7 @@ export default function ArticlesPage() {
           textAlign: 'center', padding: '5rem 0',
           fontFamily: "'Geist Mono', monospace", fontSize: '.85rem', color: 'var(--f-text-3)',
         }}>
-          Aucun article dans cette catégorie.
+          {t('empty')}
         </div>
       ) : (
         <>
@@ -245,7 +247,7 @@ export default function ArticlesPage() {
                           fontSize: '.6rem', transition: 'color .15s, border-color .15s',
                           flexShrink: 0,
                         }}
-                        title="Voir les commentaires"
+                        title={t('comments')}
                       >
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -266,7 +268,7 @@ export default function ArticlesPage() {
                         letterSpacing: '.04em',
                         textDecoration: 'none',
                       }}
-                    >Lire →</a>
+                    >{t('read')}</a>
                   </div>
 
                 </article>
@@ -277,7 +279,7 @@ export default function ArticlesPage() {
           {visible < filtered.length && (
             <div style={{ textAlign: 'center', marginTop: '3rem' }}>
               <button className="btn-f btn-f-secondary" onClick={() => setVisible(v => v + PAGE_SIZE)}>
-                Charger plus ({filtered.length - visible} restants) →
+                {t('loadMore', { count: filtered.length - visible })}
               </button>
             </div>
           )}
@@ -290,7 +292,7 @@ export default function ArticlesPage() {
             marginTop: '1.25rem',
             letterSpacing: '.06em',
           }}>
-            {Math.min(visible, filtered.length)} / {filtered.length} articles
+            {t('counter', { visible: Math.min(visible, filtered.length), total: filtered.length })}
           </p>
         </>
       )}

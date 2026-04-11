@@ -7,19 +7,17 @@ import { SkeletonPraticienCard } from '@/components/SkeletonCard';
 import { getCountryDisplay } from '@/lib/countryFlag';
 import { BADGE_STYLES } from '@/lib/badges';
 import FlagImg from '@/components/FlagImg';
+import { useTranslations } from 'next-intl';
 
 const PAGE_SIZE = 12;
 
 const FILTERS = ['all','data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded','autre'];
-const FILTER_LABELS: Record<string,string> = {
-  all:'Tous', data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA',
-  cyber:'Cybersécurité', frontend:'Frontend', backend:'Backend',
-  fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT', autre:'Autre',
-};
 
 import { CAT_COLOR as CAT_COLORS } from '@/lib/constants';
 
 export default function PraticiensPage() {
+  const t = useTranslations('praticiens');
+  const tCats = useTranslations('cats');
   const [praticiens, setPraticiens] = useState<Praticien[]>([]);
   const [loading, setLoading]       = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
@@ -76,7 +74,7 @@ export default function PraticiensPage() {
 
       {/* ── Header ── */}
       <div style={{ marginBottom: '3rem' }}>
-        <span className="f-label" style={{ marginBottom: '.6rem' }}>// praticiens</span>
+        <span className="f-label" style={{ marginBottom: '.6rem' }}>{t('label')}</span>
         <h1 style={{
           fontFamily: "'Syne', sans-serif",
           fontSize: 'clamp(2rem, 4.5vw, 3rem)',
@@ -86,10 +84,10 @@ export default function PraticiensPage() {
           letterSpacing: '-.03em',
           lineHeight: 1.1,
         }}>
-          Les gens qui construisent
+          {t('title')}
         </h1>
         <p style={{ color: 'var(--f-text-3)', fontSize: '.88rem', margin: '0 0 2.25rem 0', lineHeight: 1.7 }}>
-          Data · DevOps · Cloud · IA · Cybersécurité · Frontend · Backend · Mobile · Web3
+          {t('subtitle')}
         </p>
 
         {/* Recherche + pays */}
@@ -97,7 +95,7 @@ export default function PraticiensPage() {
           <input
             className="f-input"
             type="text"
-            placeholder="Rechercher par nom, rôle, stack…"
+            placeholder={t('searchPlaceholder')}
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{ flex: 1, minWidth: 220 }}
@@ -118,7 +116,7 @@ export default function PraticiensPage() {
               minWidth: 160,
             }}
           >
-            <option value="all">🌍 Tous les pays</option>
+            <option value="all">{t('allCountries')}</option>
             {countries.map(c => (
               <option key={c.label} value={c.label}>
                 {c.flag ? `${c.flag} ` : ''}{c.label}
@@ -135,7 +133,7 @@ export default function PraticiensPage() {
               className={`filter-pill${activeFilter === f ? ' active' : ''}`}
               onClick={() => setActiveFilter(f)}
             >
-              {FILTER_LABELS[f]}
+              {f === 'all' ? tCats('all') : (tCats(f as Parameters<typeof tCats>[0]) || f)}
             </button>
           ))}
         </div>
@@ -151,7 +149,7 @@ export default function PraticiensPage() {
           textAlign: 'center', padding: '5rem 0',
           fontFamily: "'Geist Mono', monospace", fontSize: '.85rem', color: 'var(--f-text-3)',
         }}>
-          Aucun praticien dans cette catégorie.
+          {t('empty')}
         </div>
       ) : (
         <>
@@ -313,7 +311,7 @@ export default function PraticiensPage() {
           {visible < filtered.length && (
             <div style={{ textAlign: 'center', marginTop: '3rem' }}>
               <button className="btn-f btn-f-secondary" onClick={() => setVisible(v => v + PAGE_SIZE)}>
-                Charger plus ({filtered.length - visible} restants) →
+                {t('loadMore', { count: filtered.length - visible })}
               </button>
             </div>
           )}
@@ -326,7 +324,7 @@ export default function PraticiensPage() {
             marginTop: '1.25rem',
             letterSpacing: '.06em',
           }}>
-            {Math.min(visible, filtered.length)} / {filtered.length} praticiens
+            {t('counter', { visible: Math.min(visible, filtered.length), total: filtered.length })}
           </p>
         </>
       )}

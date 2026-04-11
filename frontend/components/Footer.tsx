@@ -1,20 +1,19 @@
 'use client';
 import Link from 'next/link';
-
-const NAV = [
-  { href: '/praticiens',   label: 'Praticiens' },
-  { href: '/realisations', label: 'Réalisations' },
-  { href: '/articles',     label: 'Articles' },
-  { href: '/evenements',   label: 'Événements' },
-];
-
-const NAV2 = [
-  { href: '/soumettre',    label: 'Soumettre' },
-  { href: '/connexion',    label: 'Connexion' },
-  { href: '/legal',        label: 'Mentions légales' },
-];
+import { useTranslations } from 'next-intl';
 
 export default function Footer() {
+  const t = useTranslations('footer');
+
+  const NAV = [
+    { href: '/praticiens',   labelKey: 'nav.praticiens' },
+    { href: '/realisations', labelKey: 'nav.realisations' },
+    { href: '/articles',     labelKey: 'nav.articles' },
+    { href: '/evenements',   labelKey: 'nav.evenements' },
+  ];
+
+  const tNav = useTranslations('nav');
+
   return (
     <footer style={{ background: '#0a0e17', borderTop: '1px solid #1a2235' }}>
 
@@ -43,12 +42,12 @@ export default function Footer() {
             margin: '0 0 1.5rem 0',
             letterSpacing: '.01em',
           }}>
-            Ce qu&apos;ils ont construit.<br />
-            Pas ce qu&apos;ils ont promis.
+            {t('tagline1')}<br />
+            {t('tagline2')}
           </p>
           <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
-            {['Data', 'DevOps', 'Cloud', 'IA', 'Cyber', 'Dev'].map(t => (
-              <span key={t} style={{
+            {['Data', 'DevOps', 'Cloud', 'IA', 'Cyber', 'Dev'].map(tag => (
+              <span key={tag} style={{
                 fontFamily: "'Geist Mono', monospace",
                 fontSize: '.55rem',
                 letterSpacing: '.1em',
@@ -56,7 +55,7 @@ export default function Footer() {
                 border: '1px solid #1e293b',
                 padding: '2px 7px',
                 borderRadius: 99,
-              }}>{t}</span>
+              }}>{tag}</span>
             ))}
           </div>
         </div>
@@ -64,7 +63,7 @@ export default function Footer() {
         {/* Navigation */}
         <div>
           <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', letterSpacing: '.14em', textTransform: 'uppercase', color: '#334155', marginBottom: '1.1rem' }}>
-            Explorer
+            {t('explore')}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '.6rem' }}>
             {NAV.map(l => (
@@ -78,7 +77,7 @@ export default function Footer() {
               }}
               onMouseEnter={e => (e.currentTarget.style.color = '#f97316')}
               onMouseLeave={e => (e.currentTarget.style.color = '#64748b')}
-              >{l.label}</Link>
+              >{tNav(l.labelKey.replace('nav.', '') as Parameters<typeof tNav>[0])}</Link>
             ))}
           </div>
         </div>
@@ -86,22 +85,42 @@ export default function Footer() {
         {/* Liens secondaires */}
         <div>
           <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', letterSpacing: '.14em', textTransform: 'uppercase', color: '#334155', marginBottom: '1.1rem' }}>
-            Plateforme
+            {t('platform')}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '.6rem' }}>
-            {NAV2.map(l => (
-              <Link key={l.href} href={l.href} style={{
-                fontFamily: "'Geist Mono', monospace",
-                fontSize: '.75rem',
-                color: '#64748b',
-                textDecoration: 'none',
-                letterSpacing: '.02em',
-                transition: 'color .15s',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#0ea5e9')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#64748b')}
-              >{l.label}</Link>
-            ))}
+            <Link href="/soumettre" style={{
+              fontFamily: "'Geist Mono', monospace",
+              fontSize: '.75rem',
+              color: '#64748b',
+              textDecoration: 'none',
+              letterSpacing: '.02em',
+              transition: 'color .15s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#0ea5e9')}
+            onMouseLeave={e => (e.currentTarget.style.color = '#64748b')}
+            >{tNav('soumettre')}</Link>
+            <Link href="/connexion" style={{
+              fontFamily: "'Geist Mono', monospace",
+              fontSize: '.75rem',
+              color: '#64748b',
+              textDecoration: 'none',
+              letterSpacing: '.02em',
+              transition: 'color .15s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#0ea5e9')}
+            onMouseLeave={e => (e.currentTarget.style.color = '#64748b')}
+            >{tNav('connexion')}</Link>
+            <Link href="/legal" style={{
+              fontFamily: "'Geist Mono', monospace",
+              fontSize: '.75rem',
+              color: '#64748b',
+              textDecoration: 'none',
+              letterSpacing: '.02em',
+              transition: 'color .15s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#0ea5e9')}
+            onMouseLeave={e => (e.currentTarget.style.color = '#64748b')}
+            >{t('legal')}</Link>
           </div>
         </div>
       </div>
@@ -110,10 +129,10 @@ export default function Footer() {
       <div style={{ borderTop: '1px solid #1a2235', padding: '1rem 6vw' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '.75rem' }}>
           <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.63rem', color: '#334155', letterSpacing: '.04em' }}>
-            © 2026 from0tohero.dev
+            {t('copyright')}
           </span>
           <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.63rem', color: '#1e293b', letterSpacing: '.06em' }}>
-            Construit par des praticiens · Pour des praticiens
+            {t('builtBy')}
           </span>
         </div>
       </div>

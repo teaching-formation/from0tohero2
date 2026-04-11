@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { supabase, type Evenement } from '@/lib/supabase';
+import { useTranslations } from 'next-intl';
 
 const PAGE_SIZE = 18;
 
@@ -30,6 +31,7 @@ function formatDate(dateStr: string, dateFinStr?: string) {
 }
 
 export default function EvenementsPage() {
+  const t = useTranslations('evenements');
   const [evenements, setEvenements] = useState<Evenement[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeStatut, setActiveStatut] = useState('upcoming');
@@ -65,7 +67,7 @@ export default function EvenementsPage() {
 
       {/* ── Header ── */}
       <div style={{ marginBottom: '3rem' }}>
-        <span className="f-label" style={{ marginBottom: '.6rem' }}>// événements</span>
+        <span className="f-label" style={{ marginBottom: '.6rem' }}>{t('label')}</span>
         <h1 style={{
           fontFamily: "'Syne', sans-serif",
           fontSize: 'clamp(2rem, 4.5vw, 3rem)',
@@ -75,17 +77,17 @@ export default function EvenementsPage() {
           letterSpacing: '-.03em',
           lineHeight: 1.1,
         }}>
-          Conférences, meetups & hackathons
+          {t('title')}
         </h1>
         <p style={{ color: 'var(--f-text-3)', fontSize: '.88rem', margin: '0 0 2.25rem 0', lineHeight: 1.7 }}>
-          Événements tech — en ligne et en présentiel.
+          {t('subtitle')}
         </p>
 
         {/* Barre de recherche */}
         <input
           className="f-input"
           type="search"
-          placeholder="Rechercher un événement, un lieu…"
+          placeholder={t('searchPlaceholder')}
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{ maxWidth: '100%', marginBottom: '1.25rem' }}
@@ -94,10 +96,10 @@ export default function EvenementsPage() {
         {/* Filtres statut */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem', marginBottom: '.75rem' }}>
           {[
-            { key: 'all',      label: 'Tous' },
-            { key: 'upcoming', label: '● À venir' },
-            { key: 'ongoing',  label: '● En cours' },
-            { key: 'past',     label: '○ Passés' },
+            { key: 'all',      label: t('all') },
+            { key: 'upcoming', label: t('upcoming') },
+            { key: 'ongoing',  label: t('ongoing') },
+            { key: 'past',     label: t('past') },
           ].map(s => (
             <button
               key={s.key}
@@ -111,13 +113,13 @@ export default function EvenementsPage() {
 
         {/* Filtres type */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
-          {['all', 'conference', 'meetup', 'hackathon', 'webinaire', 'bootcamp', 'atelier', 'autre'].map(t => (
+          {['all', 'conference', 'meetup', 'hackathon', 'webinaire', 'bootcamp', 'atelier', 'autre'].map(typ => (
             <button
-              key={t}
-              className={`filter-pill${activeType === t ? ' active' : ''}`}
-              onClick={() => setActiveType(t)}
+              key={typ}
+              className={`filter-pill${activeType === typ ? ' active' : ''}`}
+              onClick={() => setActiveType(typ)}
             >
-              {t === 'all' ? 'Tous types' : `${TYPE_ICON[t] || ''} ${TYPE_LABELS[t] || t}`}
+              {typ === 'all' ? t('allTypes') : `${TYPE_ICON[typ] || ''} ${TYPE_LABELS[typ] || typ}`}
             </button>
           ))}
         </div>
@@ -135,7 +137,7 @@ export default function EvenementsPage() {
           textAlign: 'center', padding: '5rem 0',
           fontFamily: "'Geist Mono', monospace", fontSize: '.85rem', color: 'var(--f-text-3)',
         }}>
-          Aucun événement pour ces filtres.
+          {t('empty')}
         </div>
       ) : (
         <>
@@ -147,9 +149,9 @@ export default function EvenementsPage() {
               const status = getEventStatus(e);
 
               const statusColor = status === 'upcoming' ? '#4ade80' : status === 'ongoing' ? 'var(--f-orange)' : 'var(--f-text-3)';
-              const statusLabel = status === 'upcoming' ? '● À venir' : status === 'ongoing' ? '● En cours' : '○ Passé';
+              const statusLabel = status === 'upcoming' ? t('upcoming') : status === 'ongoing' ? t('ongoing') : t('pastSingle');
 
-              const lieu = [e.pays, e.online ? 'En ligne' : e.lieu].filter(Boolean).join(' · ');
+              const lieu = [e.pays, e.online ? t('online') : e.lieu].filter(Boolean).join(' · ');
 
               return (
                 <article
@@ -179,19 +181,19 @@ export default function EvenementsPage() {
                   {/* Badges type + statut */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '.4rem', marginTop: '.25rem' }}>
                     <div style={{ display: 'flex', gap: '.35rem', flexWrap: 'wrap' }}>
-                      {types.slice(0, 2).map(t => (
-                        <span key={t} style={{
+                      {types.slice(0, 2).map(typ => (
+                        <span key={typ} style={{
                           fontFamily: "'Geist Mono', monospace",
                           fontSize: '.58rem',
                           letterSpacing: '.09em',
                           textTransform: 'uppercase',
-                          color: TYPE_COLOR[t] || 'var(--f-text-3)',
-                          border: `1px solid ${(TYPE_COLOR[t] || 'var(--f-text-3)')}33`,
-                          background: `${(TYPE_COLOR[t] || 'var(--f-text-3)')}0d`,
+                          color: TYPE_COLOR[typ] || 'var(--f-text-3)',
+                          border: `1px solid ${(TYPE_COLOR[typ] || 'var(--f-text-3)')}33`,
+                          background: `${(TYPE_COLOR[typ] || 'var(--f-text-3)')}0d`,
                           padding: '3px 9px',
                           borderRadius: 99,
                           fontWeight: 600,
-                        }}>{TYPE_ICON[t]} {TYPE_LABELS[t] || t}</span>
+                        }}>{TYPE_ICON[typ]} {TYPE_LABELS[typ] || typ}</span>
                       ))}
                       {e.gratuit && (
                         <span style={{
@@ -205,7 +207,7 @@ export default function EvenementsPage() {
                           padding: '3px 9px',
                           borderRadius: 99,
                           fontWeight: 600,
-                        }}>Gratuit</span>
+                        }}>{t('free')}</span>
                       )}
                     </div>
                     <span style={{
@@ -289,7 +291,7 @@ export default function EvenementsPage() {
                       letterSpacing: '.05em',
                       textTransform: 'uppercase',
                     }}>
-                      {e.online ? 'En ligne' : 'Présentiel'}
+                      {e.online ? t('online') : t('inPerson')}
                     </span>
                     {e.url && (
                       <a
@@ -308,7 +310,7 @@ export default function EvenementsPage() {
                           letterSpacing: '.04em',
                         }}
                       >
-                        Voir l&apos;événement →
+                        {t('seeEvent')}
                       </a>
                     )}
                   </div>
@@ -321,7 +323,7 @@ export default function EvenementsPage() {
           {visible < filtered.length && (
             <div style={{ textAlign: 'center', marginTop: '3rem' }}>
               <button className="btn-f btn-f-secondary" onClick={() => setVisible(v => v + PAGE_SIZE)}>
-                Charger plus ({filtered.length - visible} restants) →
+                {t('loadMore', { count: filtered.length - visible })}
               </button>
             </div>
           )}
@@ -334,7 +336,7 @@ export default function EvenementsPage() {
             marginTop: '1.25rem',
             letterSpacing: '.06em',
           }}>
-            {Math.min(visible, filtered.length)} / {filtered.length} événements
+            {t('counter', { visible: Math.min(visible, filtered.length), total: filtered.length })}
           </p>
         </>
       )}

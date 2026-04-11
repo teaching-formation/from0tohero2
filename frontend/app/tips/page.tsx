@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { useTranslations } from 'next-intl';
 
 const PAGE_SIZE = 20;
 
@@ -21,6 +22,7 @@ import { fmtDate, fmtTime } from '@/lib/utils';
 const TYPE_META = TIP_TYPE_META;
 
 export default function TipsPage() {
+  const t = useTranslations('tips');
   const [tips, setTips]         = useState<Tip[]>([]);
   const [loading, setLoading]   = useState(true);
   const [activeType, setActiveType] = useState('all');
@@ -87,7 +89,7 @@ export default function TipsPage() {
 
       {/* Header */}
       <div style={{ marginBottom: '2rem' }}>
-        <span className="f-label" style={{ marginBottom: '.6rem' }}>// tips & TIL</span>
+        <span className="f-label" style={{ marginBottom: '.6rem' }}>{t('label')}</span>
         <h1 style={{
           fontFamily: "'Syne', sans-serif",
           fontSize: 'clamp(2rem, 4.5vw, 3rem)',
@@ -97,10 +99,10 @@ export default function TipsPage() {
           letterSpacing: '-.03em',
           lineHeight: 1.1,
         }}>
-          Ce que les praticiens apprennent
+          {t('title')}
         </h1>
         <p style={{ color: 'var(--f-text-3)', fontSize: '.88rem', margin: 0, lineHeight: 1.7 }}>
-          Tips, TIL (Today I Learned) et snippets partagés par la communauté.
+          {t('subtitle')}
         </p>
       </div>
 
@@ -120,7 +122,7 @@ export default function TipsPage() {
         <input
           className="f-input"
           type="search"
-          placeholder="🔍  Rechercher un tip, un auteur…"
+          placeholder={`🔍  ${t('searchPlaceholder')}`}
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{ maxWidth: '100%' }}
@@ -129,7 +131,7 @@ export default function TipsPage() {
         {/* Type */}
         <div>
           <div style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: '.55rem' }}>
-            Type
+            {t('type')}
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.45rem' }}>
             <button
@@ -147,7 +149,7 @@ export default function TipsPage() {
                 fontWeight: activeType === 'all' ? 700 : 400,
               }}
             >
-              Tous
+              {t('all')}
             </button>
             {Object.entries(TYPE_META).map(([key, meta]) => {
               const isActive = activeType === key;
@@ -182,7 +184,7 @@ export default function TipsPage() {
         {/* Catégorie — scroll horizontal sur mobile */}
         <div>
           <div style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: '.55rem' }}>
-            Catégorie
+            {t('category')}
           </div>
           <div style={{ display: 'flex', gap: '.4rem', overflowX: 'auto', paddingBottom: '2px' }}>
             {['all', 'data', 'devops', 'cloud', 'ia', 'cyber', 'frontend', 'backend', 'fullstack', 'mobile', 'web3', 'embedded', 'autre'].map(c => {
@@ -206,7 +208,7 @@ export default function TipsPage() {
                     fontWeight: isActive ? 700 : 400,
                   }}
                 >
-                  {c === 'all' ? 'Toutes' : CAT_LABEL[c] || c}
+                  {c === 'all' ? t('allCategories') : CAT_LABEL[c] || c}
                 </button>
               );
             })}
@@ -216,14 +218,14 @@ export default function TipsPage() {
         {/* Dates + reset */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', flexWrap: 'wrap' }}>
           <div style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', letterSpacing: '.1em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
-            Période
+            {t('period')}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem' }}>
-            <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)' }}>du</span>
+            <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)' }}>{t('from')}</span>
             <input className="f-input" type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} style={{ maxWidth: 160, padding: '5px 10px', fontSize: '.75rem' }} />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem' }}>
-            <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)' }}>au</span>
+            <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)' }}>{t('to')}</span>
             <input className="f-input" type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} style={{ maxWidth: 160, padding: '5px 10px', fontSize: '.75rem' }} />
           </div>
 
@@ -257,7 +259,7 @@ export default function TipsPage() {
                   whiteSpace: 'nowrap',
                 }}
               >
-                ✕ reset
+                {t('reset')}
               </button>
             )}
           </div>
@@ -273,7 +275,7 @@ export default function TipsPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '5rem 0', fontFamily: "'Geist Mono', monospace", fontSize: '.85rem', color: 'var(--f-text-3)' }}>
-          Aucun tip pour ces filtres.
+          {t('empty')}
         </div>
       ) : (
         <>
@@ -338,13 +340,13 @@ export default function TipsPage() {
           {visible < filtered.length && (
             <div style={{ textAlign: 'center', marginTop: '2rem' }}>
               <button className="btn-f btn-f-secondary" onClick={() => setVisible(v => v + PAGE_SIZE)}>
-                Charger plus ({filtered.length - visible} restants) →
+                {t('loadMore', { count: filtered.length - visible })}
               </button>
             </div>
           )}
 
           <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.63rem', color: 'var(--f-text-3)', textAlign: 'center', marginTop: '1rem', letterSpacing: '.06em' }}>
-            {Math.min(visible, filtered.length)} / {filtered.length} tips
+            {t('counter', { visible: Math.min(visible, filtered.length), total: filtered.length })}
           </p>
         </>
       )}

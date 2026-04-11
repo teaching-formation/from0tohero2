@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Avatar from '@/components/Avatar';
 import LikeButton from '@/components/LikeButton';
+import { useTranslations, useLocale } from 'next-intl';
 
 type RealisationDetail = {
   id: string; slug: string; title: string;
@@ -30,6 +31,8 @@ import { formatDateTime, timeAgo } from '@/lib/utils';
 
 
 export default function RealisationModal({ realisation, onClose }: Props) {
+  const t = useTranslations('modal');
+  const locale = useLocale();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loadingComments, setLoadingComments] = useState(false);
   const [text, setText] = useState('');
@@ -39,6 +42,9 @@ export default function RealisationModal({ realisation, onClose }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
+  const [translations, setTranslations] = useState<Record<string, string>>({});
+  const [translating, setTranslating] = useState<Record<string, boolean>>({});
+  const [showOriginal, setShowOriginal] = useState<Record<string, boolean>>({});
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
@@ -109,6 +115,27 @@ export default function RealisationModal({ realisation, onClose }: Props) {
   const typeIcon = REAL_TYPE_ICONS[realisation.type] || '◦';
   const typeLabel = REAL_TYPE_LABELS[realisation.type] || realisation.type;
 
+  async function translateComment(id: string, content: string) {
+    const targetLang = locale === 'fr' ? 'en' : 'fr';
+    setTranslating(prev => ({ ...prev, [id]: true }));
+    try {
+      const res = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: content, targetLang }),
+      });
+      const d = await res.json();
+      if (d.translated) {
+        setTranslations(prev => ({ ...prev, [id]: d.translated }));
+        setShowOriginal(prev => ({ ...prev, [id]: false }));
+      }
+    } catch {
+      // ignore
+    } finally {
+      setTranslating(prev => ({ ...prev, [id]: false }));
+    }
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
@@ -131,7 +158,7 @@ export default function RealisationModal({ realisation, onClose }: Props) {
 
     if (!res.ok) {
       const d = await res.json().catch(() => ({}));
-      setError(d.error || 'Erreur lors de l\'envoi.');
+      setError(d.error || t('sendError'));
       return;
     }
     const { comment } = await res.json();
@@ -245,7 +272,7 @@ export default function RealisationModal({ realisation, onClose }: Props) {
                   </span>
                 )}
                 <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', marginLeft: 'auto' }}>
-                  Soumis le {formatDateTime(realisation.created_at)}
+                  {t('submittedOn')} {formatDateTime(realisation.created_at)}
                 </span>
               </div>
             )}
@@ -289,13 +316,13 @@ export default function RealisationModal({ realisation, onClose }: Props) {
                   fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', color: catColor,
                   border: `1px solid ${catColor}44`, background: `${catColor}0a`,
                   padding: '5px 14px', borderRadius: 99, textDecoration: 'none',
-                }}>Demo →</a>
+                }}>{t('demo')}</a>
               )}
               {realisation.repo_url && (
                 <a href={realisation.repo_url} target="_blank" rel="noreferrer" style={{
                   fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', color: 'var(--f-text-3)',
                   border: '1px solid var(--f-border)', padding: '5px 14px', borderRadius: 99, textDecoration: 'none',
-                }}>Repo →</a>
+                }}>{t('repo')}</a>
               )}
             </div>
           )}
@@ -311,24 +338,29 @@ export default function RealisationModal({ realisation, onClose }: Props) {
               fontFamily: "'Geist Mono', monospace", fontSize: '.65rem',
               color: 'var(--f-text-3)', letterSpacing: '.06em', textTransform: 'uppercase',
             }}>
-              // commentaires ({comments.length})
+              {t('commentsLabel')} ({comments.length})
             </span>
           </div>
 
           {/* Liste commentaires */}
           {loadingComments ? (
             <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', margin: 0 }}>
-              Chargement…
+              {t('loading')}
             </p>
           ) : comments.length === 0 ? (
             <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', margin: 0 }}>
-              Sois le premier à commenter.
+              {t('beFirst')}
             </p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem' }}>
               {comments.map(c => {
                 const isOwn = mySlug && c.praticiens?.slug === mySlug;
                 const isEditing = editingId === c.id;
+                const translated = translations[c.id];
+                const isShowingOriginal = showOriginal[c.id];
+                const isTranslating = translating[c.id];
+                const displayContent = translated && !isShowingOriginal ? translated : c.content;
+
                 return (
                   <div key={c.id} style={{ display: 'flex', gap: '.6rem', alignItems: 'flex-start' }}>
                     {c.praticiens && (
@@ -355,7 +387,7 @@ export default function RealisationModal({ realisation, onClose }: Props) {
                                 fontFamily: "'Geist Mono', monospace", fontSize: '.58rem',
                                 color: 'var(--f-text-3)',
                               }}
-                            >Modifier</button>
+                            >{t('edit')}</button>
                             <button
                               onClick={() => deleteComment(c.id)}
                               style={{
@@ -364,7 +396,7 @@ export default function RealisationModal({ realisation, onClose }: Props) {
                                 fontFamily: "'Geist Mono', monospace", fontSize: '.58rem',
                                 color: '#f87171',
                               }}
-                            >Suppr.</button>
+                            >{t('delete')}</button>
                           </div>
                         )}
                       </div>
@@ -393,7 +425,7 @@ export default function RealisationModal({ realisation, onClose }: Props) {
                                 borderRadius: 5, padding: '3px 10px', cursor: 'pointer',
                                 fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)',
                               }}
-                            >Annuler</button>
+                            >{t('cancel')}</button>
                             <button
                               onClick={() => saveEdit(c.id)}
                               disabled={savingEdit || editText.trim().length < 2}
@@ -403,14 +435,42 @@ export default function RealisationModal({ realisation, onClose }: Props) {
                                 background: editText.trim().length >= 2 ? 'var(--f-sky)' : 'var(--f-border)',
                                 color: editText.trim().length >= 2 ? '#0d1117' : 'var(--f-text-3)',
                               }}
-                            >{savingEdit ? '…' : 'Sauvegarder'}</button>
+                            >{savingEdit ? '…' : t('save')}</button>
                           </div>
                         </div>
                       ) : (
-                        <p style={{
-                          fontFamily: "'Geist Mono', monospace", fontSize: '.74rem',
-                          color: 'var(--f-text-2)', lineHeight: 1.65, margin: 0, wordBreak: 'break-word',
-                        }}>{c.content}</p>
+                        <>
+                          <p style={{
+                            fontFamily: "'Geist Mono', monospace", fontSize: '.74rem',
+                            color: 'var(--f-text-2)', lineHeight: 1.65, margin: '0 0 .3rem 0', wordBreak: 'break-word',
+                          }}>{displayContent}</p>
+                          <div style={{ display: 'flex', gap: '.35rem', alignItems: 'center' }}>
+                            {!translated ? (
+                              <button
+                                onClick={() => translateComment(c.id, c.content)}
+                                disabled={isTranslating}
+                                style={{
+                                  background: 'none', border: 'none', cursor: isTranslating ? 'wait' : 'pointer',
+                                  fontFamily: "'Geist Mono', monospace", fontSize: '.56rem',
+                                  color: 'var(--f-text-3)', padding: 0, opacity: isTranslating ? 0.5 : 1,
+                                }}
+                              >
+                                {isTranslating ? t('translating') : t('translate')}
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => setShowOriginal(prev => ({ ...prev, [c.id]: !isShowingOriginal }))}
+                                style={{
+                                  background: 'none', border: 'none', cursor: 'pointer',
+                                  fontFamily: "'Geist Mono', monospace", fontSize: '.56rem',
+                                  color: 'var(--f-sky)', padding: 0,
+                                }}
+                              >
+                                {isShowingOriginal ? t('translate') : t('showOriginal')}
+                              </button>
+                            )}
+                          </div>
+                        </>
                       )}
                     </div>
                   </div>
@@ -425,7 +485,7 @@ export default function RealisationModal({ realisation, onClose }: Props) {
               ref={inputRef}
               value={text}
               onChange={e => setText(e.target.value)}
-              placeholder="Ajouter un commentaire…"
+              placeholder={t('commentPlaceholder')}
               maxLength={500}
               rows={2}
               style={{
@@ -449,7 +509,7 @@ export default function RealisationModal({ realisation, onClose }: Props) {
                 cursor: sending || text.trim().length < 2 ? 'not-allowed' : 'pointer',
                 transition: 'background .15s',
               }}
-            >{sending ? '…' : 'Envoyer →'}</button>
+            >{sending ? '…' : t('send')}</button>
           </form>
         </div>
       </div>

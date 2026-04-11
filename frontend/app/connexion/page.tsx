@@ -2,8 +2,10 @@
 import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { useTranslations } from 'next-intl';
 
 function ConnexionForm() {
+  const t = useTranslations('connexion');
   const searchParams = useSearchParams();
   const rawNext      = searchParams.get('next') || '/mon-compte';
   const next         = rawNext.startsWith('/') && !rawNext.startsWith('//') && !rawNext.includes(':')
@@ -44,10 +46,10 @@ function ConnexionForm() {
   if (sent) {
     return (
       <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-green)', marginBottom: '.75rem' }}>✓ Lien envoyé !</p>
+        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-green)', marginBottom: '.75rem' }}>{t('sent')}</p>
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-text-3)', lineHeight: 1.7 }}>
-          Vérifie ta boîte mail <strong style={{ color: 'var(--f-text-1)' }}>{email}</strong>.<br />
-          Clique sur le lien pour accéder à ton espace.
+          {t('checkMail')} <strong style={{ color: 'var(--f-text-1)' }}>{email}</strong>.<br />
+          {t('checkMailHint')}
         </p>
       </div>
     );
@@ -58,7 +60,7 @@ function ConnexionForm() {
 
       {hasError && (
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: '#f87171', background: '#f871711a', border: '1px solid #f8717133', borderRadius: 6, padding: '.6rem .9rem', margin: 0 }}>
-          Une erreur est survenue. Réessaie.
+          {t('error')}
         </p>
       )}
 
@@ -70,22 +72,22 @@ function ConnexionForm() {
           <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
           <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
         </svg>
-        Continuer avec Google
+        {t('googleCta')}
       </button>
 
       {/* Séparateur */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
         <div style={{ flex: 1, height: 1, background: 'var(--f-border)' }} />
-        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>ou</span>
+        <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>{t('or')}</span>
         <div style={{ flex: 1, height: 1, background: 'var(--f-border)' }} />
       </div>
 
       {/* Magic Link */}
       <form onSubmit={handleMagicLink} style={{ display: 'flex', flexDirection: 'column', gap: '.75rem' }}>
-        <input className="f-input" type="email" placeholder="ton@email.com" value={email} onChange={e => setEmail(e.target.value)} style={{ maxWidth: '100%' }} />
+        <input className="f-input" type="email" placeholder={t('emailPlaceholder')} value={email} onChange={e => setEmail(e.target.value)} style={{ maxWidth: '100%' }} />
         {error && <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171', margin: 0 }}>{error}</p>}
         <button type="submit" className="btn-f btn-f-primary" disabled={loading || !email.trim()} style={{ width: '100%', justifyContent: 'center' }}>
-          {loading ? 'Envoi…' : 'Recevoir un lien de connexion →'}
+          {loading ? t('sending') : t('magicLinkCta')}
         </button>
       </form>
 
@@ -93,19 +95,20 @@ function ConnexionForm() {
   );
 }
 
-export default function ConnexionPage() {
+function ConnexionPageInner() {
+  const t = useTranslations('connexion');
   return (
     <div style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
       <div style={{ width: '100%', maxWidth: 420 }}>
         <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
           <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--f-orange)', marginBottom: '.75rem' }}>
-            // connexion
+            {t('label')}
           </p>
           <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.6rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0' }}>
-            Accède à ton espace
+            {t('title')}
           </h1>
           <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-text-3)', margin: 0 }}>
-            Gère ton profil, tes réalisations et tes articles.
+            {t('subtitle')}
           </p>
         </div>
         <div style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 12, padding: '1.75rem' }}>
@@ -116,4 +119,8 @@ export default function ConnexionPage() {
       </div>
     </div>
   );
+}
+
+export default function ConnexionPage() {
+  return <ConnexionPageInner />;
 }

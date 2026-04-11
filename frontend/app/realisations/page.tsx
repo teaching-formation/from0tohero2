@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { SkeletonArticleCard } from '@/components/SkeletonCard';
 import LikeButton from '@/components/LikeButton';
 import RealisationModal from '@/components/RealisationModal';
+import { useTranslations } from 'next-intl';
 
 const PAGE_SIZE = 12;
 
@@ -19,6 +20,7 @@ type RealisationWithPraticien = {
 import { CAT_COLOR, CAT_LABEL, REAL_TYPE_LABELS, REAL_TYPE_ICONS } from '@/lib/constants';
 
 export default function RealisationsPage() {
+  const t = useTranslations('realisations');
   const [realisations, setRealisations] = useState<RealisationWithPraticien[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeType, setActiveType] = useState('all');
@@ -69,7 +71,7 @@ export default function RealisationsPage() {
 
       {/* ── Header ── */}
       <div style={{ marginBottom: '3rem' }}>
-        <span className="f-label" style={{ marginBottom: '.6rem' }}>// réalisations</span>
+        <span className="f-label" style={{ marginBottom: '.6rem' }}>{t('label')}</span>
         <h1 style={{
           fontFamily: "'Syne', sans-serif",
           fontSize: 'clamp(2rem, 4.5vw, 3rem)',
@@ -79,17 +81,17 @@ export default function RealisationsPage() {
           letterSpacing: '-.03em',
           lineHeight: 1.1,
         }}>
-          Ce que les praticiens construisent
+          {t('title')}
         </h1>
         <p style={{ color: 'var(--f-text-3)', fontSize: '.88rem', margin: '0 0 2.25rem 0', lineHeight: 1.7 }}>
-          Pipelines · Dashboards · APIs · Bootcamps · Chaînes YT — du concret, pas des promesses.
+          {t('subtitle')}
         </p>
 
         {/* Barre de recherche */}
         <input
           className="f-input"
           type="search"
-          placeholder="Rechercher une réalisation, un auteur…"
+          placeholder={t('searchPlaceholder')}
           value={search}
           onChange={e => setSearch(e.target.value)}
           style={{ maxWidth: '100%', marginBottom: '1.25rem' }}
@@ -103,20 +105,20 @@ export default function RealisationsPage() {
               className={`filter-pill${activeCat === c ? ' active' : ''}`}
               onClick={() => setActiveCat(c)}
             >
-              {c === 'all' ? 'Toutes catégories' : CAT_LABEL[c] || c}
+              {c === 'all' ? t('allCategories') : CAT_LABEL[c] || c}
             </button>
           ))}
         </div>
 
         {/* Filtres type */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
-          {['all', 'pipeline', 'dashboard', 'api', 'bootcamp', 'youtube', 'app', 'cours', 'autre'].map(t => (
+          {['all', 'pipeline', 'dashboard', 'api', 'bootcamp', 'youtube', 'app', 'cours', 'autre'].map(typ => (
             <button
-              key={t}
-              className={`filter-pill${activeType === t ? ' active' : ''}`}
-              onClick={() => setActiveType(t)}
+              key={typ}
+              className={`filter-pill${activeType === typ ? ' active' : ''}`}
+              onClick={() => setActiveType(typ)}
             >
-              {t === 'all' ? 'Tous les types' : `${REAL_TYPE_ICONS[t] || ''} ${REAL_TYPE_LABELS[t] || t}`}
+              {typ === 'all' ? t('allTypes') : `${REAL_TYPE_ICONS[typ] || ''} ${REAL_TYPE_LABELS[typ] || typ}`}
             </button>
           ))}
         </div>
@@ -132,7 +134,7 @@ export default function RealisationsPage() {
           textAlign: 'center', padding: '5rem 0',
           fontFamily: "'Geist Mono', monospace", fontSize: '.85rem', color: 'var(--f-text-3)',
         }}>
-          Aucune réalisation pour ces filtres.
+          {t('empty')}
         </div>
       ) : (
         <>
@@ -303,7 +305,7 @@ export default function RealisationsPage() {
                             transition: 'opacity .15s',
                           }}
                         >
-                          Demo →
+                          {t('demo')}
                         </a>
                       )}
                       {r.repo_url && (
@@ -323,7 +325,7 @@ export default function RealisationsPage() {
                             transition: 'opacity .15s',
                           }}
                         >
-                          Repo →
+                          {t('repo')}
                         </a>
                       )}
                     </div>
@@ -339,7 +341,7 @@ export default function RealisationsPage() {
                           fontSize: '.6rem', transition: 'color .15s, border-color .15s',
                           flexShrink: 0,
                         }}
-                        title="Voir les commentaires"
+                        title={t('comments')}
                       >
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -360,7 +362,7 @@ export default function RealisationsPage() {
           {visible < filtered.length && (
             <div style={{ textAlign: 'center', marginTop: '3rem' }}>
               <button className="btn-f btn-f-secondary" onClick={() => setVisible(v => v + PAGE_SIZE)}>
-                Charger plus ({filtered.length - visible} restants) →
+                {t('loadMore', { count: filtered.length - visible })}
               </button>
             </div>
           )}
@@ -373,9 +375,9 @@ export default function RealisationsPage() {
             marginTop: '1.25rem',
             letterSpacing: '.06em',
           }}>
-            {Math.min(visible, filtered.length)} / {filtered.length} réalisations
+            {t('counter', { visible: Math.min(visible, filtered.length), total: filtered.length })}
             {activeStack && (
-              <> · filtre stack : <button onClick={() => setActiveStack('')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Geist Mono', monospace", fontSize: '.63rem', color: 'var(--f-sky)', padding: 0 }}>{activeStack} ✕</button></>
+              <> · {t('stackFilter')} <button onClick={() => setActiveStack('')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Geist Mono', monospace", fontSize: '.63rem', color: 'var(--f-sky)', padding: 0 }}>{activeStack} ✕</button></>
             )}
           </p>
         </>
