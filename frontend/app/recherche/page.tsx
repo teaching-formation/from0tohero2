@@ -266,8 +266,8 @@ export default function RecherchePage() {
             marginBottom: '2.5rem',
           }}>
             {total > 0
-              ? `// ${total} résultat${total > 1 ? 's' : ''} pour « ${query} »`
-              : `// Aucun résultat pour « ${query} »`}
+              ? t('resultsFound', { total, query })
+              : t('noResultsFor', { query })}
           </p>
 
           {/* ── Praticiens ── */}
@@ -444,7 +444,7 @@ export default function RecherchePage() {
                           display: 'flex', justifyContent: 'flex-end',
                         }}>
                           <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: catColor, opacity: .8 }}>
-                            Lire →
+                            {t('read')}
                           </span>
                         </div>
                       </article>
@@ -521,7 +521,7 @@ export default function RecherchePage() {
               textAlign: 'center', padding: '5rem 0',
               fontFamily: "'Geist Mono', monospace", fontSize: '.85rem', color: 'var(--f-text-3)',
             }}>
-              <p style={{ marginBottom: '1rem' }}>Aucun résultat pour « {query} »</p>
+              <p style={{ marginBottom: '1rem' }}>{t('noResultsBody', { query })}</p>
               <p style={{ fontSize: '.72rem', opacity: .7 }}>
                 {t('noResultsHint')}
               </p>
