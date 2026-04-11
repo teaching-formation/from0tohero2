@@ -88,7 +88,8 @@
     "reset": "✕ reset",
     "empty": "Aucun tip pour ces filtres.",
     "loadMore": "Charger plus ({count} restants) →",
-    "counter": "{visible} / {total} tips"
+    "counter": "{visible} / {total} tips",
+    "filteredCount": "{count, plural, one {# résultat} other {# résultats}}"
   },
   "evenements": {
     "label": "// événements",

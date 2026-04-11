@@ -241,7 +241,7 @@ export default function TipsPage() {
                 padding: '3px 10px',
                 borderRadius: 99,
               }}>
-                {filtered.length} résultat{filtered.length !== 1 ? 's' : ''}
+                {t('filteredCount', { count: filtered.length })}
               </span>
             )}
             {hasFilters && (
