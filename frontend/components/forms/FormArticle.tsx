@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import CollabInput from './CollabInput';
 
 const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
@@ -10,6 +11,7 @@ const PLAT_LABELS: Record<string,string> = { linkedin:'LinkedIn', medium:'Medium
 type Props = { onSuccess: () => void; username?: string; hideEmail?: boolean; initialEmail?: string; initialCountry?: string };
 
 export default function FormArticle({ onSuccess, username = '', hideEmail = false, initialEmail = '', initialCountry = '' }: Props) {
+  const t = useTranslations('forms');
   const [form, setForm] = useState({
     title: '', username: username, author_country: initialCountry, email: initialEmail,
     category: '', source: '', source_autre: '', external_url: '',
@@ -48,9 +50,9 @@ export default function FormArticle({ onSuccess, username = '', hideEmail = fals
         source:       src,
       }));
       const filled = [data.title, data.excerpt].filter(Boolean).length;
-      setAfMsg({ type: 'ok', text: `✓ ${filled} champ${filled > 1 ? 's' : ''} rempli${filled > 1 ? 's' : ''} automatiquement` });
+      setAfMsg({ type: 'ok', text: t('autofillFieldsFilled', { count: filled }) });
     } catch (e: unknown) {
-      setAfMsg({ type: 'err', text: e instanceof Error ? e.message : 'Impossible de récupérer les infos' });
+      setAfMsg({ type: 'err', text: e instanceof Error ? e.message : t('autofillFetchError') });
     } finally {
       setAfLoading(false);
     }
@@ -67,18 +69,18 @@ export default function FormArticle({ onSuccess, username = '', hideEmail = fals
 
   function validate() {
     const e: Record<string, string> = {};
-    if (!form.title.trim())        e.title        = 'Champ requis';
-    if (!form.username.trim()) e.username = 'Champ requis';
-    if (!form.author_country.trim()) e.author_country = 'Champ requis';
-    if (!form.category)            e.category     = 'Sélectionne une catégorie';
-    if (!form.source)              e.source       = 'Sélectionne une plateforme';
-    if (form.source === 'autre' && !form.source_autre.trim()) e.source_autre = 'Précise la plateforme';
-    if (!form.external_url.trim()) e.external_url = 'Champ requis';
-    else if (!isValidUrl(form.external_url)) e.external_url = 'URL invalide';
-    if (!form.date_published)      e.date_published = 'Champ requis';
-    if (!form.excerpt.trim())      e.excerpt      = 'Champ requis';
-    if (!hideEmail && !initialEmail && !form.email.trim())        e.email = 'Champ requis';
-    if (!hideEmail && !initialEmail && form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Email invalide';
+    if (!form.title.trim())        e.title        = t('fieldRequired');
+    if (!form.username.trim()) e.username = t('fieldRequired');
+    if (!form.author_country.trim()) e.author_country = t('fieldRequired');
+    if (!form.category)            e.category     = t('selectCategory');
+    if (!form.source)              e.source       = t('article.selectPlatform');
+    if (form.source === 'autre' && !form.source_autre.trim()) e.source_autre = t('article.preciserPlatform');
+    if (!form.external_url.trim()) e.external_url = t('fieldRequired');
+    else if (!isValidUrl(form.external_url)) e.external_url = t('urlInvalid');
+    if (!form.date_published)      e.date_published = t('fieldRequired');
+    if (!form.excerpt.trim())      e.excerpt      = t('fieldRequired');
+    if (!hideEmail && !initialEmail && !form.email.trim())        e.email = t('fieldRequired');
+    if (!hideEmail && !initialEmail && form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = t('emailInvalid');
     return e;
   }
 
@@ -101,8 +103,8 @@ export default function FormArticle({ onSuccess, username = '', hideEmail = fals
     });
     setLoading(false);
     if (!res.ok) {
-      const { error } = await res.json().catch(() => ({ error: 'Erreur serveur' }));
-      setErrors(e => ({ ...e, external_url: error || 'Erreur lors de la soumission' }));
+      const { error } = await res.json().catch(() => ({ error: t('serverError') }));
+      setErrors(e => ({ ...e, external_url: error || t('submitError') }));
       return;
     }
     onSuccess();
@@ -119,16 +121,16 @@ export default function FormArticle({ onSuccess, username = '', hideEmail = fals
         padding: '1.1rem 1.25rem',
       }}>
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', fontWeight: 600, color: 'var(--f-sky)', marginBottom: '.25rem' }}>
-          ✦ Autofill depuis une URL
+          {t('article.autofillTitle')}
         </p>
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', marginBottom: '.85rem' }}>
-          Colle le lien de ton article — on remplit le formulaire automatiquement.
+          {t('article.autofillDesc')}
         </p>
         <div style={{ display: 'flex', gap: '.5rem' }}>
           <input
             className="f-input"
             type="text"
-            placeholder="https://medium.com/@toi/mon-article"
+            placeholder={t('article.autofillPlaceholder')}
             value={afUrl}
             onChange={e => setAfUrl(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAutofill())}
@@ -141,7 +143,7 @@ export default function FormArticle({ onSuccess, username = '', hideEmail = fals
             disabled={afLoading || !afUrl.trim()}
             style={{ flexShrink: 0, fontSize: '.72rem' }}
           >
-            {afLoading ? '…' : 'Autofill →'}
+            {afLoading ? '…' : t('autofillBtn')}
           </button>
         </div>
         {afMsg && (
@@ -151,22 +153,22 @@ export default function FormArticle({ onSuccess, username = '', hideEmail = fals
         )}
       </div>
 
-      <Field label="Titre de l'article" required error={errors.title}>
-        <input className="f-input" placeholder="Ex: Comment j'ai migré vers dbt en production" value={form.title} onChange={e => set('title', e.target.value)} style={{ maxWidth: '100%' }} />
+      <Field label={t('article.titleLabel')} required error={errors.title}>
+        <input className="f-input" placeholder={t('article.titlePlaceholder')} value={form.title} onChange={e => set('title', e.target.value)} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Ton username" required error={errors.username}>
+      <Field label={t('usernameLabel')} required error={errors.username}>
         <input className="f-input" type="text" value={form.username} readOnly
           style={{ maxWidth: '100%', opacity: .6, cursor: 'not-allowed', background: 'var(--f-surface)' }} />
       </Field>
 
-      <Field label="Ton pays" required error={errors.author_country}>
-        <input className="f-input" placeholder="Ex: Sénégal" value={form.author_country} onChange={e => set('author_country', e.target.value)}
+      <Field label={t('countryLabel')} required error={errors.author_country}>
+        <input className="f-input" placeholder={t('countryPlaceholder')} value={form.author_country} onChange={e => set('author_country', e.target.value)}
           readOnly={!!initialCountry}
           style={{ maxWidth: '100%', ...(initialCountry ? { opacity: .7, cursor: 'not-allowed', background: 'var(--f-surface)' } : {}) }} />
       </Field>
 
-      <Field label="Catégorie" required error={errors.category}>
+      <Field label={t('categoryLabel')} required error={errors.category}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
           {CATEGORIES.map(c => (
             <button key={c} type="button" className={`filter-pill${form.category === c ? ' active' : ''}`} onClick={() => set('category', c)}>
@@ -176,7 +178,7 @@ export default function FormArticle({ onSuccess, username = '', hideEmail = fals
         </div>
       </Field>
 
-      <Field label="Plateforme de publication" required error={errors.source}>
+      <Field label={t('article.platformLabel')} required error={errors.source}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
           {PLATEFORMES.map(p => (
             <button key={p} type="button" className={`filter-pill${form.source === p ? ' active' : ''}`} onClick={() => set('source', p)}>
@@ -187,7 +189,7 @@ export default function FormArticle({ onSuccess, username = '', hideEmail = fals
         {form.source === 'autre' && (
           <input
             className="f-input"
-            placeholder="Précise la plateforme (ex: Hashnode, Dev Community…)"
+            placeholder={t('article.platformPlaceholder')}
             value={form.source_autre}
             onChange={e => set('source_autre', e.target.value)}
             style={{ maxWidth: '100%', marginTop: '.75rem' }}
@@ -196,37 +198,37 @@ export default function FormArticle({ onSuccess, username = '', hideEmail = fals
         {errors.source_autre && <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{errors.source_autre}</span>}
       </Field>
 
-      <Field label="Lien vers l'article" required error={errors.external_url}>
+      <Field label={t('article.urlLabel')} required error={errors.external_url}>
         <input className="f-input" type="text" placeholder="https://medium.com/..." value={form.external_url} onChange={e => set('external_url', e.target.value)} onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('external_url', 'https://' + v); }} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Date de publication" required error={errors.date_published}>
+      <Field label={t('article.dateLabel')} required error={errors.date_published}>
         <input className="f-input" type="date" value={form.date_published} onChange={e => set('date_published', e.target.value)} style={{ maxWidth: '280px' }} />
       </Field>
 
-      <Field label="Co-auteurs" error={errors.collaborateurs}>
+      <Field label={t('article.coauthorsLabel')} error={errors.collaborateurs}>
         <CollabInput value={collaborateurs} onChange={setCollaborateurs} />
       </Field>
 
-      <Field label="Résumé (1-2 phrases)" required error={errors.excerpt}>
-        <textarea className="f-input" placeholder="De quoi parle cet article ?" value={form.excerpt} onChange={e => set('excerpt', e.target.value)} rows={3} style={{ maxWidth: '100%', resize: 'vertical' }} />
+      <Field label={t('article.excerptLabel')} required error={errors.excerpt}>
+        <textarea className="f-input" placeholder={t('article.excerptPlaceholder')} value={form.excerpt} onChange={e => set('excerpt', e.target.value)} rows={3} style={{ maxWidth: '100%', resize: 'vertical' }} />
       </Field>
 
       {!hideEmail && (
-        <Field label="Email de contact" required={!initialEmail} error={errors.email}>
-          <input className="f-input" type="email" placeholder="ton@email.com"
+        <Field label={t('emailLabel')} required={!initialEmail} error={errors.email}>
+          <input className="f-input" type="email" placeholder={t('emailPlaceholder')}
             value={form.email} readOnly={!!initialEmail}
             onChange={e => set('email', e.target.value)}
             style={{ maxWidth: '100%', ...(initialEmail ? { opacity: .7, cursor: 'not-allowed', background: 'var(--f-surface)' } : {}) }} />
           {initialEmail
-            ? <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-green)' }}>✓ Email récupéré depuis ton compte</span>
-            : <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
+            ? <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-green)' }}>{t('emailFromAccount')}</span>
+            : <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>{t('emailHint')}</span>
           }
         </Field>
       )}
 
       <button type="submit" className="btn-f btn-f-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>
-        {loading ? 'Envoi…' : 'Soumettre l\'article →'}
+        {loading ? t('submitting') : t('article.submitBtn')}
       </button>
     </form>
   );

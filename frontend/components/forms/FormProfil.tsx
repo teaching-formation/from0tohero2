@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { supabase } from '@/lib/supabase';
 import CropModal from '@/components/CropModal';
 
@@ -134,6 +135,7 @@ const ALL_GROUP_SKILLS = new Set(SKILL_GROUPS.flatMap(g => g.skills));
 type Props = { onSuccess: () => void; initialEmail?: string };
 
 export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
+  const t = useTranslations('forms');
   const [form, setForm] = useState({
     name: '', username: '', role: '', pays: '', bio: '',
     categories: [] as string[], linkedin_url: '', github_url: '',
@@ -250,20 +252,20 @@ export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
 
   function validate() {
     const e: Record<string, string> = {};
-    if (!form.name.trim())         e.name         = 'Champ requis';
-    if (!form.username.trim())     e.username     = 'Champ requis';
-    if (usernameStatus === 'checking') e.username = 'Vérification en cours…';
-    if (usernameStatus === 'taken') e.username    = 'Ce username est déjà utilisé';
-    if (!form.role.trim())         e.role         = 'Champ requis';
-    if (!form.pays.trim())         e.pays         = 'Sélectionne ton pays';
-    if (form.categories.length === 0) e.categories = 'Sélectionne au moins une catégorie';
-    if (!form.email.trim())        e.email        = 'Champ requis';
-    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Email invalide';
-    if (totalSkills() === 0)       e.skills       = 'Sélectionne au moins une compétence';
+    if (!form.name.trim())         e.name         = t('fieldRequired');
+    if (!form.username.trim())     e.username     = t('fieldRequired');
+    if (usernameStatus === 'checking') e.username = t('profil.usernameChecking');
+    if (usernameStatus === 'taken') e.username    = t('profil.usernameTaken');
+    if (!form.role.trim())         e.role         = t('fieldRequired');
+    if (!form.pays.trim())         e.pays         = t('profil.selectPaysError');
+    if (form.categories.length === 0) e.categories = t('profil.selectCategoryError');
+    if (!form.email.trim())        e.email        = t('fieldRequired');
+    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = t('emailInvalid');
+    if (totalSkills() === 0)       e.skills       = t('profil.selectSkillError');
     const socialKeys = ['linkedin_url','github_url','twitter_url','youtube_url','website_url','whatsapp_url'] as const;
     for (const key of socialKeys) {
       const val = (form as unknown as Record<string, string>)[key];
-      if (val && !isValidUrl(val)) e[key] = 'URL invalide';
+      if (val && !isValidUrl(val)) e[key] = t('urlInvalid');
     }
     return e;
   }
@@ -282,8 +284,8 @@ export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
       fd.append('username', form.username || String(Date.now()));
       const upRes = await fetch('/api/upload-avatar', { method: 'POST', body: fd });
       if (!upRes.ok) {
-        const { error } = await upRes.json().catch(() => ({ error: 'Erreur upload' }));
-        setPhotoError(error || 'Erreur lors de l\'upload de la photo.');
+        const { error } = await upRes.json().catch(() => ({ error: t('serverError') }));
+        setPhotoError(error || t('profil.uploadError'));
         setLoading(false);
         return;
       }
@@ -309,8 +311,8 @@ export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
     });
     setLoading(false);
     if (!res.ok) {
-      const { error } = await res.json().catch(() => ({ error: 'Erreur serveur' }));
-      setErrors(e => ({ ...e, username: error || 'Erreur lors de la soumission' }));
+      const { error } = await res.json().catch(() => ({ error: t('serverError') }));
+      setErrors(e => ({ ...e, username: error || t('submitError') }));
       return;
     }
     onSuccess();
@@ -745,7 +747,7 @@ export default function FormProfil({ onSuccess, initialEmail = '' }: Props) {
       </Field>
 
       <button type="submit" className="btn-f btn-f-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>
-        {loading ? 'Envoi…' : 'Soumettre mon profil →'}
+        {loading ? t('submitting') : t('profil.submitBtn')}
       </button>
     </form>
     </>

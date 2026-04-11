@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 const TYPES = ['conference','meetup','hackathon','webinaire','bootcamp','autre'];
 const TYPE_LABELS: Record<string,string> = {
@@ -24,6 +25,7 @@ const PAYS_AFRIQUE = [
 type Props = { onSuccess: () => void; username?: string; hideEmail?: boolean; initialEmail?: string; initialCountry?: string };
 
 export default function FormEvenement({ onSuccess, username = '', hideEmail = false, initialEmail = '', initialCountry = '' }: Props) {
+  const t = useTranslations('forms');
   const [form, setForm] = useState({
     title: '', username: username, email: initialEmail,
     types: [] as string[], type_autre: '',
@@ -43,7 +45,7 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
     if (!target) return;
     // LinkedIn ne peut pas être scrapé — message guidé spécifique
     if (target.includes('linkedin.com')) {
-      setAfMsg({ type: 'err', text: '⚠ LinkedIn ne permet pas la récupération automatique. Colle l\'URL directe de l\'événement (lu.ma, eventbrite, meetup…) pour l\'autofill, et mets le lien LinkedIn dans le champ "Lien vers l\'événement" si tu le souhaites.' });
+      setAfMsg({ type: 'err', text: t('evenement.linkedinError') });
       return;
     }
     setAfLoading(true); setAfMsg(null);
@@ -58,9 +60,9 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
         ...(data.demo_url && !f.url ? { url: data.demo_url } : {}),
       }));
       const filled = [data.title, data.excerpt].filter(Boolean).length;
-      setAfMsg({ type: 'ok', text: `✓ ${filled} champ${filled > 1 ? 's' : ''} rempli${filled > 1 ? 's' : ''} automatiquement` });
+      setAfMsg({ type: 'ok', text: t('autofillFieldsFilled', { count: filled }) });
     } catch (e: unknown) {
-      setAfMsg({ type: 'err', text: e instanceof Error ? e.message : 'Impossible de récupérer les infos' });
+      setAfMsg({ type: 'err', text: e instanceof Error ? e.message : t('autofillFetchError') });
     } finally {
       setAfLoading(false);
     }
@@ -85,19 +87,19 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
 
   function validate() {
     const e: Record<string, string> = {};
-    if (!form.title.trim())       e.title    = 'Champ requis';
-    if (!form.username.trim())    e.username = 'Champ requis';
-    if (form.types.length === 0)  e.types    = 'Sélectionne au moins un type';
-    if (form.types.includes('autre') && !form.type_autre.trim()) e.type_autre = 'Précise le type';
-    if (!form.pays.trim())        e.pays     = 'Champ requis';
-    if (!form.url.trim())      e.url      = 'Champ requis';
-    else if (!isValidUrl(form.url)) e.url = 'URL invalide';
-    if (!form.date_debut)      e.date_debut = 'Champ requis';
-    if (!form.excerpt.trim())  e.excerpt  = 'Champ requis';
-    if (!hideEmail && !initialEmail && !form.email.trim())    e.email    = 'Champ requis';
-    if (!hideEmail && !initialEmail && form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Email invalide';
+    if (!form.title.trim())       e.title    = t('fieldRequired');
+    if (!form.username.trim())    e.username = t('fieldRequired');
+    if (form.types.length === 0)  e.types    = t('evenement.selectType');
+    if (form.types.includes('autre') && !form.type_autre.trim()) e.type_autre = t('evenement.preciserType');
+    if (!form.pays.trim())        e.pays     = t('fieldRequired');
+    if (!form.url.trim())      e.url      = t('fieldRequired');
+    else if (!isValidUrl(form.url)) e.url = t('urlInvalid');
+    if (!form.date_debut)      e.date_debut = t('fieldRequired');
+    if (!form.excerpt.trim())  e.excerpt  = t('fieldRequired');
+    if (!hideEmail && !initialEmail && !form.email.trim())    e.email    = t('fieldRequired');
+    if (!hideEmail && !initialEmail && form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = t('emailInvalid');
     if (form.date_fin && form.date_debut && form.date_fin < form.date_debut)
-      e.date_fin = 'La date de fin doit être après la date de début';
+      e.date_fin = t('evenement.endDateError');
     return e;
   }
 
@@ -120,8 +122,8 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
     });
     setLoading(false);
     if (!res.ok) {
-      const { error } = await res.json().catch(() => ({ error: 'Erreur serveur' }));
-      setErrors(e => ({ ...e, title: error || 'Erreur lors de la soumission' }));
+      const { error } = await res.json().catch(() => ({ error: t('serverError') }));
+      setErrors(e => ({ ...e, title: error || t('submitError') }));
       return;
     }
     onSuccess();
@@ -133,20 +135,20 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
       {/* Autofill */}
       <div style={{ background: 'linear-gradient(135deg, rgba(56,189,248,.07) 0%, rgba(56,189,248,.02) 100%)', border: '1px solid var(--f-sky-border)', borderRadius: 10, padding: '1rem 1.25rem' }}>
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', fontWeight: 600, color: 'var(--f-sky)', marginBottom: '.2rem' }}>
-          ✦ Autofill depuis l&apos;URL de l&apos;événement
+          {t('evenement.autofillTitle')}
         </p>
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', marginBottom: '.75rem' }}>
-          Colle le lien de la page événement pour remplir le titre et la description automatiquement.
+          {t('evenement.autofillDesc')}
         </p>
         <div style={{ display: 'flex', gap: '.5rem' }}>
-          <input className="f-input" type="text" placeholder="https://meetup.com/…"
+          <input className="f-input" type="text" placeholder={t('evenement.autofillPlaceholder')}
             value={afUrl} onChange={e => setAfUrl(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAutofill())}
             style={{ flex: 1 }} />
           <button type="button" className="btn-f btn-f-secondary"
             onClick={handleAutofill} disabled={afLoading || !afUrl.trim()}
             style={{ fontSize: '.72rem', flexShrink: 0 }}>
-            {afLoading ? '…' : 'Autofill →'}
+            {afLoading ? '…' : t('autofillBtn')}
           </button>
         </div>
         {afMsg && (
@@ -156,26 +158,26 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
         )}
       </div>
 
-      <Field label="Titre de l'événement" required error={errors.title}>
-        <input className="f-input" placeholder="Ex: SIADE 2026 — Salon IA & Data d'Afrique"
+      <Field label={t('evenement.titleLabel')} required error={errors.title}>
+        <input className="f-input" placeholder={t('evenement.titlePlaceholder')}
           value={form.title} onChange={e => set('title', e.target.value)} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Ton username" required>
+      <Field label={t('usernameLabel')} required>
         <input className="f-input" type="text" value={form.username} readOnly
           style={{ maxWidth: '100%', opacity: .6, cursor: 'not-allowed', background: 'var(--f-surface)' }} />
       </Field>
 
-      <Field label="Type(s) d'événement" required error={errors.types}>
+      <Field label={t('evenement.typesLabel')} required error={errors.types}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
-          {TYPES.map(t => (
-            <button key={t} type="button" className={`filter-pill${form.types.includes(t) ? ' active' : ''}`} onClick={() => toggleType(t)}>
-              {TYPE_LABELS[t]}
+          {TYPES.map(tp => (
+            <button key={tp} type="button" className={`filter-pill${form.types.includes(tp) ? ' active' : ''}`} onClick={() => toggleType(tp)}>
+              {TYPE_LABELS[tp]}
             </button>
           ))}
         </div>
         {form.types.includes('autre') && (
-          <input className="f-input" placeholder="Précise le type d'événement"
+          <input className="f-input" placeholder={t('evenement.typePlaceholder')}
             value={form.type_autre} onChange={e => set('type_autre', e.target.value)}
             style={{ maxWidth: '100%', marginTop: '.75rem' }} />
         )}
@@ -183,9 +185,9 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
       </Field>
 
       <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
-        <Field label="Pays" required error={errors.pays} style={{ flex: 1, minWidth: 180 }}>
+        <Field label={t('evenement.paysLabel')} required error={errors.pays} style={{ flex: 1, minWidth: 180 }}>
           <select className="f-input" value={form.pays} onChange={e => set('pays', e.target.value)} style={{ maxWidth: '100%', cursor: 'pointer' }}>
-            <option value="">— Sélectionne un pays —</option>
+            <option value="">{t('evenement.selectPays')}</option>
             {PAYS_AFRIQUE.map(p => (
               p.startsWith('─')
                 ? <option key={p} disabled style={{ color: 'var(--f-text-3)', fontStyle: 'italic' }}>{p}</option>
@@ -193,8 +195,8 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
             ))}
           </select>
         </Field>
-        <Field label="Ville / Lieu" style={{ flex: 1, minWidth: 180 }}>
-          <input className="f-input" placeholder="Ex: Abidjan, Palais des Sports"
+        <Field label={t('evenement.lieuLabel')} style={{ flex: 1, minWidth: 180 }}>
+          <input className="f-input" placeholder={t('evenement.lieuPlaceholder')}
             value={form.lieu} onChange={e => set('lieu', e.target.value)} style={{ maxWidth: '100%' }} />
         </Field>
       </div>
@@ -203,52 +205,52 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
         <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer', fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-2)' }}>
           <input type="checkbox" checked={form.online} onChange={e => set('online', e.target.checked)}
             style={{ accentColor: 'var(--f-sky)', width: 16, height: 16 }} />
-          En ligne
+          {t('evenement.onlineLabel')}
         </label>
         <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer', fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-2)' }}>
           <input type="checkbox" checked={form.gratuit} onChange={e => set('gratuit', e.target.checked)}
             style={{ accentColor: 'var(--f-green)', width: 16, height: 16 }} />
-          Gratuit
+          {t('evenement.gratuitLabel')}
         </label>
       </div>
 
-      <Field label="Lien vers l'événement" required error={errors.url}>
+      <Field label={t('evenement.urlLabel')} required error={errors.url}>
         <input className="f-input" type="text" placeholder="https://..."
           value={form.url} onChange={e => set('url', e.target.value)} onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('url', 'https://' + v); }} style={{ maxWidth: '100%' }} />
       </Field>
 
       <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
-        <Field label="Date de début" required error={errors.date_debut} style={{ flex: 1, minWidth: 180 }}>
+        <Field label={t('evenement.startDateLabel')} required error={errors.date_debut} style={{ flex: 1, minWidth: 180 }}>
           <input className="f-input" type="date" value={form.date_debut}
             onChange={e => set('date_debut', e.target.value)} style={{ maxWidth: '100%' }} />
         </Field>
-        <Field label="Date de fin (optionnel)" error={errors.date_fin} style={{ flex: 1, minWidth: 180 }}>
+        <Field label={t('evenement.endDateLabel')} error={errors.date_fin} style={{ flex: 1, minWidth: 180 }}>
           <input className="f-input" type="date" value={form.date_fin}
             onChange={e => set('date_fin', e.target.value)} style={{ maxWidth: '100%' }} />
         </Field>
       </div>
 
-      <Field label="Description courte" required error={errors.excerpt}>
-        <textarea className="f-input" placeholder="En quoi consiste cet événement ? Qui peut participer ?"
+      <Field label={t('descLabel')} required error={errors.excerpt}>
+        <textarea className="f-input" placeholder={t('evenement.descPlaceholder')}
           value={form.excerpt} onChange={e => set('excerpt', e.target.value)}
           rows={3} style={{ maxWidth: '100%', resize: 'vertical' }} />
       </Field>
 
       {!hideEmail && (
-        <Field label="Email de contact" required={!initialEmail} error={errors.email}>
-          <input className="f-input" type="email" placeholder="ton@email.com"
+        <Field label={t('emailLabel')} required={!initialEmail} error={errors.email}>
+          <input className="f-input" type="email" placeholder={t('emailPlaceholder')}
             value={form.email} readOnly={!!initialEmail}
             onChange={e => set('email', e.target.value)}
             style={{ maxWidth: '100%', ...(initialEmail ? { opacity: .7, cursor: 'not-allowed', background: 'var(--f-surface)' } : {}) }} />
           {initialEmail
-            ? <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-green)' }}>✓ Email récupéré depuis ton compte</span>
-            : <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
+            ? <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-green)' }}>{t('emailFromAccount')}</span>
+            : <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>{t('emailHint')}</span>
           }
         </Field>
       )}
 
       <button type="submit" className="btn-f btn-f-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>
-        {loading ? 'Envoi…' : 'Soumettre l\'événement →'}
+        {loading ? t('submitting') : t('evenement.submitBtn')}
       </button>
     </form>
   );

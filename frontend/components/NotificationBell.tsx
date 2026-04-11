@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 
 type Notif = {
   id: string;
@@ -12,28 +13,32 @@ type Notif = {
   praticiens?: { name: string; slug: string; photo_url?: string } | null;
 };
 
-const TYPE_LABEL: Record<string, string> = {
-  like:      'a aimé',
-  comment:   'a commenté',
-  follow:    'te suit désormais',
-  coauteur:  'tu es crédité(e) comme co-auteur',
-};
-
 const TYPE_ICON: Record<string, string> = {
   like: '♥', comment: '💬', follow: '＋', coauteur: '✦',
 };
 
-function timeAgo(date: string) {
+function getTypeLabel(type: string, t: (key: string) => string): string {
+  const map: Record<string, string> = {
+    like:     t('typeAime'),
+    comment:  t('typeCommente'),
+    follow:   t('typeSuit'),
+    coauteur: t('typeCoauteur'),
+  };
+  return map[type] || type;
+}
+
+function timeAgo(date: string, t: (key: string, values?: Record<string, number>) => string): string {
   const diff = Date.now() - new Date(date).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'à l\'instant';
-  if (mins < 60) return `${mins}min`;
+  if (mins < 1) return t('timeNow');
+  if (mins < 60) return t('timeMin', { count: mins });
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h`;
-  return `${Math.floor(hrs / 24)}j`;
+  if (hrs < 24) return t('timeHour', { count: hrs });
+  return t('timeDay', { count: Math.floor(hrs / 24) });
 }
 
 export default function NotificationBell() {
+  const t = useTranslations('notifications');
   const [notifs, setNotifs] = useState<Notif[]>([]);
   const [unread, setUnread] = useState(0);
   const [open, setOpen] = useState(false);
@@ -127,7 +132,7 @@ export default function NotificationBell() {
 
           {notifs.length === 0 ? (
             <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', color: 'var(--f-text-3)', padding: '1.5rem 1rem', margin: 0, textAlign: 'center' }}>
-              Aucune notification.
+              {t('empty')}
             </p>
           ) : (
             <div>
@@ -159,13 +164,13 @@ export default function NotificationBell() {
                       <span style={{ color: 'var(--f-sky)', fontWeight: 600 }}>
                         @{n.praticiens?.slug ?? '?'}
                       </span>{' '}
-                      {TYPE_LABEL[n.type]}
+                      {getTypeLabel(n.type, t)}
                       {n.content_title && (
                         <span style={{ color: 'var(--f-text-3)' }}> · {n.content_title}</span>
                       )}
                     </p>
                     <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.57rem', color: 'var(--f-text-3)' }}>
-                      {timeAgo(n.created_at)}
+                      {timeAgo(n.created_at, t)}
                     </span>
                   </div>
 

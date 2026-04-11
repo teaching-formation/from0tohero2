@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import CollabInput from './CollabInput';
 
 const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
@@ -10,6 +11,7 @@ const TYPE_LABELS: Record<string,string> = { pipeline:'Pipeline', dashboard:'Das
 type Props = { onSuccess: () => void; username?: string; hideEmail?: boolean; initialEmail?: string };
 
 export default function FormRealisation({ onSuccess, username = '', hideEmail = false, initialEmail = '' }: Props) {
+  const t = useTranslations('forms');
   const [form, setForm] = useState({
     title: '', username: username, category: '', type: '', type_autre: '',
     stack: '', excerpt: '', demo_url: '', repo_url: '', date_published: '', email: initialEmail,
@@ -24,7 +26,7 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
   async function handleAutofill() {
     if (!autofillUrl.trim()) return;
     if (autofillUrl.trim().includes('linkedin.com')) {
-      setAutofillMsg({ type: 'err', text: '⚠ LinkedIn ne permet pas la récupération automatique. Utilise un lien GitHub, un lien de démo, ou remplis le formulaire manuellement.' });
+      setAutofillMsg({ type: 'err', text: t('realisation.linkedinError') });
       return;
     }
     setAutofillLoading(true);
@@ -44,9 +46,9 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
         repo_url:       data.repo_url || f.repo_url,
       }));
       const filled = [data.title, data.excerpt, data.stack].filter(Boolean).length;
-      setAutofillMsg({ type: 'ok', text: `✓ ${filled} champ${filled > 1 ? 's' : ''} rempli${filled > 1 ? 's' : ''} automatiquement` });
+      setAutofillMsg({ type: 'ok', text: t('autofillFieldsFilled', { count: filled }) });
     } catch (e: unknown) {
-      setAutofillMsg({ type: 'err', text: e instanceof Error ? e.message : 'Impossible de récupérer les infos' });
+      setAutofillMsg({ type: 'err', text: e instanceof Error ? e.message : t('autofillFetchError') });
     } finally {
       setAutofillLoading(false);
     }
@@ -63,17 +65,17 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
 
   function validate() {
     const e: Record<string, string> = {};
-    if (!form.title.trim())        e.title        = 'Champ requis';
-    if (!form.username.trim()) e.username = 'Champ requis';
-    if (!form.category)            e.category     = 'Sélectionne une catégorie';
-    if (!form.type)                e.type         = 'Sélectionne un type';
-    if (form.type === 'autre' && !form.type_autre.trim()) e.type_autre = 'Précise le type';
-    if (!form.stack.trim())        e.stack        = 'Champ requis';
-    if (!form.excerpt.trim())      e.excerpt      = 'Champ requis';
-    if (form.demo_url && !isValidUrl(form.demo_url)) e.demo_url = 'URL invalide';
-    if (form.repo_url && !isValidUrl(form.repo_url)) e.repo_url = 'URL invalide';
-    if (!hideEmail && !initialEmail && !form.email.trim())        e.email = 'Champ requis';
-    if (!hideEmail && !initialEmail && form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Email invalide';
+    if (!form.title.trim())        e.title        = t('fieldRequired');
+    if (!form.username.trim()) e.username = t('fieldRequired');
+    if (!form.category)            e.category     = t('selectCategory');
+    if (!form.type)                e.type         = t('realisation.selectType');
+    if (form.type === 'autre' && !form.type_autre.trim()) e.type_autre = t('realisation.preciserType');
+    if (!form.stack.trim())        e.stack        = t('fieldRequired');
+    if (!form.excerpt.trim())      e.excerpt      = t('fieldRequired');
+    if (form.demo_url && !isValidUrl(form.demo_url)) e.demo_url = t('urlInvalid');
+    if (form.repo_url && !isValidUrl(form.repo_url)) e.repo_url = t('urlInvalid');
+    if (!hideEmail && !initialEmail && !form.email.trim())        e.email = t('fieldRequired');
+    if (!hideEmail && !initialEmail && form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = t('emailInvalid');
     return e;
   }
 
@@ -97,8 +99,8 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
     });
     setLoading(false);
     if (!res.ok) {
-      const { error } = await res.json().catch(() => ({ error: 'Erreur serveur' }));
-      setErrors(e => ({ ...e, title: error || 'Erreur lors de la soumission' }));
+      const { error } = await res.json().catch(() => ({ error: t('serverError') }));
+      setErrors(e => ({ ...e, title: error || t('submitError') }));
       return;
     }
     onSuccess();
@@ -115,16 +117,16 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
         padding: '1.1rem 1.25rem',
       }}>
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', fontWeight: 600, color: 'var(--f-sky)', marginBottom: '.25rem' }}>
-          ✦ Autofill depuis une URL
+          {t('realisation.autofillTitle')}
         </p>
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', marginBottom: '.85rem' }}>
-          Colle le lien GitHub ou de démo — on remplit le formulaire automatiquement.
+          {t('realisation.autofillDesc')}
         </p>
         <div style={{ display: 'flex', gap: '.5rem' }}>
           <input
             className="f-input"
             type="text"
-            placeholder="https://github.com/toi/mon-projet"
+            placeholder={t('realisation.autofillPlaceholder')}
             value={autofillUrl}
             onChange={e => setAutofillUrl(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAutofill())}
@@ -137,7 +139,7 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
             disabled={autofillLoading || !autofillUrl.trim()}
             style={{ flexShrink: 0, fontSize: '.72rem' }}
           >
-            {autofillLoading ? '…' : 'Autofill →'}
+            {autofillLoading ? '…' : t('autofillBtn')}
           </button>
         </div>
         {autofillMsg && (
@@ -152,16 +154,16 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
         )}
       </div>
 
-      <Field label="Titre du projet" required error={errors.title}>
-        <input className="f-input" placeholder="Ex: Pipeline de données temps réel avec Kafka" value={form.title} onChange={e => set('title', e.target.value)} style={{ maxWidth: '100%' }} />
+      <Field label={t('realisation.titleLabel')} required error={errors.title}>
+        <input className="f-input" placeholder={t('realisation.titlePlaceholder')} value={form.title} onChange={e => set('title', e.target.value)} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Ton username" required error={errors.username}>
+      <Field label={t('usernameLabel')} required error={errors.username}>
         <input className="f-input" type="text" value={form.username} readOnly
           style={{ maxWidth: '100%', opacity: .6, cursor: 'not-allowed', background: 'var(--f-surface)' }} />
       </Field>
 
-      <Field label="Catégorie" required error={errors.category}>
+      <Field label={t('categoryLabel')} required error={errors.category}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
           {CATEGORIES.map(c => (
             <button key={c} type="button" className={`filter-pill${form.category === c ? ' active' : ''}`} onClick={() => set('category', c)}>
@@ -171,18 +173,18 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
         </div>
       </Field>
 
-      <Field label="Type" required error={errors.type}>
+      <Field label={t('realisation.typeLabel')} required error={errors.type}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
-          {TYPES.map(t => (
-            <button key={t} type="button" className={`filter-pill${form.type === t ? ' active' : ''}`} onClick={() => set('type', t)}>
-              {TYPE_LABELS[t]}
+          {TYPES.map(tp => (
+            <button key={tp} type="button" className={`filter-pill${form.type === tp ? ' active' : ''}`} onClick={() => set('type', tp)}>
+              {TYPE_LABELS[tp]}
             </button>
           ))}
         </div>
         {form.type === 'autre' && (
           <input
             className="f-input"
-            placeholder="Précise le type (ex: Newsletter, Podcast, Tutoriel…)"
+            placeholder={t('realisation.typePlaceholder')}
             value={form.type_autre}
             onChange={e => set('type_autre', e.target.value)}
             style={{ maxWidth: '100%', marginTop: '.75rem' }}
@@ -191,45 +193,45 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
         {errors.type_autre && <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{errors.type_autre}</span>}
       </Field>
 
-      <Field label="Stack utilisée (séparé par ,)" required error={errors.stack}>
-        <input className="f-input" placeholder="Ex: Python, Kafka, Spark, GCP" value={form.stack} onChange={e => set('stack', e.target.value)} style={{ maxWidth: '100%' }} />
+      <Field label={t('realisation.stackLabel')} required error={errors.stack}>
+        <input className="f-input" placeholder={t('realisation.stackPlaceholder')} value={form.stack} onChange={e => set('stack', e.target.value)} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Description courte" required error={errors.excerpt}>
-        <textarea className="f-input" placeholder="Décris ce que tu as construit en 2-3 phrases." value={form.excerpt} onChange={e => set('excerpt', e.target.value)} rows={3} style={{ maxWidth: '100%', resize: 'vertical' }} />
+      <Field label={t('descLabel')} required error={errors.excerpt}>
+        <textarea className="f-input" placeholder={t('realisation.descPlaceholder')} value={form.excerpt} onChange={e => set('excerpt', e.target.value)} rows={3} style={{ maxWidth: '100%', resize: 'vertical' }} />
       </Field>
 
-      <Field label="Lien demo / site" error={errors.demo_url}>
+      <Field label={t('realisation.demoLabel')} error={errors.demo_url}>
         <input className="f-input" type="text" placeholder="https://..." value={form.demo_url} onChange={e => set('demo_url', e.target.value)} onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('demo_url', 'https://' + v); }} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Lien repo GitHub" error={errors.repo_url}>
+      <Field label={t('realisation.repoLabel')} error={errors.repo_url}>
         <input className="f-input" type="text" placeholder="https://github.com/..." value={form.repo_url} onChange={e => set('repo_url', e.target.value)} onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('repo_url', 'https://' + v); }} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Collaborateurs" error={errors.collaborateurs}>
+      <Field label={t('realisation.collabLabel')} error={errors.collaborateurs}>
         <CollabInput value={collaborateurs} onChange={setCollaborateurs} />
       </Field>
 
-      <Field label="Date de réalisation" error={errors.date_published}>
+      <Field label={t('realisation.dateLabel')} error={errors.date_published}>
         <input className="f-input" type="date" value={form.date_published} onChange={e => set('date_published', e.target.value)} style={{ maxWidth: '280px' }} />
       </Field>
 
       {!hideEmail && (
-        <Field label="Email de contact" required={!initialEmail} error={errors.email}>
-          <input className="f-input" type="email" placeholder="ton@email.com"
+        <Field label={t('emailLabel')} required={!initialEmail} error={errors.email}>
+          <input className="f-input" type="email" placeholder={t('emailPlaceholder')}
             value={form.email} readOnly={!!initialEmail}
             onChange={e => set('email', e.target.value)}
             style={{ maxWidth: '100%', ...(initialEmail ? { opacity: .7, cursor: 'not-allowed', background: 'var(--f-surface)' } : {}) }} />
           {initialEmail
-            ? <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-green)' }}>✓ Email récupéré depuis ton compte</span>
-            : <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>Utilisé uniquement pour te notifier du statut de ta soumission.</span>
+            ? <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-green)' }}>{t('emailFromAccount')}</span>
+            : <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>{t('emailHint')}</span>
           }
         </Field>
       )}
 
       <button type="submit" className="btn-f btn-f-primary" disabled={loading} style={{ alignSelf: 'flex-start' }}>
-        {loading ? 'Envoi…' : 'Soumettre la réalisation →'}
+        {loading ? t('submitting') : t('realisation.submitBtn')}
       </button>
     </form>
   );

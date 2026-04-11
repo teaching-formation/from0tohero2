@@ -1,5 +1,6 @@
 'use client';
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import Cropper from 'react-easy-crop';
 import { getCroppedImg } from '@/lib/getCroppedImg';
 
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export default function CropModal({ imageSrc, onCrop, onCancel }: Props) {
+  const t = useTranslations('cropModal');
   const [crop,          setCrop]          = useState({ x: 0, y: 0 });
   const [zoom,          setZoom]          = useState(1);
   const [croppedArea,   setCroppedArea]   = useState<Area | null>(null);
@@ -61,16 +63,16 @@ export default function CropModal({ imageSrc, onCrop, onCancel }: Props) {
         }}>
           <div>
             <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--f-orange)', margin: '0 0 .2rem 0' }}>
-              // photo de profil
+              {t('label')}
             </p>
             <h2 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: 0 }}>
-              Ajuster la photo
+              {t('title')}
             </h2>
           </div>
           <button
             onClick={onCancel}
             style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--f-text-3)', fontSize: '1.2rem', lineHeight: 1, padding: '.25rem' }}
-            aria-label="Fermer"
+            aria-label={t('close')}
           >
             ✕
           </button>
@@ -123,7 +125,7 @@ export default function CropModal({ imageSrc, onCrop, onCancel }: Props) {
             </span>
           </div>
           <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', margin: '.5rem 0 0 0', textAlign: 'center' }}>
-            Glisse pour repositionner · Scroll ou slider pour zoomer
+            {t('hint')}
           </p>
         </div>
 
@@ -139,7 +141,7 @@ export default function CropModal({ imageSrc, onCrop, onCancel }: Props) {
             className="btn-f btn-f-secondary"
             style={{ fontSize: '.72rem' }}
           >
-            Annuler
+            {t('cancel')}
           </button>
           <button
             type="button"
@@ -148,7 +150,7 @@ export default function CropModal({ imageSrc, onCrop, onCancel }: Props) {
             className="btn-f btn-f-primary"
             style={{ fontSize: '.72rem', minWidth: 90 }}
           >
-            {processing ? '…' : 'Valider'}
+            {processing ? '…' : t('validate')}
           </button>
         </div>
       </div>
