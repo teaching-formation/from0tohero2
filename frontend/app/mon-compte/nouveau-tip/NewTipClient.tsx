@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded','autre'];
 const CAT_LABELS: Record<string,string> = {
@@ -10,11 +11,6 @@ const CAT_LABELS: Record<string,string> = {
 };
 const TYPES = ['tip','TIL','snippet'] as const;
 const TYPE_LABELS: Record<string,string> = { tip:'💡 Tip', TIL:'🧠 TIL', snippet:'{ } Snippet' };
-const TYPE_DESC: Record<string,string> = {
-  tip:     'Une bonne pratique, une astuce, un conseil concret.',
-  TIL:     '"Today I Learned" — quelque chose que tu viens de découvrir.',
-  snippet: 'Un bout de code réutilisable avec une explication.',
-};
 
 const INSPIRATIONS = [
   'Une commande que tu utilises tout le temps mais que personne ne connaît…',
@@ -31,6 +27,14 @@ const INSPIRATIONS = [
 
 export default function NewTipClient() {
   const router = useRouter();
+  const t = useTranslations('forms');
+  const tMC = useTranslations('monCompte');
+
+  const TYPE_DESC: Record<string,string> = {
+    tip:     tMC('tip.tipDesc'),
+    TIL:     tMC('tip.tilDesc'),
+    snippet: tMC('tip.snippetDesc'),
+  };
 
   const [content,       setContent]       = useState('');
   const [type,          setType]          = useState<typeof TYPES[number]>('tip');
@@ -46,9 +50,9 @@ export default function NewTipClient() {
 
   function validate() {
     const e: Record<string,string> = {};
-    if (!content.trim())  e.content  = 'Champ requis';
-    if (content.length > 280) e.content = 'Maximum 280 caractères';
-    if (!category)        e.category = 'Sélectionne une catégorie';
+    if (!content.trim())  e.content  = t('fieldRequired');
+    if (content.length > 280) e.content = tMC('maxChars');
+    if (!category)        e.category = t('selectCategory');
     return e;
   }
 
@@ -70,7 +74,7 @@ export default function NewTipClient() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) { setErrors({ content: data.error || 'Erreur' }); return; }
+      if (!res.ok) { setErrors({ content: data.error || t('serverError') }); return; }
       setSuccess(true);
       setTimeout(() => router.push('/mon-compte?tab=tips'), 1200);
     } finally {
@@ -83,7 +87,7 @@ export default function NewTipClient() {
       <div style={{ maxWidth: 680, margin: '4rem auto', padding: '0 1.5rem', textAlign: 'center' }}>
         <div style={{ border: '1px solid var(--f-border)', borderRadius: 12, padding: '3rem 2rem', background: 'var(--f-surface)' }}>
           <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.85rem', color: 'var(--f-green)', margin: 0 }}>
-            ✓ Tip publié — redirection…
+            {tMC('tip.successNew')}
           </p>
         </div>
       </div>
@@ -93,17 +97,17 @@ export default function NewTipClient() {
   return (
     <div style={{ maxWidth: 680, margin: '0 auto', padding: '2.5rem 1.5rem' }}>
       <a href="/mon-compte?tab=tips" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-text-3)', textDecoration: 'none', display: 'inline-block', marginBottom: '2rem' }}>
-        ← Mon espace
+        {tMC('back')}
       </a>
 
       <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--f-orange)', marginBottom: '.5rem' }}>
-        // nouveau tip
+        {tMC('tip.newLabel')}
       </p>
       <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.75rem', fontWeight: 800, color: 'var(--f-text-1)', margin: '0 0 .5rem 0' }}>
-        Partage un tip
+        {tMC('tip.newTitle')}
       </h1>
       <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-3)', margin: '0 0 2.5rem 0', lineHeight: 1.7 }}>
-        Publié instantanément · visible sur ton profil et la homepage.
+        {tMC('tip.newSubtitle')}
       </p>
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -114,14 +118,14 @@ export default function NewTipClient() {
             Type <span style={{ color: 'var(--f-orange)' }}>*</span>
           </label>
           <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
-            {TYPES.map(t => (
+            {TYPES.map(tp => (
               <button
-                key={t}
+                key={tp}
                 type="button"
-                className={`filter-pill${type === t ? ' active' : ''}`}
-                onClick={() => setType(t)}
+                className={`filter-pill${type === tp ? ' active' : ''}`}
+                onClick={() => setType(tp)}
               >
-                {TYPE_LABELS[t]}
+                {TYPE_LABELS[tp]}
               </button>
             ))}
           </div>
@@ -133,7 +137,7 @@ export default function NewTipClient() {
         {/* Contenu */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
           <label style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-2)' }}>
-            Contenu <span style={{ color: 'var(--f-orange)' }}>*</span>
+            {tMC('tip.contentLabel')} <span style={{ color: 'var(--f-orange)' }}>*</span>
           </label>
           <div style={{ position: 'relative' }}>
             <textarea
@@ -165,7 +169,7 @@ export default function NewTipClient() {
         {/* Catégorie */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
           <label style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-2)' }}>
-            Catégorie <span style={{ color: 'var(--f-orange)' }}>*</span>
+            {tMC('tip.categoryLabel')} <span style={{ color: 'var(--f-orange)' }}>*</span>
           </label>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
             {CATEGORIES.map(c => (
@@ -183,7 +187,7 @@ export default function NewTipClient() {
             <input
               className="f-input"
               type="text"
-              placeholder="Précise la catégorie (ex: GameDev, Robotique…)"
+              placeholder={tMC('tip.categoryOtherPlaceholder')}
               value={categoryLabel}
               onChange={e => setCategoryLabel(e.target.value)}
               style={{ maxWidth: '100%', marginTop: '.25rem' }}
@@ -211,9 +215,9 @@ export default function NewTipClient() {
 
         <div style={{ display: 'flex', gap: '1rem', paddingTop: '.5rem' }}>
           <button type="submit" className="btn-f btn-f-primary" disabled={loading}>
-            {loading ? 'Publication…' : 'Publier le tip →'}
+            {loading ? tMC('publishing') : tMC('tip.publishBtn')}
           </button>
-          <a href="/mon-compte?tab=tips" className="btn-f btn-f-secondary">Annuler</a>
+          <a href="/mon-compte?tab=tips" className="btn-f btn-f-secondary">{tMC('cancel')}</a>
         </div>
       </form>
     </div>

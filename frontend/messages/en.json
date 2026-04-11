@@ -397,5 +397,39 @@
     "hint": "Go back to home.",
     "home": "← Home",
     "practitioners": "View practitioners"
+  },
+  "monCompte": {
+    "back": "← My space",
+    "saving": "Saving…",
+    "save": "Save →",
+    "publishing": "Publishing…",
+    "cancel": "Cancel",
+    "maxChars": "Maximum 280 characters",
+    "updateError": "Update error",
+    "tip": {
+      "newLabel": "// new tip",
+      "newTitle": "Share a tip",
+      "newSubtitle": "Published instantly · visible on your profile and the homepage.",
+      "editLabel": "// edit tip",
+      "editTitle": "Edit",
+      "publishBtn": "Publish tip →",
+      "contentLabel": "Content",
+      "categoryLabel": "Category",
+      "categoryOtherPlaceholder": "Specify the category (e.g. GameDev, Robotics…)",
+      "tipDesc": "A best practice, a trick, concrete advice.",
+      "tilDesc": "\"Today I Learned\" — something you just discovered.",
+      "snippetDesc": "A reusable code snippet with an explanation.",
+      "successNew": "✓ Tip published — redirecting…",
+      "successEdit": "✓ Tip updated — redirecting…"
+    },
+    "realisation": {
+      "successEdit": "✓ Project updated — redirecting…"
+    },
+    "article": {
+      "successEdit": "✓ Article updated — redirecting…"
+    },
+    "evenement": {
+      "successEdit": "✓ Event updated — redirecting…"
+    }
   }
 }

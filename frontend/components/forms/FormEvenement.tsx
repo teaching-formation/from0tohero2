@@ -52,7 +52,7 @@ export default function FormEvenement({ onSuccess, username = '', hideEmail = fa
     try {
       const res  = await fetch(`/api/autofill?url=${encodeURIComponent(target)}`);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erreur');
+      if (!res.ok) throw new Error(data.error || t('autofillFetchError'));
       setForm(f => ({
         ...f,
         ...(data.title   ? { title:   data.title   } : {}),

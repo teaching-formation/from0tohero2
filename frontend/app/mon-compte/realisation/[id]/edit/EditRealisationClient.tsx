@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import CollabInput from '@/components/forms/CollabInput';
+import { useTranslations } from 'next-intl';
 
 const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
 const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cyber-Sécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
@@ -12,6 +13,8 @@ type Props = { realisation: Record<string, unknown> };
 
 export default function EditRealisationClient({ realisation: r }: Props) {
   const router = useRouter();
+  const t = useTranslations('forms');
+  const tMC = useTranslations('monCompte');
   const initStack = Array.isArray(r.stack) ? (r.stack as string[]).join(', ') : String(r.stack || '');
   const initCollabs = Array.isArray(r.collaborateurs) ? (r.collaborateurs as string[]) : [];
 
@@ -37,7 +40,7 @@ export default function EditRealisationClient({ realisation: r }: Props) {
   async function handleAutofill() {
     if (!autofillUrl.trim()) return;
     if (autofillUrl.trim().includes('linkedin.com')) {
-      setAutofillMsg({ type: 'err', text: '⚠ LinkedIn ne permet pas la récupération automatique. Utilise un lien GitHub, un lien de démo, ou remplis le formulaire manuellement.' });
+      setAutofillMsg({ type: 'err', text: t('realisation.linkedinError') });
       return;
     }
     setAutofillLoading(true);
@@ -45,7 +48,7 @@ export default function EditRealisationClient({ realisation: r }: Props) {
     try {
       const res  = await fetch(`/api/autofill?url=${encodeURIComponent(autofillUrl.trim())}`);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erreur');
+      if (!res.ok) throw new Error(data.error || t('autofillFetchError'));
       setForm(f => ({
         ...f,
         title:    data.title    || f.title,
@@ -57,9 +60,9 @@ export default function EditRealisationClient({ realisation: r }: Props) {
         repo_url: data.repo_url || f.repo_url,
       }));
       const filled = [data.title, data.excerpt, data.stack].filter(Boolean).length;
-      setAutofillMsg({ type: 'ok', text: `✓ ${filled} champ${filled > 1 ? 's' : ''} rempli${filled > 1 ? 's' : ''} automatiquement` });
+      setAutofillMsg({ type: 'ok', text: t('autofillFieldsFilled', { count: filled }) });
     } catch (e: unknown) {
-      setAutofillMsg({ type: 'err', text: e instanceof Error ? e.message : 'Impossible de récupérer les infos' });
+      setAutofillMsg({ type: 'err', text: e instanceof Error ? e.message : t('autofillFetchError') });
     } finally {
       setAutofillLoading(false);
     }
@@ -72,12 +75,12 @@ export default function EditRealisationClient({ realisation: r }: Props) {
 
   function validate() {
     const e: Record<string, string> = {};
-    if (!form.title.trim())        e.title    = 'Champ requis';
-    if (!form.category)            e.category = 'Sélectionne une catégorie';
-    if (!form.type)                e.type     = 'Sélectionne un type';
-    if (form.type === 'autre' && !form.type_autre.trim()) e.type_autre = 'Précise le type';
-    if (!form.stack.trim())        e.stack    = 'Champ requis';
-    if (!form.excerpt.trim())      e.excerpt  = 'Champ requis';
+    if (!form.title.trim())        e.title    = t('fieldRequired');
+    if (!form.category)            e.category = t('selectCategory');
+    if (!form.type)                e.type     = t('realisation.selectType');
+    if (form.type === 'autre' && !form.type_autre.trim()) e.type_autre = t('realisation.preciserType');
+    if (!form.stack.trim())        e.stack    = t('fieldRequired');
+    if (!form.excerpt.trim())      e.excerpt  = t('fieldRequired');
     return e;
   }
 
@@ -100,8 +103,8 @@ export default function EditRealisationClient({ realisation: r }: Props) {
     setLoading(false);
 
     if (!res.ok) {
-      const { error } = await res.json().catch(() => ({ error: 'Erreur serveur' }));
-      setErrors(e => ({ ...e, title: error || 'Erreur lors de la mise à jour' }));
+      const { error } = await res.json().catch(() => ({ error: t('serverError') }));
+      setErrors(e => ({ ...e, title: error || tMC('updateError') }));
       return;
     }
     setSuccess(true);
@@ -111,7 +114,7 @@ export default function EditRealisationClient({ realisation: r }: Props) {
   if (success) {
     return (
       <div style={{ border: '1px solid var(--f-border)', borderRadius: 8, padding: '2rem', textAlign: 'center' }}>
-        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.8rem', color: 'var(--f-green)', margin: 0 }}>✓ Réalisation mise à jour — redirection…</p>
+        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.8rem', color: 'var(--f-green)', margin: 0 }}>{tMC('realisation.successEdit')}</p>
       </div>
     );
   }
@@ -127,16 +130,16 @@ export default function EditRealisationClient({ realisation: r }: Props) {
         padding: '1.1rem 1.25rem',
       }}>
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', fontWeight: 600, color: 'var(--f-sky)', marginBottom: '.25rem' }}>
-          ✦ Autofill depuis une URL
+          {t('realisation.autofillTitle')}
         </p>
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', marginBottom: '.85rem' }}>
-          Colle le lien GitHub ou de démo — on écrase les champs automatiquement.
+          {t('realisation.autofillDesc')}
         </p>
         <div style={{ display: 'flex', gap: '.5rem' }}>
           <input
             className="f-input"
             type="text"
-            placeholder="https://github.com/toi/mon-projet"
+            placeholder={t('realisation.autofillPlaceholder')}
             value={autofillUrl}
             onChange={e => setAutofillUrl(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAutofill())}
@@ -149,7 +152,7 @@ export default function EditRealisationClient({ realisation: r }: Props) {
             disabled={autofillLoading || !autofillUrl.trim()}
             style={{ flexShrink: 0, fontSize: '.72rem' }}
           >
-            {autofillLoading ? '…' : 'Autofill →'}
+            {autofillLoading ? '…' : t('autofillBtn')}
           </button>
         </div>
         {autofillMsg && (
@@ -164,11 +167,11 @@ export default function EditRealisationClient({ realisation: r }: Props) {
         )}
       </div>
 
-      <Field label="Titre du projet" required error={errors.title}>
+      <Field label={t('realisation.titleLabel')} required error={errors.title}>
         <input className="f-input" value={form.title} onChange={e => set('title', e.target.value)} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Catégorie" required error={errors.category}>
+      <Field label={t('categoryLabel')} required error={errors.category}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
           {CATEGORIES.map(c => (
             <button key={c} type="button" className={`filter-pill${form.category === c ? ' active' : ''}`} onClick={() => set('category', c)}>
@@ -178,49 +181,49 @@ export default function EditRealisationClient({ realisation: r }: Props) {
         </div>
       </Field>
 
-      <Field label="Type" required error={errors.type}>
+      <Field label={t('realisation.typeLabel')} required error={errors.type}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
-          {TYPES.map(t => (
-            <button key={t} type="button" className={`filter-pill${form.type === t ? ' active' : ''}`} onClick={() => set('type', t)}>
-              {TYPE_LABELS[t]}
+          {TYPES.map(tp => (
+            <button key={tp} type="button" className={`filter-pill${form.type === tp ? ' active' : ''}`} onClick={() => set('type', tp)}>
+              {TYPE_LABELS[tp]}
             </button>
           ))}
         </div>
         {form.type === 'autre' && (
-          <input className="f-input" placeholder="Précise le type" value={form.type_autre} onChange={e => set('type_autre', e.target.value)} style={{ maxWidth: '100%', marginTop: '.75rem' }} />
+          <input className="f-input" placeholder={t('realisation.preciserType')} value={form.type_autre} onChange={e => set('type_autre', e.target.value)} style={{ maxWidth: '100%', marginTop: '.75rem' }} />
         )}
         {errors.type_autre && <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{errors.type_autre}</span>}
       </Field>
 
-      <Field label="Stack utilisée (séparé par ,)" required error={errors.stack}>
+      <Field label={t('realisation.stackLabel')} required error={errors.stack}>
         <input className="f-input" placeholder="Ex: Python, Kafka, Spark" value={form.stack} onChange={e => set('stack', e.target.value)} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Description courte" required error={errors.excerpt}>
+      <Field label={t('descLabel')} required error={errors.excerpt}>
         <textarea className="f-input" value={form.excerpt} onChange={e => set('excerpt', e.target.value)} rows={3} style={{ maxWidth: '100%', resize: 'vertical' }} />
       </Field>
 
-      <Field label="Lien demo / site" error={errors.demo_url}>
+      <Field label={t('realisation.demoLabel')} error={errors.demo_url}>
         <input className="f-input" type="text" value={form.demo_url} onChange={e => set('demo_url', e.target.value)} onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('demo_url', 'https://' + v); }} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Lien repo GitHub" error={errors.repo_url}>
+      <Field label={t('realisation.repoLabel')} error={errors.repo_url}>
         <input className="f-input" type="text" value={form.repo_url} onChange={e => set('repo_url', e.target.value)} onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('repo_url', 'https://' + v); }} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Collaborateurs" error={errors.collaborateurs}>
+      <Field label={t('realisation.collabLabel')} error={errors.collaborateurs}>
         <CollabInput value={collaborateurs} onChange={setCollaborateurs} />
       </Field>
 
-      <Field label="Date de réalisation" error={errors.date_published}>
+      <Field label={t('realisation.dateLabel')} error={errors.date_published}>
         <input className="f-input" type="date" value={form.date_published} onChange={e => set('date_published', e.target.value)} style={{ maxWidth: '280px' }} />
       </Field>
 
       <div style={{ display: 'flex', gap: '1rem', paddingTop: '.5rem' }}>
         <button type="submit" className="btn-f btn-f-primary" disabled={loading}>
-          {loading ? 'Enregistrement…' : 'Enregistrer →'}
+          {loading ? tMC('saving') : tMC('save')}
         </button>
-        <a href="/mon-compte" className="btn-f btn-f-secondary">Annuler</a>
+        <a href="/mon-compte" className="btn-f btn-f-secondary">{tMC('cancel')}</a>
       </div>
     </form>
   );

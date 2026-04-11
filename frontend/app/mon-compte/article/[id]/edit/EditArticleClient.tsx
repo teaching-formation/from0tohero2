@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import CollabInput from '@/components/forms/CollabInput';
+import { useTranslations } from 'next-intl';
 
 const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded'];
 const CAT_LABELS: Record<string,string> = { data:'Data', devops:'DevOps', cloud:'Cloud', ia:'IA', cyber:'Cyber-Sécurité', frontend:'Frontend', backend:'Backend', fullstack:'Full-Stack', mobile:'Mobile', web3:'Web3', embedded:'Embedded / IoT' };
@@ -12,6 +13,8 @@ type Props = { article: Record<string, unknown> };
 
 export default function EditArticleClient({ article: a }: Props) {
   const router = useRouter();
+  const t = useTranslations('forms');
+  const tMC = useTranslations('monCompte');
   const [form, setForm] = useState({
     title:          String(a.title          || ''),
     category:       String(a.category       || ''),
@@ -47,7 +50,7 @@ export default function EditArticleClient({ article: a }: Props) {
     try {
       const res  = await fetch(`/api/autofill?url=${encodeURIComponent(afUrl.trim())}`);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erreur');
+      if (!res.ok) throw new Error(data.error || t('autofillFetchError'));
       const src = detectSource(afUrl);
       setForm(f => ({
         ...f,
@@ -57,9 +60,9 @@ export default function EditArticleClient({ article: a }: Props) {
         source:       src,
       }));
       const filled = [data.title, data.excerpt].filter(Boolean).length;
-      setAfMsg({ type: 'ok', text: `✓ ${filled} champ${filled > 1 ? 's' : ''} rempli${filled > 1 ? 's' : ''} automatiquement` });
+      setAfMsg({ type: 'ok', text: t('autofillFieldsFilled', { count: filled }) });
     } catch (e: unknown) {
-      setAfMsg({ type: 'err', text: e instanceof Error ? e.message : 'Impossible de récupérer les infos' });
+      setAfMsg({ type: 'err', text: e instanceof Error ? e.message : t('autofillFetchError') });
     } finally {
       setAfLoading(false);
     }
@@ -72,13 +75,13 @@ export default function EditArticleClient({ article: a }: Props) {
 
   function validate() {
     const e: Record<string, string> = {};
-    if (!form.title.trim())        e.title        = 'Champ requis';
-    if (!form.category)            e.category     = 'Sélectionne une catégorie';
-    if (!form.source)              e.source       = 'Sélectionne une plateforme';
-    if (form.source === 'autre' && !form.source_autre.trim()) e.source_autre = 'Précise la plateforme';
-    if (!form.external_url.trim()) e.external_url = 'Champ requis';
-    if (!form.date_published)      e.date_published = 'Champ requis';
-    if (!form.excerpt.trim())      e.excerpt      = 'Champ requis';
+    if (!form.title.trim())        e.title        = t('fieldRequired');
+    if (!form.category)            e.category     = t('selectCategory');
+    if (!form.source)              e.source       = t('article.selectPlatform');
+    if (form.source === 'autre' && !form.source_autre.trim()) e.source_autre = t('article.preciserPlatform');
+    if (!form.external_url.trim()) e.external_url = t('fieldRequired');
+    if (!form.date_published)      e.date_published = t('fieldRequired');
+    if (!form.excerpt.trim())      e.excerpt      = t('fieldRequired');
     return e;
   }
 
@@ -102,8 +105,8 @@ export default function EditArticleClient({ article: a }: Props) {
     setLoading(false);
 
     if (!res.ok) {
-      const { error } = await res.json().catch(() => ({ error: 'Erreur serveur' }));
-      setErrors(e => ({ ...e, title: error || 'Erreur lors de la mise à jour' }));
+      const { error } = await res.json().catch(() => ({ error: t('serverError') }));
+      setErrors(e => ({ ...e, title: error || tMC('updateError') }));
       return;
     }
     setSuccess(true);
@@ -113,7 +116,7 @@ export default function EditArticleClient({ article: a }: Props) {
   if (success) {
     return (
       <div style={{ border: '1px solid var(--f-border)', borderRadius: 8, padding: '2rem', textAlign: 'center' }}>
-        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.8rem', color: 'var(--f-green)', margin: 0 }}>✓ Article mis à jour — redirection…</p>
+        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.8rem', color: 'var(--f-green)', margin: 0 }}>{tMC('article.successEdit')}</p>
       </div>
     );
   }
@@ -129,16 +132,16 @@ export default function EditArticleClient({ article: a }: Props) {
         padding: '1.1rem 1.25rem',
       }}>
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', fontWeight: 600, color: 'var(--f-sky)', marginBottom: '.25rem' }}>
-          ✦ Autofill depuis une URL
+          {t('article.autofillTitle')}
         </p>
         <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', marginBottom: '.85rem' }}>
-          Colle le lien de l'article — on écrase les champs automatiquement.
+          {t('article.autofillDesc')}
         </p>
         <div style={{ display: 'flex', gap: '.5rem' }}>
           <input
             className="f-input"
             type="text"
-            placeholder="https://medium.com/@toi/mon-article"
+            placeholder={t('article.autofillPlaceholder')}
             value={afUrl}
             onChange={e => setAfUrl(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAutofill())}
@@ -151,7 +154,7 @@ export default function EditArticleClient({ article: a }: Props) {
             disabled={afLoading || !afUrl.trim()}
             style={{ flexShrink: 0, fontSize: '.72rem' }}
           >
-            {afLoading ? '…' : 'Autofill →'}
+            {afLoading ? '…' : t('autofillBtn')}
           </button>
         </div>
         {afMsg && (
@@ -161,11 +164,11 @@ export default function EditArticleClient({ article: a }: Props) {
         )}
       </div>
 
-      <Field label="Titre de l'article" required error={errors.title}>
+      <Field label={t('article.titleLabel')} required error={errors.title}>
         <input className="f-input" value={form.title} onChange={e => set('title', e.target.value)} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Catégorie" required error={errors.category}>
+      <Field label={t('categoryLabel')} required error={errors.category}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
           {CATEGORIES.map(c => (
             <button key={c} type="button" className={`filter-pill${form.category === c ? ' active' : ''}`} onClick={() => set('category', c)}>
@@ -175,7 +178,7 @@ export default function EditArticleClient({ article: a }: Props) {
         </div>
       </Field>
 
-      <Field label="Plateforme de publication" required error={errors.source}>
+      <Field label={t('article.platformLabel')} required error={errors.source}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
           {PLATEFORMES.map(p => (
             <button key={p} type="button" className={`filter-pill${form.source === p ? ' active' : ''}`} onClick={() => set('source', p)}>
@@ -184,32 +187,32 @@ export default function EditArticleClient({ article: a }: Props) {
           ))}
         </div>
         {form.source === 'autre' && (
-          <input className="f-input" placeholder="Précise la plateforme" value={form.source_autre} onChange={e => set('source_autre', e.target.value)} style={{ maxWidth: '100%', marginTop: '.75rem' }} />
+          <input className="f-input" placeholder={t('article.preciserPlatform')} value={form.source_autre} onChange={e => set('source_autre', e.target.value)} style={{ maxWidth: '100%', marginTop: '.75rem' }} />
         )}
         {errors.source_autre && <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: '#f87171' }}>{errors.source_autre}</span>}
       </Field>
 
-      <Field label="Lien vers l'article" required error={errors.external_url}>
+      <Field label={t('article.urlLabel')} required error={errors.external_url}>
         <input className="f-input" type="text" value={form.external_url} onChange={e => set('external_url', e.target.value)} onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('external_url', 'https://' + v); }} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Date de publication" required error={errors.date_published}>
+      <Field label={t('article.dateLabel')} required error={errors.date_published}>
         <input className="f-input" type="date" value={form.date_published} onChange={e => set('date_published', e.target.value)} style={{ maxWidth: '280px' }} />
       </Field>
 
-      <Field label="Co-auteurs" error={errors.collaborateurs}>
+      <Field label={t('article.coauthorsLabel')} error={errors.collaborateurs}>
         <CollabInput value={collaborateurs} onChange={setCollaborateurs} />
       </Field>
 
-      <Field label="Résumé (1-2 phrases)" required error={errors.excerpt}>
+      <Field label={t('article.excerptLabel')} required error={errors.excerpt}>
         <textarea className="f-input" value={form.excerpt} onChange={e => set('excerpt', e.target.value)} rows={3} style={{ maxWidth: '100%', resize: 'vertical' }} />
       </Field>
 
       <div style={{ display: 'flex', gap: '1rem', paddingTop: '.5rem' }}>
         <button type="submit" className="btn-f btn-f-primary" disabled={loading}>
-          {loading ? 'Enregistrement…' : 'Enregistrer →'}
+          {loading ? tMC('saving') : tMC('save')}
         </button>
-        <a href="/mon-compte" className="btn-f btn-f-secondary">Annuler</a>
+        <a href="/mon-compte" className="btn-f btn-f-secondary">{tMC('cancel')}</a>
       </div>
     </form>
   );

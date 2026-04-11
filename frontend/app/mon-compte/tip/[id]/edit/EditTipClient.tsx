@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded','autre'];
 const CAT_LABELS: Record<string,string> = {
@@ -15,6 +16,8 @@ type Tip = { id: string; content: string; type: string; category: string; stack:
 
 export default function EditTipClient({ tip }: { tip: Tip }) {
   const router = useRouter();
+  const t = useTranslations('forms');
+  const tMC = useTranslations('monCompte');
 
   const [content,  setContent]  = useState(tip.content);
   const [type,     setType]     = useState(tip.type as typeof TYPES[number]);
@@ -28,9 +31,9 @@ export default function EditTipClient({ tip }: { tip: Tip }) {
 
   function validate() {
     const e: Record<string,string> = {};
-    if (!content.trim()) e.content = 'Champ requis';
-    if (content.length > 280) e.content = 'Maximum 280 caractères';
-    if (!category) e.category = 'Sélectionne une catégorie';
+    if (!content.trim()) e.content = t('fieldRequired');
+    if (content.length > 280) e.content = tMC('maxChars');
+    if (!category) e.category = t('selectCategory');
     return e;
   }
 
@@ -51,7 +54,7 @@ export default function EditTipClient({ tip }: { tip: Tip }) {
         }),
       });
       const data = await res.json();
-      if (!res.ok) { setErrors({ content: data.error || 'Erreur' }); return; }
+      if (!res.ok) { setErrors({ content: data.error || t('serverError') }); return; }
       setSuccess(true);
       setTimeout(() => router.push('/mon-compte?tab=tips'), 1000);
     } finally {
@@ -64,7 +67,7 @@ export default function EditTipClient({ tip }: { tip: Tip }) {
       <div style={{ maxWidth: 680, margin: '4rem auto', padding: '0 1.5rem', textAlign: 'center' }}>
         <div style={{ border: '1px solid var(--f-border)', borderRadius: 12, padding: '3rem 2rem', background: 'var(--f-surface)' }}>
           <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.85rem', color: 'var(--f-green)', margin: 0 }}>
-            ✓ Tip mis à jour — redirection…
+            {tMC('tip.successEdit')}
           </p>
         </div>
       </div>
@@ -74,14 +77,14 @@ export default function EditTipClient({ tip }: { tip: Tip }) {
   return (
     <div style={{ maxWidth: 680, margin: '0 auto', padding: '2.5rem 1.5rem' }}>
       <a href="/mon-compte?tab=tips" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: 'var(--f-text-3)', textDecoration: 'none', display: 'inline-block', marginBottom: '2rem' }}>
-        ← Mon espace
+        {tMC('back')}
       </a>
 
       <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--f-orange)', marginBottom: '.5rem' }}>
-        // modifier le tip
+        {tMC('tip.editLabel')}
       </p>
       <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.75rem', fontWeight: 800, color: 'var(--f-text-1)', margin: '0 0 2rem 0' }}>
-        Modifier
+        {tMC('tip.editTitle')}
       </h1>
 
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -92,9 +95,9 @@ export default function EditTipClient({ tip }: { tip: Tip }) {
             Type <span style={{ color: 'var(--f-orange)' }}>*</span>
           </label>
           <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
-            {TYPES.map(t => (
-              <button key={t} type="button" className={`filter-pill${type === t ? ' active' : ''}`} onClick={() => setType(t)}>
-                {TYPE_LABELS[t]}
+            {TYPES.map(tp => (
+              <button key={tp} type="button" className={`filter-pill${type === tp ? ' active' : ''}`} onClick={() => setType(tp)}>
+                {TYPE_LABELS[tp]}
               </button>
             ))}
           </div>
@@ -103,7 +106,7 @@ export default function EditTipClient({ tip }: { tip: Tip }) {
         {/* Contenu */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
           <label style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-2)' }}>
-            Contenu <span style={{ color: 'var(--f-orange)' }}>*</span>
+            {tMC('tip.contentLabel')} <span style={{ color: 'var(--f-orange)' }}>*</span>
           </label>
           <div style={{ position: 'relative' }}>
             <textarea
@@ -128,7 +131,7 @@ export default function EditTipClient({ tip }: { tip: Tip }) {
         {/* Catégorie */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '.5rem' }}>
           <label style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-2)' }}>
-            Catégorie <span style={{ color: 'var(--f-orange)' }}>*</span>
+            {tMC('tip.categoryLabel')} <span style={{ color: 'var(--f-orange)' }}>*</span>
           </label>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
             {CATEGORIES.map(c => (
@@ -151,9 +154,9 @@ export default function EditTipClient({ tip }: { tip: Tip }) {
 
         <div style={{ display: 'flex', gap: '1rem', paddingTop: '.5rem' }}>
           <button type="submit" className="btn-f btn-f-primary" disabled={loading}>
-            {loading ? 'Enregistrement…' : 'Enregistrer →'}
+            {loading ? tMC('saving') : tMC('save')}
           </button>
-          <a href="/mon-compte?tab=tips" className="btn-f btn-f-secondary">Annuler</a>
+          <a href="/mon-compte?tab=tips" className="btn-f btn-f-secondary">{tMC('cancel')}</a>
         </div>
       </form>
     </div>

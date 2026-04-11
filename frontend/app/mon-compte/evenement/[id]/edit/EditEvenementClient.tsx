@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 const TYPES = ['conference','meetup','hackathon','webinaire','bootcamp','autre'];
 const TYPE_LABELS: Record<string,string> = {
@@ -12,6 +13,8 @@ type Props = { evenement: Record<string, unknown> };
 
 export default function EditEvenementClient({ evenement: ev }: Props) {
   const router = useRouter();
+  const t = useTranslations('forms');
+  const tMC = useTranslations('monCompte');
   const [form, setForm] = useState({
     title:      String(ev.title      || ''),
     type:       String(ev.type       || ''),
@@ -36,23 +39,23 @@ export default function EditEvenementClient({ evenement: ev }: Props) {
     const urlToFetch = afUrl.trim() || form.url.trim();
     if (!urlToFetch) return;
     if (urlToFetch.includes('linkedin.com')) {
-      setAfMsg({ type: 'err', text: '⚠ LinkedIn ne permet pas la récupération automatique. Colle l\'URL directe de l\'événement (lu.ma, eventbrite, meetup…) pour l\'autofill.' });
+      setAfMsg({ type: 'err', text: t('evenement.linkedinError') });
       return;
     }
     setAfLoading(true); setAfMsg(null);
     try {
       const res  = await fetch(`/api/autofill?url=${encodeURIComponent(urlToFetch)}`);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erreur');
+      if (!res.ok) throw new Error(data.error || t('autofillFetchError'));
       setForm(f => ({
         ...f,
         ...(data.title   ? { title:   data.title   } : {}),
         ...(data.excerpt ? { excerpt: data.excerpt } : {}),
       }));
       const filled = [data.title, data.excerpt].filter(Boolean).length;
-      setAfMsg({ type: 'ok', text: `✓ ${filled} champ${filled > 1 ? 's' : ''} rempli${filled > 1 ? 's' : ''} automatiquement` });
+      setAfMsg({ type: 'ok', text: t('autofillFieldsFilled', { count: filled }) });
     } catch (e: unknown) {
-      setAfMsg({ type: 'err', text: e instanceof Error ? e.message : 'Impossible de récupérer les infos' });
+      setAfMsg({ type: 'err', text: e instanceof Error ? e.message : t('autofillFetchError') });
     } finally {
       setAfLoading(false);
     }
@@ -65,15 +68,15 @@ export default function EditEvenementClient({ evenement: ev }: Props) {
 
   function validate() {
     const e: Record<string, string> = {};
-    if (!form.title.trim())    e.title    = 'Champ requis';
-    if (!form.type)            e.type     = 'Sélectionne un type';
-    if (form.type === 'autre' && !form.type_autre.trim()) e.type_autre = 'Précise le type';
-    if (!form.pays.trim())     e.pays     = 'Champ requis';
-    if (!form.url.trim())      e.url      = 'Champ requis';
-    if (!form.date_debut)      e.date_debut = 'Champ requis';
-    if (!form.excerpt.trim())  e.excerpt  = 'Champ requis';
+    if (!form.title.trim())    e.title    = t('fieldRequired');
+    if (!form.type)            e.type     = t('evenement.selectType');
+    if (form.type === 'autre' && !form.type_autre.trim()) e.type_autre = t('evenement.preciserType');
+    if (!form.pays.trim())     e.pays     = t('fieldRequired');
+    if (!form.url.trim())      e.url      = t('fieldRequired');
+    if (!form.date_debut)      e.date_debut = t('fieldRequired');
+    if (!form.excerpt.trim())  e.excerpt  = t('fieldRequired');
     if (form.date_fin && form.date_debut && form.date_fin < form.date_debut)
-      e.date_fin = 'La date de fin doit être après la date de début';
+      e.date_fin = t('evenement.endDateError');
     return e;
   }
 
@@ -94,8 +97,8 @@ export default function EditEvenementClient({ evenement: ev }: Props) {
     setLoading(false);
 
     if (!res.ok) {
-      const { error } = await res.json().catch(() => ({ error: 'Erreur serveur' }));
-      setErrors(e => ({ ...e, title: error || 'Erreur lors de la mise à jour' }));
+      const { error } = await res.json().catch(() => ({ error: t('serverError') }));
+      setErrors(e => ({ ...e, title: error || tMC('updateError') }));
       return;
     }
     setSuccess(true);
@@ -105,7 +108,7 @@ export default function EditEvenementClient({ evenement: ev }: Props) {
   if (success) {
     return (
       <div style={{ border: '1px solid var(--f-border)', borderRadius: 8, padding: '2rem', textAlign: 'center' }}>
-        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.8rem', color: 'var(--f-green)', margin: 0 }}>✓ Événement mis à jour — redirection…</p>
+        <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.8rem', color: 'var(--f-green)', margin: 0 }}>{tMC('evenement.successEdit')}</p>
       </div>
     );
   }
@@ -129,7 +132,7 @@ export default function EditEvenementClient({ evenement: ev }: Props) {
           <button type="button" className="btn-f btn-f-secondary"
             onClick={handleAutofill} disabled={afLoading || (!afUrl.trim() && !form.url.trim())}
             style={{ fontSize: '.72rem', flexShrink: 0 }}>
-            {afLoading ? '…' : 'Autofill →'}
+            {afLoading ? '…' : t('autofillBtn')}
           </button>
         </div>
         {afMsg && (
@@ -139,20 +142,20 @@ export default function EditEvenementClient({ evenement: ev }: Props) {
         )}
       </div>
 
-      <Field label="Titre de l'événement" required error={errors.title}>
+      <Field label={t('evenement.titleLabel')} required error={errors.title}>
         <input className="f-input" value={form.title} onChange={e => set('title', e.target.value)} style={{ maxWidth: '100%' }} />
       </Field>
 
-      <Field label="Type d'événement" required error={errors.type}>
+      <Field label={t('evenement.typesLabel')} required error={errors.type}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem' }}>
-          {TYPES.map(t => (
-            <button key={t} type="button" className={`filter-pill${form.type === t ? ' active' : ''}`} onClick={() => set('type', t)}>
-              {TYPE_LABELS[t]}
+          {TYPES.map(tp => (
+            <button key={tp} type="button" className={`filter-pill${form.type === tp ? ' active' : ''}`} onClick={() => set('type', tp)}>
+              {TYPE_LABELS[tp]}
             </button>
           ))}
         </div>
         {form.type === 'autre' && (
-          <input className="f-input" placeholder="Précise le type d'événement"
+          <input className="f-input" placeholder={t('evenement.typePlaceholder')}
             value={form.type_autre} onChange={e => set('type_autre', e.target.value)}
             style={{ maxWidth: '100%', marginTop: '.75rem' }} />
         )}
@@ -160,11 +163,11 @@ export default function EditEvenementClient({ evenement: ev }: Props) {
       </Field>
 
       <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
-        <Field label="Pays" required error={errors.pays} style={{ flex: 1, minWidth: 180 }}>
+        <Field label={t('evenement.paysLabel')} required error={errors.pays} style={{ flex: 1, minWidth: 180 }}>
           <input className="f-input" placeholder="Ex: Côte d'Ivoire" value={form.pays}
             onChange={e => set('pays', e.target.value)} style={{ maxWidth: '100%' }} />
         </Field>
-        <Field label="Ville / Lieu" style={{ flex: 1, minWidth: 180 }}>
+        <Field label={t('evenement.lieuLabel')} style={{ flex: 1, minWidth: 180 }}>
           <input className="f-input" placeholder="Ex: Abidjan, Palais des Sports"
             value={form.lieu} onChange={e => set('lieu', e.target.value)} style={{ maxWidth: '100%' }} />
         </Field>
@@ -174,16 +177,16 @@ export default function EditEvenementClient({ evenement: ev }: Props) {
         <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer', fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-2)' }}>
           <input type="checkbox" checked={form.online} onChange={e => set('online', e.target.checked)}
             style={{ accentColor: 'var(--f-sky)', width: 16, height: 16 }} />
-          En ligne
+          {t('evenement.onlineLabel')}
         </label>
         <label style={{ display: 'flex', alignItems: 'center', gap: '.5rem', cursor: 'pointer', fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-2)' }}>
           <input type="checkbox" checked={form.gratuit} onChange={e => set('gratuit', e.target.checked)}
             style={{ accentColor: 'var(--f-green)', width: 16, height: 16 }} />
-          Gratuit
+          {t('evenement.gratuitLabel')}
         </label>
       </div>
 
-      <Field label="Lien vers l'événement" required error={errors.url}>
+      <Field label={t('evenement.urlLabel')} required error={errors.url}>
         <input className="f-input" type="text" value={form.url}
           onChange={e => set('url', e.target.value)}
           onBlur={e => { const v = e.target.value.trim(); if (v && !v.startsWith('http')) set('url', 'https://' + v); }}
@@ -191,26 +194,26 @@ export default function EditEvenementClient({ evenement: ev }: Props) {
       </Field>
 
       <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
-        <Field label="Date de début" required error={errors.date_debut} style={{ flex: 1, minWidth: 180 }}>
+        <Field label={t('evenement.startDateLabel')} required error={errors.date_debut} style={{ flex: 1, minWidth: 180 }}>
           <input className="f-input" type="date" value={form.date_debut}
             onChange={e => set('date_debut', e.target.value)} style={{ maxWidth: '100%' }} />
         </Field>
-        <Field label="Date de fin (optionnel)" error={errors.date_fin} style={{ flex: 1, minWidth: 180 }}>
+        <Field label={t('evenement.endDateLabel')} error={errors.date_fin} style={{ flex: 1, minWidth: 180 }}>
           <input className="f-input" type="date" value={form.date_fin}
             onChange={e => set('date_fin', e.target.value)} style={{ maxWidth: '100%' }} />
         </Field>
       </div>
 
-      <Field label="Description courte" required error={errors.excerpt}>
+      <Field label={t('descLabel')} required error={errors.excerpt}>
         <textarea className="f-input" value={form.excerpt} onChange={e => set('excerpt', e.target.value)}
           rows={3} style={{ maxWidth: '100%', resize: 'vertical' }} />
       </Field>
 
       <div style={{ display: 'flex', gap: '1rem', paddingTop: '.5rem' }}>
         <button type="submit" className="btn-f btn-f-primary" disabled={loading}>
-          {loading ? 'Enregistrement…' : 'Enregistrer →'}
+          {loading ? tMC('saving') : tMC('save')}
         </button>
-        <a href="/mon-compte?tab=evenements" className="btn-f btn-f-secondary">Annuler</a>
+        <a href="/mon-compte?tab=evenements" className="btn-f btn-f-secondary">{tMC('cancel')}</a>
       </div>
     </form>
   );

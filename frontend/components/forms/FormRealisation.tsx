@@ -34,7 +34,7 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
     try {
       const res  = await fetch(`/api/autofill?url=${encodeURIComponent(autofillUrl.trim())}`);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erreur');
+      if (!res.ok) throw new Error(data.error || t('autofillFetchError'));
       setForm(f => ({
         ...f,
         title:          data.title    || f.title,

@@ -40,7 +40,7 @@ export default function FormArticle({ onSuccess, username = '', hideEmail = fals
     try {
       const res  = await fetch(`/api/autofill?url=${encodeURIComponent(afUrl.trim())}`);
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erreur');
+      if (!res.ok) throw new Error(data.error || t('autofillFetchError'));
       const src = detectSource(afUrl);
       setForm(f => ({
         ...f,

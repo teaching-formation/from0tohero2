@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import CropModal from '@/components/CropModal';
+import { useTranslations } from 'next-intl';
 
 const PAYS_AFRIQUE = [
   'Afrique du Sud','Algérie','Angola','Bénin','Botswana','Burkina Faso','Burundi',
@@ -61,6 +62,7 @@ type Props = { praticien: Record<string, unknown> };
 
 export default function EditProfilClient({ praticien: p }: Props) {
   const router = useRouter();
+  const t = useTranslations('forms');
 
   const initStack   = Array.isArray(p.stack)      ? (p.stack      as string[]) : [];
   const initCats    = Array.isArray(p.categories) ? (p.categories as string[]) : p.category ? [String(p.category)] : [];
@@ -157,11 +159,11 @@ export default function EditProfilClient({ praticien: p }: Props) {
 
   function validate() {
     const e: Record<string, string> = {};
-    if (!form.name.trim())  e.name  = 'Champ requis';
-    if (!form.role.trim())  e.role  = 'Champ requis';
-    if (!form.pays.trim())  e.pays  = 'Sélectionne ton pays';
-    if (form.categories.length === 0) e.categories = 'Sélectionne au moins une catégorie';
-    if (selectedSkills.length === 0)  e.skills     = 'Sélectionne au moins une compétence';
+    if (!form.name.trim())  e.name  = t('fieldRequired');
+    if (!form.role.trim())  e.role  = t('fieldRequired');
+    if (!form.pays.trim())  e.pays  = t('profil.selectPaysError');
+    if (form.categories.length === 0) e.categories = t('profil.selectCategoryError');
+    if (selectedSkills.length === 0)  e.skills     = t('profil.selectSkillError');
     return e;
   }
 
@@ -209,8 +211,8 @@ export default function EditProfilClient({ praticien: p }: Props) {
     setLoading(false);
 
     if (!res.ok) {
-      const { error } = await res.json().catch(() => ({ error: 'Erreur serveur' }));
-      setErrors(e => ({ ...e, name: error || 'Erreur lors de la mise à jour' }));
+      const { error } = await res.json().catch(() => ({ error: t('serverError') }));
+      setErrors(e => ({ ...e, name: error || t('serverError') }));
       return;
     }
     setSuccess(true);
