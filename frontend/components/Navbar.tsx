@@ -113,7 +113,7 @@ export default function Navbar() {
       transition: 'background 0.3s ease, box-shadow 0.3s ease',
     }}>
       <div style={{
-        maxWidth: 1200, margin: '0 auto', padding: '0 4vw',
+        padding: '0 6vw',
         height: 60, display: 'flex', alignItems: 'stretch',
         justifyContent: 'space-between',
       }}>
