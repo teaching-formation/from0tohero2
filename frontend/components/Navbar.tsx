@@ -181,25 +181,25 @@ export default function Navbar() {
         </div>
 
         {/* Right actions */}
-        <div className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '.4rem', paddingLeft: '1rem', flexShrink: 0 }}>
+        <div className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '.3rem', paddingLeft: '.75rem', flexShrink: 0 }}>
           <Link href="/recherche" style={{
             color: pathname === '/recherche' ? 'var(--f-sky)' : 'var(--f-text-3)',
-            padding: '.4rem .5rem', display: 'flex', alignItems: 'center',
+            padding: '.3rem .4rem', display: 'flex', alignItems: 'center',
             transition: 'color .15s', textDecoration: 'none',
           }} title={t('rechercher')}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>
           </Link>
-          <Link href="/soumettre" className="btn-f btn-f-primary" style={{ fontSize: '.68rem', padding: '.45rem .9rem' }}>
+          <Link href="/soumettre" className="btn-f btn-f-primary" style={{ fontSize: '.65rem', padding: '.38rem .85rem' }}>
             {t('soumettre')}
           </Link>
           {isLoggedIn && <NotificationBell />}
           <Link
             href={isLoggedIn ? '/mon-compte' : '/connexion'}
             style={{
-              fontFamily: "'Geist Mono', monospace", fontSize: '.68rem',
-              padding: '.45rem .9rem', borderRadius: 7,
+              fontFamily: "'Geist Mono', monospace", fontSize: '.65rem',
+              padding: '.38rem .85rem', borderRadius: 7,
               border: '1.5px solid var(--f-border)', color: 'var(--f-text-2)',
               textDecoration: 'none', transition: 'border-color .15s, color .15s',
               whiteSpace: 'nowrap',
@@ -209,7 +209,7 @@ export default function Navbar() {
             {isLoggedIn ? t('monEspace') : t('connexion')}
           </Link>
           <LocaleSwitcher />
-          <button onClick={toggleDark} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--f-text-3)', fontSize: '1rem', lineHeight: 1, padding: '.25rem' }}>
+          <button onClick={toggleDark} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--f-text-3)', fontSize: '.95rem', lineHeight: 1, padding: '.2rem' }}>
             {dark ? '☀️' : '🌙'}
           </button>
         </div>
