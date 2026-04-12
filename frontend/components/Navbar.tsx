@@ -55,6 +55,7 @@ export default function Navbar() {
     { href: '/articles',     label: t('articles') },
     { href: '/evenements',   label: t('evenements') },
     { href: '/tips',         label: t('tips') },
+    { href: '/collections',  label: t('collections') },
   ];
 
   return (

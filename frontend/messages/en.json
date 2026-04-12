@@ -5,6 +5,7 @@
     "articles": "Articles",
     "evenements": "Events",
     "tips": "Tips",
+    "collections": "Collections",
     "rechercher": "Search",
     "soumettre": "Submit",
     "monEspace": "My space",
@@ -451,6 +452,17 @@
       "successNew": "✓ Collection created — redirecting…",
       "successEdit": "✓ Collection updated — redirecting…"
     }
+  },
+  "collectionsPage": {
+    "label": "// collections",
+    "title": "Collections",
+    "subtitle": "Resources curated by practitioners: books, tools, courses, articles.",
+    "searchPlaceholder": "Search a collection…",
+    "empty": "No collections found.",
+    "by": "by",
+    "resources": "{count, plural, one {# resource} other {# resources}}",
+    "loadMore": "Load more ({count})",
+    "counter": "{visible} / {total}"
   },
   "legal": {
     "label": "// legal",
