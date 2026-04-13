@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
 import Avatar from '@/components/Avatar';
 import FlagImg from '@/components/FlagImg';
 import { getCountryDisplay } from '@/lib/countryFlag';
@@ -38,6 +39,9 @@ export default function MonCompteClient({ user, praticien, articles, realisation
   const router       = useRouter();
   const searchParams = useSearchParams();
   const supabase     = createClient();
+  const t            = useTranslations('monCompte');
+  const locale       = useLocale();
+
   type Tab = 'profil' | 'articles' | 'realisations' | 'evenements' | 'collections' | 'tips';
   const rawTab    = searchParams.get('tab') ?? '';
   const initialTab: Tab = (['profil','articles','realisations','evenements','collections','tips'] as Tab[]).includes(rawTab as Tab)
@@ -57,7 +61,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
   }, []);
 
   async function deleteContent(table: 'articles' | 'realisations' | 'evenements', id: string, label: string) {
-    if (!window.confirm(`Supprimer "${label}" ? Cette action est irréversible.`)) return;
+    if (!window.confirm(t('delete.confirm', { title: label }))) return;
     setDeleting(id);
     const r = await fetch('/api/delete-content', {
       method: 'POST',
@@ -65,16 +69,16 @@ export default function MonCompteClient({ user, praticien, articles, realisation
       body: JSON.stringify({ table, id }),
     });
     setDeleting(null);
-    if (!r.ok) { alert('Erreur lors de la suppression.'); return; }
+    if (!r.ok) { alert(t('delete.error')); return; }
     router.refresh();
   }
 
   async function deleteTip(id: string) {
-    if (!window.confirm('Supprimer ce tip ? Cette action est irréversible.')) return;
+    if (!window.confirm(t('delete.confirmTip'))) return;
     setDeleting(id);
     const r = await fetch(`/api/tip/${id}`, { method: 'DELETE' });
     setDeleting(null);
-    if (!r.ok) { alert('Erreur lors de la suppression.'); return; }
+    if (!r.ok) { alert(t('delete.error')); return; }
     router.refresh();
   }
 
@@ -90,21 +94,23 @@ export default function MonCompteClient({ user, praticien, articles, realisation
       <div style={{ minHeight: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
         <div style={{ width: '100%', maxWidth: 520, textAlign: 'center' }}>
           <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--f-orange)', marginBottom: '.75rem' }}>
-            // bienvenue
+            {t('noProfile.label')}
           </p>
           <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.6rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .75rem 0' }}>
-            Tu n&apos;as pas encore de profil
+            {t('noProfile.title')}
           </h1>
           <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-3)', lineHeight: 1.7, marginBottom: '2rem' }}>
-            Connecté en tant que <strong style={{ color: 'var(--f-text-2)' }}>{user.email}</strong>.<br />
-            Crée ton profil praticien pour apparaître dans l&apos;annuaire.
+            {t.rich('noProfile.desc', {
+              email: user.email,
+              strong: (chunks) => <strong style={{ color: 'var(--f-text-2)' }}>{chunks}</strong>,
+            })}
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="/soumettre" className="btn-f btn-f-primary">
-              Créer mon profil →
+              {t('noProfile.createBtn')}
             </a>
             <button onClick={handleSignOut} className="btn-f btn-f-secondary">
-              Se déconnecter
+              {t('signOut')}
             </button>
           </div>
         </div>
@@ -130,7 +136,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
           />
           <div>
             <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--f-orange)', margin: '0 0 .4rem 0' }}>
-              // mon espace
+              {t('label')}
             </p>
             <h1 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.6rem', fontWeight: 700, color: 'var(--f-text-1)', margin: 0 }}>
               {String(p.name)}
@@ -141,18 +147,18 @@ export default function MonCompteClient({ user, praticien, articles, realisation
           </div>
         </div>
         <button onClick={handleSignOut} className="btn-f btn-f-secondary" style={{ fontSize: '.7rem' }}>
-          Se déconnecter
+          {t('signOut')}
         </button>
       </div>
 
       {/* Onboarding checklist — visible seulement si profil incomplet */}
       {(() => {
         const checks = [
-          { label: 'Profil créé',           done: true },
-          { label: 'Bio ajoutée',           done: !!p.bio },
-          { label: 'Stack renseignée',      done: Array.isArray(p.stack) && (p.stack as string[]).length > 0 },
-          { label: 'Photo de profil',       done: !!p.photo_url },
-          { label: 'Première réalisation',  done: realisations.length > 0 },
+          { label: t('onboarding.checkProfile'), done: true },
+          { label: t('onboarding.checkBio'),     done: !!p.bio },
+          { label: t('onboarding.checkStack'),   done: Array.isArray(p.stack) && (p.stack as string[]).length > 0 },
+          { label: t('onboarding.checkPhoto'),   done: !!p.photo_url },
+          { label: t('onboarding.checkReal'),    done: realisations.length > 0 },
         ];
         const doneCount = checks.filter(c => c.done).length;
         if (doneCount === checks.length) return null; // profil complet → masquer
@@ -161,7 +167,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
           <div style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 10, padding: '1.25rem 1.5rem', marginBottom: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '.75rem', flexWrap: 'wrap', gap: '.5rem' }}>
               <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-orange)', margin: 0 }}>
-                // complète ton profil
+                {t('onboarding.label')}
               </p>
               <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)' }}>
                 {doneCount}/{checks.length} · {pct}%
@@ -188,7 +194,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
               ))}
             </div>
             <a href="/mon-compte/edit" style={{ display: 'inline-block', marginTop: '.85rem', fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-orange)', textDecoration: 'none' }}>
-              Compléter mon profil →
+              {t('onboarding.complete')}
             </a>
           </div>
         );
@@ -197,30 +203,30 @@ export default function MonCompteClient({ user, praticien, articles, realisation
       {/* Tabs */}
       <div className="moncompte-tabs" style={{ display: 'flex', gap: '.5rem', borderBottom: '1px solid var(--f-border)', marginBottom: '2rem', overflowX: 'auto' }}>
         {([
-          { key: 'profil',       label: 'Mon profil' },
-          { key: 'articles',     label: `Articles (${articles.length})` },
-          { key: 'realisations', label: `Réalisations (${realisations.length})` },
-          { key: 'evenements',   label: `Événements (${evenements.length})` },
-          { key: 'collections',  label: `Collections (${collections.length})` },
-          { key: 'tips',         label: `Tips (${tips.length})` },
-        ] as { key: typeof tab; label: string }[]).map(t => (
+          { key: 'profil',       label: t('tabs.profil') },
+          { key: 'articles',     label: t('tabs.articles',     { count: articles.length }) },
+          { key: 'realisations', label: t('tabs.realisations', { count: realisations.length }) },
+          { key: 'evenements',   label: t('tabs.evenements',   { count: evenements.length }) },
+          { key: 'collections',  label: t('tabs.collections',  { count: collections.length }) },
+          { key: 'tips',         label: t('tabs.tips',         { count: tips.length }) },
+        ] as { key: typeof tab; label: string }[]).map(tabItem => (
           <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
+            key={tabItem.key}
+            onClick={() => setTab(tabItem.key)}
             style={{
               fontFamily: "'Geist Mono', monospace",
               fontSize: '.72rem',
               padding: '.6rem 1rem',
               border: 'none',
-              borderBottom: tab === t.key ? '2px solid var(--f-orange)' : '2px solid transparent',
+              borderBottom: tab === tabItem.key ? '2px solid var(--f-orange)' : '2px solid transparent',
               background: 'transparent',
-              color: tab === t.key ? 'var(--f-text-1)' : 'var(--f-text-3)',
+              color: tab === tabItem.key ? 'var(--f-text-1)' : 'var(--f-text-3)',
               cursor: 'pointer',
               marginBottom: '-1px',
               transition: 'color .15s',
             }}
           >
-            {t.label}
+            {tabItem.label}
           </button>
         ))}
       </div>
@@ -230,9 +236,9 @@ export default function MonCompteClient({ user, praticien, articles, realisation
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
             {[
-              { label: 'Rôle',      value: p.role },
-              { label: 'Catégorie', value: Array.isArray(p.categories) ? p.categories.join(', ') : String(p.category || '') },
-              { label: 'Stack',     value: Array.isArray(p.stack) ? (p.stack as string[]).slice(0, 6).join(', ') : '' },
+              { label: t('profil.role'),     value: p.role },
+              { label: t('profil.category'), value: Array.isArray(p.categories) ? p.categories.join(', ') : String(p.category || '') },
+              { label: t('profil.stack'),    value: Array.isArray(p.stack) ? (p.stack as string[]).slice(0, 6).join(', ') : '' },
             ].map(({ label, value }) => (
               <div key={label} style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1rem 1.25rem' }}>
                 <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 .4rem 0' }}>{label}</p>
@@ -241,7 +247,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
             ))}
             {/* Localisation avec drapeau image */}
             <div style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1rem 1.25rem' }}>
-              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 .4rem 0' }}>Localisation</p>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 .4rem 0' }}>{t('profil.location')}</p>
               <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-1)', margin: 0, display: 'flex', alignItems: 'center', gap: '.4rem' }}>
                 {p.country ? (
                   <><FlagImg country={String(p.country)} size={16} />{getCountryDisplay(String(p.country)).name || String(p.country)}</>
@@ -252,7 +258,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
 
           {!!p.bio && (
             <div style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1rem 1.25rem' }}>
-              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 .5rem 0' }}>Bio</p>
+              <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 .5rem 0' }}>{t('profil.bio')}</p>
               <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.75rem', color: 'var(--f-text-2)', lineHeight: 1.7, margin: 0 }}>{String(p.bio)}</p>
             </div>
           )}
@@ -261,7 +267,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
           <div style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 8, padding: '1.25rem 1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', flexWrap: 'wrap', gap: '.5rem' }}>
               <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: 0 }}>
-                // vues de profil
+                {t('profil.viewsLabel')}
               </p>
               {visitors.length > 0 && (
                 <button
@@ -273,15 +279,15 @@ export default function MonCompteClient({ user, praticien, articles, realisation
                     padding: '3px 10px', cursor: 'pointer',
                   }}
                 >
-                  Visiteurs ({visitors.length}) →
+                  {t('profil.visitors', { count: visitors.length })}
                 </button>
               )}
             </div>
             <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
               {[
-                { label: '7 jours',  value: viewStats.week },
-                { label: '30 jours', value: viewStats.month },
-                { label: 'total',    value: viewStats.total },
+                { label: t('profil.week'),  value: viewStats.week },
+                { label: t('profil.month'), value: viewStats.month },
+                { label: t('profil.total'), value: viewStats.total },
               ].map(({ label, value }) => (
                 <div key={label}>
                   <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.6rem', fontWeight: 800, color: 'var(--f-sky)', margin: '0 0 .2rem 0', lineHeight: 1 }}>{value}</p>
@@ -312,7 +318,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
                 {/* Header */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1.5rem', borderBottom: '1px solid var(--f-border)' }}>
                   <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--f-text-3)' }}>
-                    // visiteurs récents · {visitors.length}
+                    {t('profil.visitorsModal', { count: visitors.length })}
                   </span>
                   <button
                     onClick={() => setVisitorsOpen(false)}
@@ -342,8 +348,8 @@ export default function MonCompteClient({ user, praticien, articles, realisation
                         </p>
                       </div>
                       <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', whiteSpace: 'nowrap', flexShrink: 0 }}>
-                        {new Date(v.viewed_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })}
-                        {' '}{new Date(v.viewed_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(v.viewed_at).toLocaleDateString(locale, { day: '2-digit', month: 'short', year: 'numeric' })}
+                        {' '}{new Date(v.viewed_at).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </a>
                   ))}
@@ -354,10 +360,10 @@ export default function MonCompteClient({ user, praticien, articles, realisation
 
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <a href={`/mon-compte/edit`} className="btn-f btn-f-primary">
-              ✎ Modifier mon profil
+              {t('profil.editBtn')}
             </a>
             <a href={`/praticiens/${String(p.slug)}`} className="btn-f btn-f-secondary" target="_blank" rel="noreferrer">
-              Voir mon profil public →
+              {t('profil.viewPublic')}
             </a>
           </div>
         </div>
@@ -368,23 +374,23 @@ export default function MonCompteClient({ user, praticien, articles, realisation
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '.5rem', flexWrap: 'wrap' }}>
             <a href="/mon-compte/import-rss" className="btn-f btn-f-secondary" style={{ fontSize: '.72rem' }}>
-              ↓ Importer des articles
+              {t('articles.import')}
             </a>
             <a href="/mon-compte/nouvel-article" className="btn-f btn-f-primary" style={{ fontSize: '.72rem' }}>
-              + Ajouter un article
+              {t('articles.add')}
             </a>
           </div>
           {articles.length === 0 ? (
             <div style={{ border: '1.5px dashed var(--f-border)', borderRadius: 12, padding: '3rem 2rem', textAlign: 'center', background: 'var(--f-surface)' }}>
               <div style={{ fontSize: '2.2rem', marginBottom: '1rem' }}>✍️</div>
               <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0' }}>
-                Partage ton expertise
+                {t('articles.emptyTitle')}
               </p>
               <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', margin: '0 0 1.5rem 0', lineHeight: 1.7, maxWidth: 360, marginInline: 'auto' }}>
-                Publie un article, un tutoriel ou un retour d&apos;expérience. Tes pairs en ont besoin.
+                {t('articles.emptyDesc')}
               </p>
               <a href="/mon-compte/nouvel-article" className="btn-f btn-f-primary" style={{ fontSize: '.75rem' }}>
-                + Écrire mon premier article
+                {t('articles.emptyBtn')}
               </a>
             </div>
           ) : (articles as Record<string, unknown>[]).map((a) => (
@@ -397,7 +403,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
               </div>
               <div style={{ display: 'flex', gap: '.5rem', flexShrink: 0 }}>
                 <a href={`/mon-compte/article/${String(a.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem' }}>
-                  ✎ Modifier
+                  {t('editBtn')}
                 </a>
                 <button
                   onClick={() => deleteContent('articles', String(a.id), String(a.title))}
@@ -418,30 +424,30 @@ export default function MonCompteClient({ user, praticien, articles, realisation
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '.5rem', flexWrap: 'wrap' }}>
             <a href="/mon-compte/import-github" className="btn-f btn-f-secondary" style={{ fontSize: '.72rem' }}>
-              ↓ Importer depuis GitHub
+              {t('realisations.import')}
             </a>
             <a href="/mon-compte/nouvelle-realisation" className="btn-f btn-f-primary" style={{ fontSize: '.72rem' }}>
-              + Ajouter une réalisation
+              {t('realisations.add')}
             </a>
           </div>
           {realisations.length === 0 ? (
             <div style={{ border: '1.5px dashed var(--f-border)', borderRadius: 12, padding: '3rem 2rem', textAlign: 'center', background: 'var(--f-surface)' }}>
               <div style={{ fontSize: '2.2rem', marginBottom: '1rem' }}>⚡</div>
               <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0' }}>
-                Montre ce que tu as construit
+                {t('realisations.emptyTitle')}
               </p>
               <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', margin: '0 0 .75rem 0', lineHeight: 1.7, maxWidth: 380, marginInline: 'auto' }}>
-                Pipeline, dashboard, API, app… Colle ton lien GitHub et le formulaire se remplit automatiquement.
+                {t('realisations.emptyDesc')}
               </p>
               <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '1.25rem' }}>
-                {['Pipeline de données', 'Dashboard BI', 'API REST', 'App mobile'].map(ex => (
+                {([t('realisations.ex0'), t('realisations.ex1'), t('realisations.ex2'), t('realisations.ex3')] as string[]).map(ex => (
                   <span key={ex} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-sky)', border: '1px solid var(--f-sky-border)', background: 'var(--f-sky-bg)', padding: '3px 10px', borderRadius: 99 }}>
                     {ex}
                   </span>
                 ))}
               </div>
               <a href="/mon-compte/nouvelle-realisation" className="btn-f btn-f-primary" style={{ fontSize: '.75rem' }}>
-                + Ajouter ma première réalisation
+                {t('realisations.emptyBtn')}
               </a>
             </div>
           ) : (realisations as Record<string, unknown>[]).map((r) => {
@@ -453,7 +459,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
                     <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-text-1)', margin: 0, fontWeight: 500 }}>{String(r.title)}</p>
                     {isCoAuthor && (
                       <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', letterSpacing: '.07em', textTransform: 'uppercase', color: 'var(--f-sky)', background: 'rgba(56,189,248,.1)', border: '1px solid rgba(56,189,248,.3)', padding: '1px 7px', borderRadius: 99 }}>
-                        co-auteur
+                        {t('realisations.coauteur')}
                       </span>
                     )}
                   </div>
@@ -463,7 +469,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
                 </div>
                 <div style={{ display: 'flex', gap: '.5rem', flexShrink: 0 }}>
                   <a href={`/mon-compte/realisation/${String(r.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem' }}>
-                    ✎ Modifier
+                    {t('editBtn')}
                   </a>
                   {!isCoAuthor && (
                     <button
@@ -487,20 +493,20 @@ export default function MonCompteClient({ user, praticien, articles, realisation
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <a href="/mon-compte/nouvel-evenement" className="btn-f btn-f-primary" style={{ fontSize: '.72rem' }}>
-              + Ajouter un événement
+              {t('evenements.add')}
             </a>
           </div>
           {evenements.length === 0 ? (
             <div style={{ border: '1.5px dashed var(--f-border)', borderRadius: 12, padding: '3rem 2rem', textAlign: 'center', background: 'var(--f-surface)' }}>
               <div style={{ fontSize: '2.2rem', marginBottom: '1rem' }}>📅</div>
               <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0' }}>
-                Tu organises ou participes à un événement ?
+                {t('evenements.emptyTitle')}
               </p>
               <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', margin: '0 0 1.5rem 0', lineHeight: 1.7, maxWidth: 360, marginInline: 'auto' }}>
-                Meetup, conférence, hackathon, webinaire… Partage-le avec la communauté.
+                {t('evenements.emptyDesc')}
               </p>
               <a href="/mon-compte/nouvel-evenement" className="btn-f btn-f-primary" style={{ fontSize: '.75rem' }}>
-                + Ajouter un événement
+                {t('evenements.add')}
               </a>
             </div>
           ) : (evenements as Record<string, unknown>[]).map((ev) => (
@@ -508,12 +514,12 @@ export default function MonCompteClient({ user, praticien, articles, realisation
               <div>
                 <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.78rem', color: 'var(--f-text-1)', margin: '0 0 .25rem 0', fontWeight: 500 }}>{String(ev.title)}</p>
                 <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', margin: 0 }}>
-                  {ev.type_label ? String(ev.type_label) : (EVTYPE_LABEL[String(ev.type)] || String(ev.type))} · {String(ev.date_debut || '—')} {ev.online ? '· En ligne' : (ev.pays ? `· ${String(ev.pays)}` : '')}
+                  {ev.type_label ? String(ev.type_label) : (EVTYPE_LABEL[String(ev.type)] || String(ev.type))} · {String(ev.date_debut || '—')} {ev.online ? `· ${t('evenements.online')}` : (ev.pays ? `· ${String(ev.pays)}` : '')}
                 </p>
               </div>
               <div style={{ display: 'flex', gap: '.5rem', flexShrink: 0 }}>
                 <a href={`/mon-compte/evenement/${String(ev.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem' }}>
-                  ✎ Modifier
+                  {t('editBtn')}
                 </a>
                 <button
                   onClick={() => deleteContent('evenements', String(ev.id), String(ev.title))}
@@ -534,20 +540,20 @@ export default function MonCompteClient({ user, praticien, articles, realisation
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <a href="/mon-compte/collections/new" className="btn-f btn-f-primary" style={{ fontSize: '.72rem' }}>
-              + Nouvelle collection
+              {t('collections.add')}
             </a>
           </div>
           {collections.length === 0 ? (
             <div style={{ border: '1.5px dashed var(--f-border)', borderRadius: 12, padding: '3rem 2rem', textAlign: 'center', background: 'var(--f-surface)' }}>
               <div style={{ fontSize: '2.2rem', marginBottom: '1rem' }}>◈</div>
               <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0' }}>
-                Crée ta première collection
+                {t('collections.emptyTitle')}
               </p>
               <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', margin: '0 0 1.5rem 0', lineHeight: 1.7, maxWidth: 380, marginInline: 'auto' }}>
-                Regroupe des ressources utiles (livres, outils, articles, cours…) et partage-les sur ton profil.
+                {t('collections.emptyDesc')}
               </p>
               <a href="/mon-compte/collections/new" className="btn-f btn-f-primary" style={{ fontSize: '.75rem' }}>
-                + Créer une collection
+                {t('collections.emptyBtn')}
               </a>
             </div>
           ) : (collections as Record<string, unknown>[]).map((col) => {
@@ -560,11 +566,11 @@ export default function MonCompteClient({ user, praticien, articles, realisation
                     <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', margin: '0 0 .3rem 0' }}>{String(col.description)}</p>
                   )}
                   <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', margin: 0 }}>
-                    {items.length} ressource{items.length !== 1 ? 's' : ''}
+                    {t('collections.resources', { count: items.length })}
                   </p>
                 </div>
                 <a href={`/mon-compte/collections/${String(col.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem', flexShrink: 0 }}>
-                  ✎ Modifier
+                  {t('editBtn')}
                 </a>
               </div>
             );
@@ -577,20 +583,20 @@ export default function MonCompteClient({ user, praticien, articles, realisation
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <a href="/mon-compte/nouveau-tip" className="btn-f btn-f-primary" style={{ fontSize: '.72rem' }}>
-              + Nouveau tip
+              {t('tips.add')}
             </a>
           </div>
           {tips.length === 0 ? (
             <div style={{ border: '1.5px dashed var(--f-border)', borderRadius: 12, padding: '3rem 2rem', textAlign: 'center', background: 'var(--f-surface)' }}>
               <div style={{ fontSize: '2.2rem', marginBottom: '1rem' }}>💡</div>
               <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0' }}>
-                Partage ce que tu sais
+                {t('tips.emptyTitle')}
               </p>
               <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', margin: '0 0 1.5rem 0', lineHeight: 1.7, maxWidth: 380, marginInline: 'auto' }}>
-                Tips, TIL, snippets… Publie en 30 secondes. Instantanément visible sur ton profil et la homepage.
+                {t('tips.emptyDesc')}
               </p>
               <a href="/mon-compte/nouveau-tip" className="btn-f btn-f-primary" style={{ fontSize: '.75rem' }}>
-                + Publier mon premier tip
+                {t('tips.emptyBtn')}
               </a>
             </div>
           ) : (tips as Record<string, unknown>[]).map((tip) => (
@@ -610,7 +616,7 @@ export default function MonCompteClient({ user, praticien, articles, realisation
               </div>
               <div style={{ display: 'flex', gap: '.5rem', flexShrink: 0 }}>
                 <a href={`/mon-compte/tip/${String(tip.id)}/edit`} className="btn-f btn-f-secondary" style={{ fontSize: '.68rem' }}>
-                  ✎ Modifier
+                  {t('editBtn')}
                 </a>
                 <button
                   onClick={() => deleteTip(String(tip.id))}

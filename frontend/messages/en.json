@@ -452,6 +452,90 @@
       "confirmDelete": "Delete \"{title}\"? This action is irreversible.",
       "successNew": "✓ Collection created — redirecting…",
       "successEdit": "✓ Collection updated — redirecting…"
+    },
+    "label": "// my space",
+    "signOut": "Sign out",
+    "noProfile": {
+      "label": "// welcome",
+      "title": "You don't have a profile yet",
+      "desc": "Signed in as {email}. Create your practitioner profile to appear in the directory.",
+      "createBtn": "Create my profile →"
+    },
+    "onboarding": {
+      "label": "// complete your profile",
+      "checkProfile": "Profile created",
+      "checkBio": "Bio added",
+      "checkStack": "Stack filled in",
+      "checkPhoto": "Profile photo",
+      "checkReal": "First project",
+      "complete": "Complete my profile →"
+    },
+    "tabs": {
+      "profil": "My profile",
+      "articles": "Articles ({count})",
+      "realisations": "Projects ({count})",
+      "evenements": "Events ({count})",
+      "collections": "Collections ({count})",
+      "tips": "Tips ({count})"
+    },
+    "profil": {
+      "role": "Role",
+      "category": "Category",
+      "stack": "Stack",
+      "location": "Location",
+      "bio": "Bio",
+      "viewsLabel": "// profile views",
+      "visitors": "Visitors ({count}) →",
+      "week": "7 days",
+      "month": "30 days",
+      "total": "total",
+      "visitorsModal": "// recent visitors · {count}",
+      "editBtn": "✎ Edit my profile",
+      "viewPublic": "View my public profile →"
+    },
+    "articles": {
+      "import": "↓ Import articles",
+      "add": "+ Add an article",
+      "emptyTitle": "Share your expertise",
+      "emptyDesc": "Publish an article, a tutorial, or a retrospective. Your peers need it.",
+      "emptyBtn": "+ Write my first article"
+    },
+    "editBtn": "✎ Edit",
+    "realisations": {
+      "import": "↓ Import from GitHub",
+      "add": "+ Add a project",
+      "emptyTitle": "Show what you've built",
+      "emptyDesc": "Pipeline, dashboard, API, app… Paste your GitHub link and the form fills itself.",
+      "emptyBtn": "+ Add my first project",
+      "coauteur": "co-author",
+      "ex0": "Data pipeline",
+      "ex1": "BI Dashboard",
+      "ex2": "REST API",
+      "ex3": "Mobile app"
+    },
+    "evenements": {
+      "add": "+ Add an event",
+      "emptyTitle": "Are you organizing or attending an event?",
+      "emptyDesc": "Meetup, conference, hackathon, webinar… Share it with the community.",
+      "online": "Online"
+    },
+    "collections": {
+      "add": "+ New collection",
+      "emptyTitle": "Create your first collection",
+      "emptyDesc": "Group useful resources (books, tools, articles, courses…) and share them on your profile.",
+      "emptyBtn": "+ Create a collection",
+      "resources": "{count, plural, one {# resource} other {# resources}}"
+    },
+    "tips": {
+      "add": "+ New tip",
+      "emptyTitle": "Share what you know",
+      "emptyDesc": "Tips, TIL, snippets… Publish in 30 seconds. Instantly visible on your profile and homepage.",
+      "emptyBtn": "+ Publish my first tip"
+    },
+    "delete": {
+      "confirm": "Delete \"{title}\"? This action is irreversible.",
+      "confirmTip": "Delete this tip? This action is irreversible.",
+      "error": "Error while deleting."
     }
   },
   "collectionsPage": {

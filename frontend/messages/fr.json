@@ -452,6 +452,90 @@
       "confirmDelete": "Supprimer \"{title}\" ? Cette action est irréversible.",
       "successNew": "✓ Collection créée — redirection…",
       "successEdit": "✓ Collection mise à jour — redirection…"
+    },
+    "label": "// mon espace",
+    "signOut": "Se déconnecter",
+    "noProfile": {
+      "label": "// bienvenue",
+      "title": "Tu n'as pas encore de profil",
+      "desc": "Connecté en tant que {email}. Crée ton profil praticien pour apparaître dans l'annuaire.",
+      "createBtn": "Créer mon profil →"
+    },
+    "onboarding": {
+      "label": "// complète ton profil",
+      "checkProfile": "Profil créé",
+      "checkBio": "Bio ajoutée",
+      "checkStack": "Stack renseignée",
+      "checkPhoto": "Photo de profil",
+      "checkReal": "Première réalisation",
+      "complete": "Compléter mon profil →"
+    },
+    "tabs": {
+      "profil": "Mon profil",
+      "articles": "Articles ({count})",
+      "realisations": "Réalisations ({count})",
+      "evenements": "Événements ({count})",
+      "collections": "Collections ({count})",
+      "tips": "Tips ({count})"
+    },
+    "profil": {
+      "role": "Rôle",
+      "category": "Catégorie",
+      "stack": "Stack",
+      "location": "Localisation",
+      "bio": "Bio",
+      "viewsLabel": "// vues de profil",
+      "visitors": "Visiteurs ({count}) →",
+      "week": "7 jours",
+      "month": "30 jours",
+      "total": "total",
+      "visitorsModal": "// visiteurs récents · {count}",
+      "editBtn": "✎ Modifier mon profil",
+      "viewPublic": "Voir mon profil public →"
+    },
+    "articles": {
+      "import": "↓ Importer des articles",
+      "add": "+ Ajouter un article",
+      "emptyTitle": "Partage ton expertise",
+      "emptyDesc": "Publie un article, un tutoriel ou un retour d'expérience. Tes pairs en ont besoin.",
+      "emptyBtn": "+ Écrire mon premier article"
+    },
+    "editBtn": "✎ Modifier",
+    "realisations": {
+      "import": "↓ Importer depuis GitHub",
+      "add": "+ Ajouter une réalisation",
+      "emptyTitle": "Montre ce que tu as construit",
+      "emptyDesc": "Pipeline, dashboard, API, app… Colle ton lien GitHub et le formulaire se remplit automatiquement.",
+      "emptyBtn": "+ Ajouter ma première réalisation",
+      "coauteur": "co-auteur",
+      "ex0": "Pipeline de données",
+      "ex1": "Dashboard BI",
+      "ex2": "API REST",
+      "ex3": "App mobile"
+    },
+    "evenements": {
+      "add": "+ Ajouter un événement",
+      "emptyTitle": "Tu organises ou participes à un événement ?",
+      "emptyDesc": "Meetup, conférence, hackathon, webinaire… Partage-le avec la communauté.",
+      "online": "En ligne"
+    },
+    "collections": {
+      "add": "+ Nouvelle collection",
+      "emptyTitle": "Crée ta première collection",
+      "emptyDesc": "Regroupe des ressources utiles (livres, outils, articles, cours…) et partage-les sur ton profil.",
+      "emptyBtn": "+ Créer une collection",
+      "resources": "{count, plural, one {# ressource} other {# ressources}}"
+    },
+    "tips": {
+      "add": "+ Nouveau tip",
+      "emptyTitle": "Partage ce que tu sais",
+      "emptyDesc": "Tips, TIL, snippets… Publie en 30 secondes. Instantanément visible sur ton profil et la homepage.",
+      "emptyBtn": "+ Publier mon premier tip"
+    },
+    "delete": {
+      "confirm": "Supprimer \"{title}\" ? Cette action est irréversible.",
+      "confirmTip": "Supprimer ce tip ? Cette action est irréversible.",
+      "error": "Erreur lors de la suppression."
     }
   },
   "collectionsPage": {
