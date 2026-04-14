@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CursorGlow from '@/components/CursorGlow';
 import PageTransition from '@/components/PageTransition';
+import SplashScreen from '@/components/SplashScreen';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 
@@ -52,6 +53,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       }} />
       <body style={{ margin: 0, minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--f-bg)' }}>
         <NextIntlClientProvider locale={locale} messages={messages}>
+          <SplashScreen />
           <CursorGlow />
           <Navbar />
           <main style={{ flex: 1 }}>
