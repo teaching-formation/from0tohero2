@@ -5,7 +5,7 @@ const LINES = [
   '> initializing from0tohero.dev...',
   '> loading practitioners',
   '> mapping the tech scene',
-  '> ready.',
+  '> ready',
 ];
 
 export default function SplashScreen() {
