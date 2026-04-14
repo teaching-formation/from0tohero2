@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 const LINES = [
   '> initializing from0tohero.dev...',
   '> loading practitioners',
-  '> mapping the african tech scene',
+  '> mapping the tech scene',
   '> ready.',
 ];
 
