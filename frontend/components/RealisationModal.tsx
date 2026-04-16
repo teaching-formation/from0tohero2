@@ -300,13 +300,16 @@ export default function RealisationModal({ realisation, onClose }: Props) {
           )}
 
           {/* Stack */}
-          {realisation.stack?.length > 0 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.3rem' }}>
-              {realisation.stack.map(s => (
-                <span key={s} className="f-tag">{s}</span>
-              ))}
-            </div>
-          )}
+          {(() => {
+            const INVALID = new Set(['null', 'unfound', 'undefined', '']);
+            const clean = (realisation.stack ?? []).filter(s => s && !INVALID.has(s.toLowerCase().trim()));
+            if (!clean.length) return null;
+            return (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.3rem' }}>
+                {clean.map(s => <span key={s} className="f-tag">{s}</span>)}
+              </div>
+            );
+          })()}
 
           {/* Liens */}
           {(realisation.demo_url || realisation.repo_url) && (
