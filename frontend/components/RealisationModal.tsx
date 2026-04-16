@@ -208,7 +208,6 @@ export default function RealisationModal({ realisation, onClose }: Props) {
       }}
     >
       <div
-        ref={scrollRef}
         onClick={e => e.stopPropagation()}
         style={{
           background: 'var(--f-surface)',
@@ -216,11 +215,11 @@ export default function RealisationModal({ realisation, onClose }: Props) {
           borderRadius: 16,
           width: '100%',
           maxWidth: 680,
-          maxHeight: '90vh',
-          overflowY: 'auto',
+          height: '90vh',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
+          overflow: 'hidden',
         }}
       >
         {/* Focus sentinel — keeps scroll at top on all browsers/OS */}
@@ -233,64 +232,62 @@ export default function RealisationModal({ realisation, onClose }: Props) {
           borderRadius: '16px 16px 0 0',
         }} />
 
-        {/* Header modal */}
-        <div style={{ padding: '1.75rem 1.75rem 0', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', marginTop: '.25rem' }}>
-          <div style={{ flex: 1 }}>
-            {/* Badges */}
-            <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap', marginBottom: '.9rem' }}>
-              <span style={{
-                fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.09em',
-                textTransform: 'uppercase', color: catColor, border: `1px solid ${catColor}33`,
-                background: `${catColor}0d`, padding: '3px 9px', borderRadius: 99, fontWeight: 600,
-              }}>{CAT_LABEL[realisation.category] || realisation.category}</span>
-              <span style={{
-                fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.09em',
-                textTransform: 'uppercase', color: 'var(--f-text-3)', border: '1px solid var(--f-border)',
-                padding: '3px 9px', borderRadius: 99, fontWeight: 600,
-              }}>{typeIcon} {typeLabel}</span>
-            </div>
-
-            {/* Titre */}
-            <h2 style={{
-              fontFamily: "'Syne', sans-serif", fontSize: '1.25rem', fontWeight: 800,
-              color: 'var(--f-text-1)', margin: '0 0 .75rem', letterSpacing: '-.02em', lineHeight: 1.25,
-            }}>{realisation.title}</h2>
-
-            {/* Auteur + date */}
-            {realisation.praticiens && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', flexWrap: 'wrap', marginBottom: '.5rem' }}>
-                <Avatar name={realisation.praticiens.name} photoUrl={realisation.praticiens.photo_url ?? null} size={24} radius={6} fontSize=".5rem" />
-                <a
-                  href={`/praticiens/${realisation.praticiens.slug}`}
-                  style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.72rem', color: catColor, textDecoration: 'none', opacity: .85 }}
-                >
-                  {realisation.praticiens.name}
-                </a>
-                {realisation.date_published && (
-                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)' }}>
-                    · {realisation.date_published}
-                  </span>
-                )}
-                <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', marginLeft: 'auto' }}>
-                  {t('submittedOn')} {formatDateTime(realisation.created_at)}
-                </span>
+        {/* ── HEADER fixe ─────────────────────────────────────────────────── */}
+        <div style={{
+          padding: '1.25rem 1.5rem 1rem',
+          borderBottom: '1px solid var(--f-border)',
+          flexShrink: 0,
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {/* Badges */}
+              <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap', marginBottom: '.65rem' }}>
+                <span style={{
+                  fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.09em',
+                  textTransform: 'uppercase', color: catColor, border: `1px solid ${catColor}33`,
+                  background: `${catColor}0d`, padding: '3px 9px', borderRadius: 99, fontWeight: 600,
+                }}>{CAT_LABEL[realisation.category] || realisation.category}</span>
+                <span style={{
+                  fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.09em',
+                  textTransform: 'uppercase', color: 'var(--f-text-3)', border: '1px solid var(--f-border)',
+                  padding: '3px 9px', borderRadius: 99, fontWeight: 600,
+                }}>{typeIcon} {typeLabel}</span>
               </div>
-            )}
-          </div>
-
-          {/* Close */}
-          <button
-            onClick={onClose}
-            style={{
+              {/* Titre */}
+              <h2 style={{
+                fontFamily: "'Syne', sans-serif", fontSize: '1.15rem', fontWeight: 800,
+                color: 'var(--f-text-1)', margin: '0 0 .6rem', letterSpacing: '-.02em', lineHeight: 1.25,
+              }}>{realisation.title}</h2>
+              {/* Auteur + date */}
+              {realisation.praticiens && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', flexWrap: 'wrap' }}>
+                  <Avatar name={realisation.praticiens.name} photoUrl={realisation.praticiens.photo_url ?? null} size={22} radius={6} fontSize=".5rem" />
+                  <a href={`/praticiens/${realisation.praticiens.slug}`}
+                    style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: catColor, textDecoration: 'none', opacity: .85 }}>
+                    {realisation.praticiens.name}
+                  </a>
+                  {realisation.date_published && (
+                    <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.63rem', color: 'var(--f-text-3)' }}>
+                      · {realisation.date_published}
+                    </span>
+                  )}
+                  <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', color: 'var(--f-text-3)', marginLeft: 'auto' }}>
+                    {t('submittedOn')} {formatDateTime(realisation.created_at)}
+                  </span>
+                </div>
+              )}
+            </div>
+            {/* Close */}
+            <button onClick={onClose} style={{
               background: 'none', border: '1px solid var(--f-border)', borderRadius: 8,
               padding: '4px 8px', cursor: 'pointer', color: 'var(--f-text-3)',
               fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', flexShrink: 0,
-            }}
-          >✕</button>
+            }}>✕</button>
+          </div>
         </div>
 
-        {/* Body */}
-        <div style={{ padding: '1rem 1.75rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {/* ── BODY scrollable ──────────────────────────────────────────────── */}
+        <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '.9rem' }}>
 
           {/* Excerpt */}
           {realisation.excerpt && (
@@ -311,32 +308,26 @@ export default function RealisationModal({ realisation, onClose }: Props) {
             );
           })()}
 
-          {/* Liens */}
-          {(realisation.demo_url || realisation.repo_url) && (
-            <div style={{ display: 'flex', gap: '.5rem' }}>
-              {realisation.demo_url && (
-                <a href={realisation.demo_url} target="_blank" rel="noreferrer" style={{
-                  fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', color: catColor,
-                  border: `1px solid ${catColor}44`, background: `${catColor}0a`,
-                  padding: '5px 14px', borderRadius: 99, textDecoration: 'none',
-                }}>{t('demo')}</a>
-              )}
-              {realisation.repo_url && (
-                <a href={realisation.repo_url} target="_blank" rel="noreferrer" style={{
-                  fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', color: 'var(--f-text-3)',
-                  border: '1px solid var(--f-border)', padding: '5px 14px', borderRadius: 99, textDecoration: 'none',
-                }}>{t('repo')}</a>
-              )}
-            </div>
-          )}
-
-          {/* Like */}
-          <div>
+          {/* Liens + Like */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', flexWrap: 'wrap' }}>
+            {realisation.demo_url && (
+              <a href={realisation.demo_url} target="_blank" rel="noreferrer" style={{
+                fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', color: catColor,
+                border: `1px solid ${catColor}44`, background: `${catColor}0a`,
+                padding: '5px 14px', borderRadius: 99, textDecoration: 'none',
+              }}>{t('demo')}</a>
+            )}
+            {realisation.repo_url && (
+              <a href={realisation.repo_url} target="_blank" rel="noreferrer" style={{
+                fontFamily: "'Geist Mono', monospace", fontSize: '.68rem', color: 'var(--f-text-3)',
+                border: '1px solid var(--f-border)', padding: '5px 14px', borderRadius: 99, textDecoration: 'none',
+              }}>{t('repo')}</a>
+            )}
             <LikeButton contentType="realisation" contentId={realisation.id} initialCount={0} initialLiked={false} />
           </div>
 
-          {/* Séparateur commentaires */}
-          <div style={{ borderTop: '1px solid var(--f-border)', paddingTop: '1rem' }}>
+          {/* Séparateur + label commentaires */}
+          <div style={{ borderTop: '1px solid var(--f-border)', paddingTop: '.75rem' }}>
             <span style={{
               fontFamily: "'Geist Mono', monospace", fontSize: '.65rem',
               color: 'var(--f-text-3)', letterSpacing: '.06em', textTransform: 'uppercase',
@@ -347,13 +338,9 @@ export default function RealisationModal({ realisation, onClose }: Props) {
 
           {/* Liste commentaires */}
           {loadingComments ? (
-            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', margin: 0 }}>
-              {t('loading')}
-            </p>
+            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', margin: 0 }}>{t('loading')}</p>
           ) : comments.length === 0 ? (
-            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', margin: 0 }}>
-              {t('beFirst')}
-            </p>
+            <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.65rem', color: 'var(--f-text-3)', margin: 0 }}>{t('beFirst')}</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '.85rem' }}>
               {comments.map(c => {
@@ -363,7 +350,6 @@ export default function RealisationModal({ realisation, onClose }: Props) {
                 const isShowingOriginal = showOriginal[c.id];
                 const isTranslating = translating[c.id];
                 const displayContent = translated && !isShowingOriginal ? translated : c.content;
-
                 return (
                   <div key={c.id} style={{ display: 'flex', gap: '.6rem', alignItems: 'flex-start' }}>
                     {c.praticiens && (
@@ -382,63 +368,40 @@ export default function RealisationModal({ realisation, onClose }: Props) {
                         </span>
                         {isOwn && !isEditing && (
                           <div style={{ marginLeft: 'auto', display: 'flex', gap: '.35rem' }}>
-                            <button
-                              onClick={() => { setEditingId(c.id); setEditText(c.content); }}
-                              style={{
-                                background: 'none', border: '1px solid var(--f-border)',
-                                borderRadius: 5, padding: '2px 7px', cursor: 'pointer',
-                                fontFamily: "'Geist Mono', monospace", fontSize: '.58rem',
-                                color: 'var(--f-text-3)',
-                              }}
-                            >{t('edit')}</button>
-                            <button
-                              onClick={() => deleteComment(c.id)}
-                              style={{
-                                background: 'none', border: '1px solid #f8717133',
-                                borderRadius: 5, padding: '2px 7px', cursor: 'pointer',
-                                fontFamily: "'Geist Mono', monospace", fontSize: '.58rem',
-                                color: '#f87171',
-                              }}
-                            >{t('delete')}</button>
+                            <button onClick={() => { setEditingId(c.id); setEditText(c.content); }} style={{
+                              background: 'none', border: '1px solid var(--f-border)', borderRadius: 5,
+                              padding: '2px 7px', cursor: 'pointer', fontFamily: "'Geist Mono', monospace",
+                              fontSize: '.58rem', color: 'var(--f-text-3)',
+                            }}>{t('edit')}</button>
+                            <button onClick={() => deleteComment(c.id)} style={{
+                              background: 'none', border: '1px solid #f8717133', borderRadius: 5,
+                              padding: '2px 7px', cursor: 'pointer', fontFamily: "'Geist Mono', monospace",
+                              fontSize: '.58rem', color: '#f87171',
+                            }}>{t('delete')}</button>
                           </div>
                         )}
                       </div>
-
                       {isEditing ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '.35rem' }}>
-                          <textarea
-                            value={editText}
-                            onChange={e => setEditText(e.target.value)}
-                            maxLength={500}
-                            rows={2}
-                            autoFocus
-                            style={{
-                              width: '100%', resize: 'none',
-                              background: 'var(--f-bg)', border: '1px solid var(--f-sky)',
-                              borderRadius: 6, padding: '.4rem .6rem',
+                          <textarea value={editText} onChange={e => setEditText(e.target.value)}
+                            maxLength={500} rows={2} autoFocus style={{
+                              width: '100%', resize: 'none', background: 'var(--f-bg)',
+                              border: '1px solid var(--f-sky)', borderRadius: 6, padding: '.4rem .6rem',
                               fontFamily: "'Geist Mono', monospace", fontSize: '.72rem',
                               color: 'var(--f-text-1)', outline: 'none', boxSizing: 'border-box',
-                            }}
-                          />
+                            }} />
                           <div style={{ display: 'flex', gap: '.35rem', justifyContent: 'flex-end' }}>
-                            <button
-                              onClick={() => { setEditingId(null); setEditText(''); }}
-                              style={{
-                                background: 'none', border: '1px solid var(--f-border)',
-                                borderRadius: 5, padding: '3px 10px', cursor: 'pointer',
-                                fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)',
-                              }}
-                            >{t('cancel')}</button>
-                            <button
-                              onClick={() => saveEdit(c.id)}
-                              disabled={savingEdit || editText.trim().length < 2}
-                              style={{
-                                border: 'none', borderRadius: 5, padding: '3px 10px', cursor: 'pointer',
-                                fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', fontWeight: 600,
-                                background: editText.trim().length >= 2 ? 'var(--f-sky)' : 'var(--f-border)',
-                                color: editText.trim().length >= 2 ? '#0d1117' : 'var(--f-text-3)',
-                              }}
-                            >{savingEdit ? '…' : t('save')}</button>
+                            <button onClick={() => { setEditingId(null); setEditText(''); }} style={{
+                              background: 'none', border: '1px solid var(--f-border)', borderRadius: 5,
+                              padding: '3px 10px', cursor: 'pointer', fontFamily: "'Geist Mono', monospace",
+                              fontSize: '.6rem', color: 'var(--f-text-3)',
+                            }}>{t('cancel')}</button>
+                            <button onClick={() => saveEdit(c.id)} disabled={savingEdit || editText.trim().length < 2} style={{
+                              border: 'none', borderRadius: 5, padding: '3px 10px', cursor: 'pointer',
+                              fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', fontWeight: 600,
+                              background: editText.trim().length >= 2 ? 'var(--f-sky)' : 'var(--f-border)',
+                              color: editText.trim().length >= 2 ? '#0d1117' : 'var(--f-text-3)',
+                            }}>{savingEdit ? '…' : t('save')}</button>
                           </div>
                         </div>
                       ) : (
@@ -449,28 +412,17 @@ export default function RealisationModal({ realisation, onClose }: Props) {
                           }}>{displayContent}</p>
                           <div style={{ display: 'flex', gap: '.35rem', alignItems: 'center' }}>
                             {!translated ? (
-                              <button
-                                onClick={() => translateComment(c.id, c.content)}
-                                disabled={isTranslating}
-                                style={{
-                                  background: 'none', border: 'none', cursor: isTranslating ? 'wait' : 'pointer',
-                                  fontFamily: "'Geist Mono', monospace", fontSize: '.56rem',
-                                  color: 'var(--f-text-3)', padding: 0, opacity: isTranslating ? 0.5 : 1,
-                                }}
-                              >
-                                {isTranslating ? t('translating') : t('translate')}
-                              </button>
+                              <button onClick={() => translateComment(c.id, c.content)} disabled={isTranslating} style={{
+                                background: 'none', border: 'none', cursor: isTranslating ? 'wait' : 'pointer',
+                                fontFamily: "'Geist Mono', monospace", fontSize: '.56rem',
+                                color: 'var(--f-text-3)', padding: 0, opacity: isTranslating ? 0.5 : 1,
+                              }}>{isTranslating ? t('translating') : t('translate')}</button>
                             ) : (
-                              <button
-                                onClick={() => setShowOriginal(prev => ({ ...prev, [c.id]: !isShowingOriginal }))}
-                                style={{
-                                  background: 'none', border: 'none', cursor: 'pointer',
-                                  fontFamily: "'Geist Mono', monospace", fontSize: '.56rem',
-                                  color: 'var(--f-sky)', padding: 0,
-                                }}
-                              >
-                                {isShowingOriginal ? t('showTranslation') : t('showOriginal')}
-                              </button>
+                              <button onClick={() => setShowOriginal(prev => ({ ...prev, [c.id]: !isShowingOriginal }))} style={{
+                                background: 'none', border: 'none', cursor: 'pointer',
+                                fontFamily: "'Geist Mono', monospace", fontSize: '.56rem',
+                                color: 'var(--f-sky)', padding: 0,
+                              }}>{isShowingOriginal ? t('showTranslation') : t('showOriginal')}</button>
                             )}
                           </div>
                         </>
@@ -481,9 +433,16 @@ export default function RealisationModal({ realisation, onClose }: Props) {
               })}
             </div>
           )}
+        </div>
 
-          {/* Form ajout commentaire */}
-          <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '.4rem', marginTop: '.25rem' }}>
+        {/* ── FOOTER fixe : formulaire commentaire ────────────────────────── */}
+        <div style={{
+          padding: '.9rem 1.5rem',
+          borderTop: '1px solid var(--f-border)',
+          flexShrink: 0,
+          background: 'var(--f-surface)',
+        }}>
+          <form onSubmit={submit} style={{ display: 'flex', gap: '.5rem', alignItems: 'flex-end' }}>
             <textarea
               ref={inputRef}
               value={text}
@@ -492,21 +451,22 @@ export default function RealisationModal({ realisation, onClose }: Props) {
               maxLength={500}
               rows={2}
               style={{
-                width: '100%', resize: 'none',
+                flex: 1, resize: 'none',
                 background: 'var(--f-bg)', border: '1px solid var(--f-border)',
-                borderRadius: 6, padding: '.5rem .7rem',
+                borderRadius: 8, padding: '.5rem .7rem',
                 fontFamily: "'Geist Mono', monospace", fontSize: '.74rem',
                 color: 'var(--f-text-1)', outline: 'none', boxSizing: 'border-box',
+                transition: 'border-color .15s',
               }}
+              onFocus={e => e.currentTarget.style.borderColor = 'var(--f-sky)'}
+              onBlur={e => e.currentTarget.style.borderColor = 'var(--f-border)'}
             />
-            {error && <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: '#f87171', margin: 0 }}>{error}</p>}
             <button
               type="submit"
               disabled={sending || text.trim().length < 2}
               style={{
-                alignSelf: 'flex-end',
                 fontFamily: "'Geist Mono', monospace", fontSize: '.64rem', fontWeight: 600,
-                padding: '5px 14px', borderRadius: 6, border: 'none',
+                padding: '8px 16px', borderRadius: 8, border: 'none', flexShrink: 0,
                 background: text.trim().length >= 2 ? 'var(--f-sky)' : 'var(--f-border)',
                 color: text.trim().length >= 2 ? '#0d1117' : 'var(--f-text-3)',
                 cursor: sending || text.trim().length < 2 ? 'not-allowed' : 'pointer',
@@ -514,6 +474,7 @@ export default function RealisationModal({ realisation, onClose }: Props) {
               }}
             >{sending ? '…' : t('send')}</button>
           </form>
+          {error && <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: '#f87171', margin: '.4rem 0 0' }}>{error}</p>}
         </div>
       </div>
     </div>
