@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
+import { headers } from 'next/headers';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -23,11 +24,13 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
   const messages = await getMessages();
+  const nonce = (await headers()).get('x-nonce') ?? '';
 
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{
+        {/* suppressHydrationWarning: browsers strip nonce from DOM after reading (security), causing expected SSR/client mismatch */}
+        <script nonce={nonce} suppressHydrationWarning dangerouslySetInnerHTML={{
           __html: `
             (function(){
               var t = localStorage.getItem('theme');
@@ -42,8 +45,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           `
         }} />
       </head>
-      <Script src="https://www.googletagmanager.com/gtag/js?id=G-X97KF9BC91" strategy="afterInteractive" />
-      <Script id="gtag-init" strategy="afterInteractive" dangerouslySetInnerHTML={{
+      <Script nonce={nonce} src="https://www.googletagmanager.com/gtag/js?id=G-X97KF9BC91" strategy="afterInteractive" />
+      <Script nonce={nonce} id="gtag-init" strategy="afterInteractive" dangerouslySetInnerHTML={{
         __html: `
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}

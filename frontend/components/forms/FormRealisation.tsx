@@ -91,7 +91,10 @@ export default function FormRealisation({ onSuccess, username = '', hideEmail = 
         type: 'realisation',
         payload: {
           ...form,
-          stack: form.stack.split(',').map(s => s.trim()).filter(Boolean),
+          stack: form.stack.split(',').map(s => s.trim()).filter(s => {
+            const v = s.toLowerCase();
+            return s && v !== 'null' && v !== 'unfound' && v !== 'undefined';
+          }),
           type_label: form.type === 'autre' ? form.type_autre : TYPE_LABELS[form.type],
           collaborateurs,
         },

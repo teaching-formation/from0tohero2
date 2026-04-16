@@ -135,9 +135,13 @@ export async function POST(req: Request) {
           category:       payload.category,
           type:           payload.type,
           type_label:     payload.type === 'autre' ? (payload.type_label || null) : null,
-          stack:          Array.isArray(payload.stack)
-            ? payload.stack
-            : String(payload.stack || '').split(',').map((s: string) => s.trim()).filter(Boolean),
+          stack:          (() => {
+            const INVALID = new Set(['null', 'unfound', 'undefined', '']);
+            const raw: string[] = Array.isArray(payload.stack)
+              ? payload.stack
+              : String(payload.stack || '').split(',').map((s: string) => s.trim());
+            return raw.filter((s: string) => s && !INVALID.has(s.toLowerCase().trim()));
+          })(),
           excerpt:         payload.excerpt || null,
           demo_url:        payload.demo_url   || null,
           repo_url:        payload.repo_url   || null,

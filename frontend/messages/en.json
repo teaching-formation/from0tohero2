@@ -13,8 +13,8 @@
     "connexion": "Sign in"
   },
   "home": {
-    "tagline1": "What they built.",
-    "tagline2": "Not what they promised.",
+    "tagline1": "What they built",
+    "tagline2": "Not what they promised",
     "subtitle": "Profiles, projects and resources from tech practitioners —",
     "subtitleLine2": "Data, DevOps, Cloud, AI, Cyber, Dev.",
     "cta1": "View practitioners →",
@@ -233,8 +233,8 @@
     "timeAgoDay": "{count}d ago"
   },
   "footer": {
-    "tagline1": "What they built.",
-    "tagline2": "Not what they promised.",
+    "tagline1": "What they built",
+    "tagline2": "Not what they promised",
     "explore": "Explore",
     "platform": "Platform",
     "legal": "Legal notices",

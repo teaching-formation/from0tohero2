@@ -257,25 +257,30 @@ export default function RealisationsPage() {
                   {/* Spacer */}
                   <div style={{ flex: 1 }} />
 
-                  {/* Stack */}
-                  {r.stack?.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.3rem' }}>
-                      {r.stack.slice(0, 5).map(s => (
-                        <button
-                          key={s}
-                          onClick={e => { e.stopPropagation(); setActiveStack(activeStack === s ? '' : s); }}
-                          className="f-tag"
-                          style={{
-                            cursor: 'pointer', border: 'none', background: activeStack === s ? 'var(--f-sky)' : undefined,
-                            color: activeStack === s ? '#0d1117' : undefined, fontWeight: activeStack === s ? 700 : undefined,
-                          }}
-                        >{s}</button>
-                      ))}
-                      {r.stack.length > 5 && (
-                        <span className="f-tag" style={{ color: 'var(--f-text-3)' }}>+{r.stack.length - 5}</span>
-                      )}
-                    </div>
-                  )}
+                  {/* Stack — filter bad values (null, unfound) from old submissions */}
+                  {(() => {
+                    const INVALID = new Set(['null', 'unfound', 'undefined', '']);
+                    const cleanStack = (r.stack ?? []).filter(s => s && !INVALID.has(s.toLowerCase().trim()));
+                    if (!cleanStack.length) return null;
+                    return (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.3rem' }}>
+                        {cleanStack.slice(0, 5).map(s => (
+                          <button
+                            key={s}
+                            onClick={e => { e.stopPropagation(); setActiveStack(activeStack === s ? '' : s); }}
+                            className="f-tag"
+                            style={{
+                              cursor: 'pointer', border: 'none', background: activeStack === s ? 'var(--f-sky)' : undefined,
+                              color: activeStack === s ? '#0d1117' : undefined, fontWeight: activeStack === s ? 700 : undefined,
+                            }}
+                          >{s}</button>
+                        ))}
+                        {cleanStack.length > 5 && (
+                          <span className="f-tag" style={{ color: 'var(--f-text-3)' }}>+{cleanStack.length - 5}</span>
+                        )}
+                      </div>
+                    );
+                  })()}
 
                   {/* Footer : liens + like + commentaires */}
                   <div style={{

@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
-export const alt = 'from0tohero.dev — Ce qu\'ils ont construit. Pas ce qu\'ils ont promis.';
+export const alt = 'from0tohero.dev — Ce qu\'ils ont construit. Pas ce qu\'ils ont promis';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -42,11 +42,11 @@ export default function OGImage() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
           <span style={{ fontSize: 72, fontWeight: 800, color: '#f0f6fc', lineHeight: 1.05, display: 'flex' }}>
             Ce qu'ils ont{' '}
-            <span style={{ color: '#38bdf8', marginLeft: 16 }}>construit.</span>
+            <span style={{ color: '#38bdf8', marginLeft: 16 }}>construit</span>
           </span>
           <span style={{ fontSize: 72, fontWeight: 800, color: '#f0f6fc', lineHeight: 1.05, display: 'flex' }}>
             Pas ce qu'ils ont{' '}
-            <span style={{ color: '#fb923c', marginLeft: 16 }}>promis.</span>
+            <span style={{ color: '#fb923c', marginLeft: 16 }}>promis</span>
           </span>
         </div>
 

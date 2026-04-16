@@ -13,10 +13,10 @@ import { getTranslations } from 'next-intl/server';
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: 'from0tohero.dev — Ce qu\'ils ont construit. Pas ce qu\'ils ont promis.',
+  title: 'from0tohero.dev — Ce qu\'ils ont construit. Pas ce qu\'ils ont promis',
   description: 'Articles, réalisations et profils de praticiens tech — Data, DevOps, Cloud, IA, Cybersécurité, Dev.',
   openGraph: {
-    title: 'from0tohero.dev — Ce qu\'ils ont construit. Pas ce qu\'ils ont promis.',
+    title: 'from0tohero.dev — Ce qu\'ils ont construit. Pas ce qu\'ils ont promis',
     description: 'Articles, réalisations et profils de praticiens tech.',
     url: 'https://from0tohero.dev',
     images: [{ url: 'https://from0tohero.dev/og-banner.png' }],
@@ -337,7 +337,10 @@ export default async function Home() {
                 {lastRealisations.map((r) => {
                   const href = r.demo_url || r.repo_url || `/realisations`;
                   const isExternal = !!(r.demo_url || r.repo_url);
-                  const stack = Array.isArray(r.stack) ? r.stack.slice(0, 4).join(' · ') : '';
+                  const INVALID_STACK = new Set(['null', 'unfound', 'undefined', '']);
+                  const stack = Array.isArray(r.stack)
+                    ? r.stack.filter((s: string) => s && !INVALID_STACK.has(s.toLowerCase().trim())).slice(0, 4).join(' · ')
+                    : '';
                   return (
                     <Link key={r.slug} href={href} {...(isExternal ? { target: '_blank', rel: 'noreferrer' } : {})} className="f-card-link" style={{ display: 'flex', height: '100%' }}>
                       <div className="f-card f-card-hover" style={{ padding: '1.1rem 1.25rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '.5rem' }}>

@@ -13,8 +13,8 @@
     "connexion": "Connexion"
   },
   "home": {
-    "tagline1": "Ce qu'ils ont construit.",
-    "tagline2": "Pas ce qu'ils ont promis.",
+    "tagline1": "Ce qu'ils ont construit",
+    "tagline2": "Pas ce qu'ils ont promis",
     "subtitle": "Profils, réalisations et ressources de praticiens tech —",
     "subtitleLine2": "Data, DevOps, Cloud, IA, Cyber, Dev.",
     "cta1": "Voir les praticiens →",
@@ -233,8 +233,8 @@
     "timeAgoDay": "il y a {count}j"
   },
   "footer": {
-    "tagline1": "Ce qu'ils ont construit.",
-    "tagline2": "Pas ce qu'ils ont promis.",
+    "tagline1": "Ce qu'ils ont construit",
+    "tagline2": "Pas ce qu'ils ont promis",
     "explore": "Explorer",
     "platform": "Plateforme",
     "legal": "Mentions légales",
