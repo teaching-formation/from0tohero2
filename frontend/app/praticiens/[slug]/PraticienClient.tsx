@@ -311,9 +311,16 @@ export default function PraticienClient({ praticien: p, realisations, collection
                   </div>
                   <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.05rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0' }}>{r.title}</h3>
                   <p style={{ fontSize: '.85rem', color: 'var(--f-text-2)', lineHeight: 1.7, margin: '0 0 1.1rem 0' }}>{r.excerpt}</p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginBottom: '1.1rem' }}>
-                    {r.stack.map(s => <span key={s} className="f-tag">{s}</span>)}
-                  </div>
+                  {(() => {
+                    const INVALID = new Set(['null', 'unfound', 'undefined', '']);
+                    const clean = (r.stack ?? []).filter((s: string) => s && !INVALID.has(s.toLowerCase().trim()));
+                    if (!clean.length) return null;
+                    return (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginBottom: '1.1rem' }}>
+                        {clean.map((s: string) => <span key={s} className="f-tag">{s}</span>)}
+                      </div>
+                    );
+                  })()}
                   {Array.isArray(r.collaborateurs) && (r.collaborateurs as string[]).length > 0 && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.35rem', marginBottom: '.85rem' }}>
                       <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)' }}>{t('with')}</span>
@@ -357,13 +364,18 @@ export default function PraticienClient({ praticien: p, realisations, collection
                       <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.role}</p>
                     </div>
                   </div>
-                  {s.stack?.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.25rem' }}>
-                      {s.stack.slice(0, 3).map(t => (
-                        <span key={t} className="f-tag" style={{ fontSize: '.55rem', padding: '1px 6px' }}>{t}</span>
-                      ))}
-                    </div>
-                  )}
+                  {(() => {
+                    const INVALID = new Set(['null', 'unfound', 'undefined', '']);
+                    const clean = (s.stack ?? []).filter((x: string) => x && !INVALID.has(x.toLowerCase().trim())).slice(0, 3);
+                    if (!clean.length) return null;
+                    return (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.25rem' }}>
+                        {clean.map((x: string) => (
+                          <span key={x} className="f-tag" style={{ fontSize: '.55rem', padding: '1px 6px' }}>{x}</span>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
               </a>
             ))}

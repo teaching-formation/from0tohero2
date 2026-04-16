@@ -268,14 +268,20 @@ export default function PraticiensPage() {
                     <div style={{ flex: 1 }} />
 
                     {/* Stack */}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.3rem' }}>
-                      {p.stack.slice(0, 5).map(s => (
-                        <span key={s} className="f-tag">{s}</span>
-                      ))}
-                      {p.stack.length > 5 && (
-                        <span className="f-tag" style={{ color: 'var(--f-text-3)' }}>+{p.stack.length - 5}</span>
-                      )}
-                    </div>
+                    {(() => {
+                      const INVALID = new Set(['null', 'unfound', 'undefined', '']);
+                      const clean = (p.stack ?? []).filter((s: string) => s && !INVALID.has(s.toLowerCase().trim()));
+                      return (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.3rem' }}>
+                        {clean.slice(0, 5).map((s: string) => (
+                          <span key={s} className="f-tag">{s}</span>
+                        ))}
+                        {clean.length > 5 && (
+                          <span className="f-tag" style={{ color: 'var(--f-text-3)' }}>+{clean.length - 5}</span>
+                        )}
+                      </div>
+                      );
+                    })()}
 
                     {/* Footer catégorie */}
                     <div style={{

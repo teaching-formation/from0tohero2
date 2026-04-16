@@ -302,13 +302,16 @@ export default function RecherchePage() {
                             color: catColor, margin: '.15rem 0 0 0', lineHeight: 1.3, opacity: .9,
                             overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                           }}>{p.role}</p>
-                          {p.stack?.length > 0 && (
-                            <div style={{ display: 'flex', gap: '.25rem', marginTop: '.4rem', flexWrap: 'wrap' }}>
-                              {p.stack.slice(0, 3).map(s => (
-                                <span key={s} className="f-tag" style={{ fontSize: '.56rem' }}>{s}</span>
-                              ))}
-                            </div>
-                          )}
+                          {(() => {
+                            const INVALID = new Set(['null', 'unfound', 'undefined', '']);
+                            const clean = (p.stack ?? []).filter((s: string) => s && !INVALID.has(s.toLowerCase().trim())).slice(0, 3);
+                            if (!clean.length) return null;
+                            return (
+                              <div style={{ display: 'flex', gap: '.25rem', marginTop: '.4rem', flexWrap: 'wrap' }}>
+                                {clean.map((s: string) => <span key={s} className="f-tag" style={{ fontSize: '.56rem' }}>{s}</span>)}
+                              </div>
+                            );
+                          })()}
                         </div>
                         <FlagImg country={p.country} size={16} />
                       </article>
@@ -355,16 +358,21 @@ export default function RecherchePage() {
                         margin: 0, letterSpacing: '-.01em', lineHeight: 1.3,
                       }}>{r.title}</h3>
                       {/* Stack */}
-                      {r.stack?.length > 0 && (
+                      {(() => {
+                        const INVALID = new Set(['null', 'unfound', 'undefined', '']);
+                        const clean = (r.stack ?? []).filter((s: string) => s && !INVALID.has(s.toLowerCase().trim()));
+                        if (!clean.length) return null;
+                        return (
                         <div style={{ display: 'flex', gap: '.25rem', flexWrap: 'wrap' }}>
-                          {r.stack.slice(0, 3).map(s => (
+                          {clean.slice(0, 3).map((s: string) => (
                             <span key={s} className="f-tag" style={{ fontSize: '.56rem' }}>{s}</span>
                           ))}
-                          {r.stack.length > 3 && (
-                            <span className="f-tag" style={{ fontSize: '.56rem', color: 'var(--f-text-3)' }}>+{r.stack.length - 3}</span>
+                          {clean.length > 3 && (
+                            <span className="f-tag" style={{ fontSize: '.56rem', color: 'var(--f-text-3)' }}>+{clean.length - 3}</span>
                           )}
                         </div>
-                      )}
+                        );
+                      })()}
                       {/* Auteur */}
                       {r.praticiens && (
                         <p style={{
