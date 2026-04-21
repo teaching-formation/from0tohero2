@@ -16,6 +16,7 @@ import { useTranslations } from 'next-intl';
 type CollectionItem = { id: string; title: string; url: string; description: string };
 type Collection = { id: string; title: string; description?: string; items: CollectionItem[] };
 type Tip = { id: string; content: string; type: string; category: string; stack: string[]; created_at: string };
+type Article = { id: string; slug: string; title: string; category: string; source: string; source_label?: string; external_url: string; excerpt?: string; date_published?: string; created_at: string };
 
 type SimilairePraticien = { id: string; slug: string; name: string; role: string; photo_url?: string; stack: string[]; country: string };
 
@@ -24,10 +25,11 @@ type Props = {
   realisations: Realisation[];
   collections: Collection[];
   tips: Tip[];
+  articles: Article[];
   similaires?: SimilairePraticien[];
 };
 
-export default function PraticienClient({ praticien: p, realisations, collections, tips: tipsList, similaires = [] }: Props) {
+export default function PraticienClient({ praticien: p, realisations, collections, tips: tipsList, articles, similaires = [] }: Props) {
   const t = useTranslations('profil');
   const [isOwner, setIsOwner] = useState(false);
   const [contactLoading, setContactLoading] = useState(false);
@@ -281,6 +283,56 @@ export default function PraticienClient({ praticien: p, realisations, collection
                   <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.8rem', color: 'var(--f-text-1)', margin: 0, lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>
                     {tip.content}
                   </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ARTICLES */}
+      {articles.length > 0 && (
+        <div style={{ marginBottom: '2.5rem' }}>
+          <span className="f-label" style={{ marginBottom: '1.25rem' }}>{t('articlesLabel')}</span>
+          <div style={{ marginTop: '.75rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {articles.map(a => {
+              const CAT_COLORS: Record<string,{color:string,border:string,bg:string}> = {
+                data:   { color:'#60a5fa', border:'rgba(96,165,250,.25)',  bg:'rgba(96,165,250,.08)' },
+                devops: { color:'#34d399', border:'rgba(52,211,153,.25)',  bg:'rgba(52,211,153,.08)' },
+                cloud:  { color:'#a78bfa', border:'rgba(167,139,250,.25)', bg:'rgba(167,139,250,.08)' },
+                ia:     { color:'#f97316', border:'rgba(249,115,22,.25)',  bg:'rgba(249,115,22,.08)' },
+                cyber:  { color:'#fb7185', border:'rgba(251,113,133,.25)', bg:'rgba(251,113,133,.08)' },
+                dev:    { color:'#f472b6', border:'rgba(244,114,182,.25)', bg:'rgba(244,114,182,.08)' },
+              };
+              const cat = CAT_COLORS[a.category] ?? CAT_COLORS.data;
+              const dateLabel = a.date_published ?? a.created_at;
+              return (
+                <div key={a.id} className="f-card f-card-hover">
+                  <div style={{ display: 'flex', gap: '.5rem', marginBottom: '.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', letterSpacing: '.08em', textTransform: 'uppercase', color: cat.color, border: `1px solid ${cat.border}`, background: cat.bg, padding: '2px 9px', borderRadius: 4 }}>{a.category.toUpperCase()}</span>
+                    {a.source_label && (
+                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 8px', borderRadius: 4 }}>{a.source_label}</span>
+                    )}
+                    {dateLabel && (
+                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', marginLeft: 'auto' }}>
+                        {new Date(dateLabel).toLocaleDateString('fr-FR', { year: 'numeric', month: 'short' })}
+                      </span>
+                    )}
+                  </div>
+                  <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.05rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0', lineHeight: 1.3 }}>{a.title}</h3>
+                  {a.excerpt && (
+                    <p style={{ fontSize: '.85rem', color: 'var(--f-text-2)', lineHeight: 1.7, margin: '0 0 1rem 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{a.excerpt}</p>
+                  )}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '.75rem', flexWrap: 'wrap', marginBottom: '.75rem' }}>
+                    <a href={a.external_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-sky)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '.35rem' }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                      Lire l&apos;article
+                    </a>
+                    <LikeButton contentType="article" contentId={a.id} initialCount={0} initialLiked={false} />
+                  </div>
+                  <div style={{ paddingTop: '.75rem', borderTop: '1px solid var(--f-border)' }}>
+                    <CommentSection contentType="article" contentId={a.id} />
+                  </div>
                 </div>
               );
             })}

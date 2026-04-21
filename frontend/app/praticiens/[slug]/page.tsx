@@ -7,6 +7,7 @@ import type { Praticien, Realisation } from '@/lib/supabase';
 type CollectionItem = { id: string; title: string; url: string; description: string };
 type Collection = { id: string; title: string; description?: string; items: CollectionItem[] };
 type Tip = { id: string; content: string; type: string; category: string; stack: string[]; created_at: string };
+type Article = { id: string; slug: string; title: string; category: string; source: string; source_label?: string; external_url: string; excerpt?: string; date_published?: string; created_at: string };
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -44,11 +45,12 @@ export default async function PraticienPage({ params }: { params: Promise<{ slug
 
   const praticienStack = Array.isArray(praticienRaw.stack) ? (praticienRaw.stack as string[]) : [];
 
-  const [{ data: realsOwned }, { data: realsCollab }, { data: cols }, { data: tps }, { data: similaires }] = await Promise.all([
+  const [{ data: realsOwned }, { data: realsCollab }, { data: cols }, { data: tps }, { data: arts }, { data: similaires }] = await Promise.all([
     supabase.from('realisations').select('*').eq('praticien_id', praticien.id).eq('status', 'approved').limit(50),
     supabase.from('realisations').select('*').contains('collaborateurs', [slug]).eq('status', 'approved').limit(50),
     supabase.from('collections').select('id, title, description, items, ordre').eq('praticien_id', praticien.id).eq('status', 'approved').order('ordre', { ascending: true }),
     supabase.from('tips').select('id, content, type, category, stack, created_at').eq('praticien_id', praticien.id).eq('status', 'approved').order('created_at', { ascending: false }).limit(20),
+    supabase.from('articles').select('id, slug, title, category, source, source_label, external_url, excerpt, date_published, created_at').eq('praticien_id', praticien.id).eq('status', 'approved').order('created_at', { ascending: false }).limit(50),
     // Praticiens avec stack similaire
     praticienStack.length > 0
       ? supabase.from('praticiens').select('id, slug, name, role, photo_url, stack, country').eq('status', 'approved').neq('id', praticien.id).overlaps('stack', praticienStack).limit(4)
@@ -93,6 +95,7 @@ export default async function PraticienPage({ params }: { params: Promise<{ slug
         realisations={reals as Realisation[]}
         collections={(cols ?? []) as Collection[]}
         tips={(tps ?? []) as Tip[]}
+        articles={(arts ?? []) as Article[]}
         similaires={(similaires ?? []) as { id: string; slug: string; name: string; role: string; photo_url?: string; stack: string[]; country: string }[]}
       />
     </>
