@@ -24,6 +24,7 @@ export default function SoumettreePage() {
   const [userCountry, setUserCountry] = useState('');
   const [authLoading, setAuthLoading] = useState(true);
   const pendingCardRef = useRef<FormType>(null);
+  const formSectionRef = useRef<HTMLDivElement>(null);
 
   // Gate
   const [usernameInput, setUsernameInput] = useState('');
@@ -87,6 +88,23 @@ export default function SoumettreePage() {
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Scroll vers le formulaire sur mobile
+  useEffect(() => {
+    if (activeForm) {
+      setTimeout(() => {
+        formSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+    }
+  }, [activeForm]);
+
+  useEffect(() => {
+    if (showForm) {
+      setTimeout(() => {
+        formSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+    }
+  }, [showForm]);
 
   async function checkUsername() {
     if (!usernameInput.trim()) return;
@@ -155,7 +173,7 @@ export default function SoumettreePage() {
       </div>
 
       {activeForm && (
-        <div>
+        <div ref={formSectionRef}>
           <hr className="f-hr" style={{ marginBottom: '2rem' }} />
 
           {/* ── SUCCÈS ── */}
