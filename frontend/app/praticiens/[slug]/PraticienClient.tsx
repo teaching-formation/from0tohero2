@@ -229,7 +229,10 @@ export default function PraticienClient({ praticien: p, realisations, collection
           <div style={{ marginTop: '.75rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {collections.map(col => (
               <div key={col.id} style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 12, padding: '1.25rem 1.5rem' }}>
-                <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .25rem 0' }}>{col.title}</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '.75rem', marginBottom: '.25rem' }}>
+                  <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: 0 }}>{col.title}</p>
+                  <ShareButton url={`https://from0tohero.dev/praticiens/${p.slug}`} title={`${col.title} · ${p.name}`} text={col.description} />
+                </div>
                 {col.description && (
                   <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', margin: '0 0 1rem 0', lineHeight: 1.6 }}>{col.description}</p>
                 )}
@@ -280,9 +283,13 @@ export default function PraticienClient({ praticien: p, realisations, collection
                       <span key={s} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.6rem', color: 'var(--f-text-3)', border: '1px solid var(--f-border)', padding: '2px 8px', borderRadius: 4 }}>{s}</span>
                     ))}
                   </div>
-                  <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.8rem', color: 'var(--f-text-1)', margin: 0, lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>
+                  <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.8rem', color: 'var(--f-text-1)', margin: '0 0 .85rem 0', lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>
                     {tip.content}
                   </p>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '.5rem', paddingTop: '.6rem', borderTop: '1px solid var(--f-border)' }}>
+                    <LikeButton contentType="tip" contentId={tip.id} initialCount={0} initialLiked={false} />
+                    <ShareButton url={`https://from0tohero.dev/praticiens/${p.slug}`} title={`Tip · ${p.name}`} text={tip.content.slice(0, 120)} />
+                  </div>
                 </div>
               );
             })}
@@ -328,7 +335,10 @@ export default function PraticienClient({ praticien: p, realisations, collection
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                       Lire l&apos;article
                     </a>
-                    <LikeButton contentType="article" contentId={a.id} initialCount={0} initialLiked={false} />
+                    <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
+                      <ShareButton url={a.external_url} title={a.title} text={a.excerpt} />
+                      <LikeButton contentType="article" contentId={a.id} initialCount={0} initialLiked={false} />
+                    </div>
                   </div>
                   <div style={{ paddingTop: '.75rem', borderTop: '1px solid var(--f-border)' }}>
                     <CommentSection contentType="article" contentId={a.id} />
@@ -388,7 +398,10 @@ export default function PraticienClient({ praticien: p, realisations, collection
                       {r.demo_url && <a href={r.demo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-sky)', textDecoration: 'none' }}>{t('demo')}</a>}
                       {r.repo_url && <a href={r.repo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', textDecoration: 'none' }}>{t('repo')}</a>}
                     </div>
-                    <LikeButton contentType="realisation" contentId={r.id} initialCount={0} initialLiked={false} />
+                    <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
+                      <ShareButton url={r.demo_url || r.repo_url || `https://from0tohero.dev/praticiens/${p.slug}`} title={r.title} text={r.excerpt} />
+                      <LikeButton contentType="realisation" contentId={r.id} initialCount={0} initialLiked={false} />
+                    </div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', paddingTop: '.75rem', borderTop: '1px solid var(--f-border)', flexWrap: 'wrap' }}>
                     <CommentSection contentType="realisation" contentId={r.id} />
