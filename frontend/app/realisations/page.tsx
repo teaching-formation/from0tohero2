@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { SkeletonArticleCard } from '@/components/SkeletonCard';
 import LikeButton from '@/components/LikeButton';
 import RealisationModal from '@/components/RealisationModal';
+import ShareButton from '@/components/ShareButton';
 import { useTranslations } from 'next-intl';
 
 const PAGE_SIZE = 12;
@@ -354,7 +355,8 @@ export default function RealisationsPage() {
                         </svg>
                         {commentCount > 0 && <span>{commentCount}</span>}
                       </button>
-                      <div onClick={e => e.stopPropagation()}>
+                      <div style={{ display: 'flex', gap: '.4rem', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
+                        <ShareButton url={r.demo_url || r.repo_url || `https://from0tohero.dev/praticiens/${r.praticiens?.slug}`} title={r.title} text={r.excerpt} />
                         <LikeButton contentType="realisation" contentId={r.id} initialCount={0} initialLiked={false} />
                       </div>
                     </div>

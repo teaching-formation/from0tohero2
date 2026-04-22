@@ -5,6 +5,7 @@ import { SkeletonArticleCard } from '@/components/SkeletonCard';
 import FlagImg from '@/components/FlagImg';
 import LikeButton from '@/components/LikeButton';
 import ArticleModal from '@/components/ArticleModal';
+import ShareButton from '@/components/ShareButton';
 import { useTranslations } from 'next-intl';
 
 const PAGE_SIZE = 12;
@@ -256,20 +257,23 @@ export default function ArticlesPage() {
                         {commentCount > 0 && <span>{commentCount}</span>}
                       </button>
                     </div>
-                    <a
-                      href={a.external_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={e => e.stopPropagation()}
-                      style={{
-                        fontFamily: "'Geist Mono', monospace",
-                        fontSize: '.62rem',
-                        color: catColor,
-                        opacity: .8,
-                        letterSpacing: '.04em',
-                        textDecoration: 'none',
-                      }}
-                    >{t('read')}</a>
+                    <div style={{ display: 'flex', gap: '.4rem', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
+                      <ShareButton url={a.external_url} title={a.title} text={a.excerpt} />
+                      <a
+                        href={a.external_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={e => e.stopPropagation()}
+                        style={{
+                          fontFamily: "'Geist Mono', monospace",
+                          fontSize: '.62rem',
+                          color: catColor,
+                          opacity: .8,
+                          letterSpacing: '.04em',
+                          textDecoration: 'none',
+                        }}
+                      >{t('read')}</a>
+                    </div>
                   </div>
 
                 </article>

@@ -16,6 +16,8 @@ type Tip = {
   praticiens: { slug: string; name: string } | null;
 };
 
+import ShareButton from '@/components/ShareButton';
+import LikeButton from '@/components/LikeButton';
 import { CAT_LABEL, TIP_TYPE_META } from '@/lib/constants';
 import { fmtDate, fmtTime } from '@/lib/utils';
 
@@ -327,12 +329,18 @@ export default function TipsPage() {
                     {tip.content}
                   </p>
 
-                  {/* Auteur */}
-                  {tip.praticiens && (
-                    <Link href={`/praticiens/${tip.praticiens.slug}`} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', textDecoration: 'none' }}>
-                      par <span style={{ color: 'var(--f-sky)' }}>@{tip.praticiens.slug}</span> · {tip.praticiens.name}
-                    </Link>
-                  )}
+                  {/* Footer : auteur + actions */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '.75rem', flexWrap: 'wrap', marginTop: '.25rem' }}>
+                    {tip.praticiens ? (
+                      <Link href={`/praticiens/${tip.praticiens.slug}`} style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', color: 'var(--f-text-3)', textDecoration: 'none' }}>
+                        par <span style={{ color: 'var(--f-sky)' }}>@{tip.praticiens.slug}</span> · {tip.praticiens.name}
+                      </Link>
+                    ) : <span />}
+                    <div style={{ display: 'flex', gap: '.4rem', alignItems: 'center' }}>
+                      <LikeButton contentType="tip" contentId={tip.id} initialCount={0} initialLiked={false} />
+                      <ShareButton url={`https://from0tohero.dev/tips#tip-${tip.id}`} title={`Tip · ${tip.praticiens?.name ?? 'from0tohero'}`} text={tip.content.slice(0, 120)} />
+                    </div>
+                  </div>
                 </div>
               );
             })}

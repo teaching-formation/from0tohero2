@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useTranslations } from 'next-intl';
+import ShareButton from '@/components/ShareButton';
 
 const PAGE_SIZE = 15;
 
@@ -116,7 +117,7 @@ export default function CollectionsPage() {
               const isOpen = expanded.has(col.id);
               return (
                 <div key={col.id} className="f-card" style={{ padding: '1.25rem 1.5rem' }}>
-                  {/* Titre + toggle */}
+                  {/* Titre + actions */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .2rem 0' }}>
@@ -138,20 +139,27 @@ export default function CollectionsPage() {
                         </span>
                       </div>
                     </div>
-                    {items.length > 0 && (
-                      <button
-                        onClick={() => toggleExpand(col.id)}
-                        style={{
-                          background: 'none', border: '1px solid var(--f-border)',
-                          borderRadius: 7, padding: '4px 10px',
-                          fontFamily: "'Geist Mono', monospace", fontSize: '.65rem',
-                          color: 'var(--f-text-3)', cursor: 'pointer',
-                          flexShrink: 0, transition: 'all .15s',
-                        }}
-                      >
-                        {isOpen ? '▲' : '▼'}
-                      </button>
-                    )}
+                    <div style={{ display: 'flex', gap: '.4rem', alignItems: 'center', flexShrink: 0 }}>
+                      <ShareButton
+                        url={col.praticiens ? `https://from0tohero.dev/praticiens/${col.praticiens.slug}` : 'https://from0tohero.dev/collections'}
+                        title={`${col.title} · from0tohero`}
+                        text={col.description}
+                      />
+                      {items.length > 0 && (
+                        <button
+                          onClick={() => toggleExpand(col.id)}
+                          style={{
+                            background: 'none', border: '1px solid var(--f-border)',
+                            borderRadius: 7, padding: '4px 10px',
+                            fontFamily: "'Geist Mono', monospace", fontSize: '.65rem',
+                            color: 'var(--f-text-3)', cursor: 'pointer',
+                            transition: 'all .15s',
+                          }}
+                        >
+                          {isOpen ? '▲' : '▼'}
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   {/* Items (expand) */}
