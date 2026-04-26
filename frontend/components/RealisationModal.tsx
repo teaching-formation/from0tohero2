@@ -28,7 +28,7 @@ type Props = {
 };
 
 import { CAT_COLOR, CAT_LABEL, REAL_TYPE_LABELS, REAL_TYPE_ICONS } from '@/lib/constants';
-import { formatDateTime, timeAgo } from '@/lib/utils';
+import { formatDateTime, timeAgo, decodeHtml } from '@/lib/utils';
 
 
 export default function RealisationModal({ realisation, onClose }: Props) {
@@ -258,7 +258,7 @@ export default function RealisationModal({ realisation, onClose }: Props) {
               <h2 style={{
                 fontFamily: "'Syne', sans-serif", fontSize: '1.15rem', fontWeight: 800,
                 color: 'var(--f-text-1)', margin: '0 0 .6rem', letterSpacing: '-.02em', lineHeight: 1.25,
-              }}>{realisation.title}</h2>
+              }}>{decodeHtml(realisation.title)}</h2>
               {/* Auteur + date */}
               {realisation.praticiens && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', flexWrap: 'wrap' }}>
@@ -293,7 +293,7 @@ export default function RealisationModal({ realisation, onClose }: Props) {
           {/* Excerpt */}
           {realisation.excerpt && (
             <p style={{ fontSize: '.88rem', color: 'var(--f-text-2)', lineHeight: 1.75, margin: 0 }}>
-              {realisation.excerpt}
+              {decodeHtml(realisation.excerpt)}
             </p>
           )}
 
@@ -439,11 +439,14 @@ export default function RealisationModal({ realisation, onClose }: Props) {
 
         {/* ── FOOTER fixe : formulaire commentaire ────────────────────────── */}
         <div style={{
-          padding: '.9rem 1.5rem',
-          borderTop: '1px solid var(--f-border)',
+          padding: '.75rem 1.5rem .9rem',
+          borderTop: '2px solid var(--f-border)',
           flexShrink: 0,
-          background: 'var(--f-surface)',
+          background: 'var(--f-bg)',
         }}>
+          <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 .5rem 0' }}>
+            {t('commentsLabel').replace(/\(.*\)/, '').trim()} →
+          </p>
           <form onSubmit={submit} style={{ display: 'flex', gap: '.5rem', alignItems: 'flex-end' }}>
             <textarea
               ref={inputRef}
@@ -454,7 +457,7 @@ export default function RealisationModal({ realisation, onClose }: Props) {
               rows={2}
               style={{
                 flex: 1, resize: 'none',
-                background: 'var(--f-bg)', border: '1px solid var(--f-border)',
+                background: 'var(--f-surface)', border: '1.5px solid var(--f-border)',
                 borderRadius: 8, padding: '.5rem .7rem',
                 fontFamily: "'Geist Mono', monospace", fontSize: '.74rem',
                 color: 'var(--f-text-1)', outline: 'none', boxSizing: 'border-box',

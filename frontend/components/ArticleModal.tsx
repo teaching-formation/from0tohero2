@@ -27,7 +27,7 @@ type Props = {
 };
 
 import { CAT_COLOR, CAT_LABEL, SOURCE_ICON } from '@/lib/constants';
-import { formatDateTime, timeAgo } from '@/lib/utils';
+import { formatDateTime, timeAgo, decodeHtml } from '@/lib/utils';
 
 
 export default function ArticleModal({ article, onClose }: Props) {
@@ -254,7 +254,7 @@ export default function ArticleModal({ article, onClose }: Props) {
               <h2 style={{
                 fontFamily: "'Syne', sans-serif", fontSize: '1.15rem', fontWeight: 800,
                 color: 'var(--f-text-1)', margin: '0 0 .6rem', letterSpacing: '-.02em', lineHeight: 1.25,
-              }}>{article.title}</h2>
+              }}>{decodeHtml(article.title)}</h2>
               <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', flexWrap: 'wrap' }}>
                 {article.author_country && <FlagImg country={article.author_country} size={16} />}
                 <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: catColor, opacity: .85 }}>
@@ -283,7 +283,7 @@ export default function ArticleModal({ article, onClose }: Props) {
 
           {article.excerpt && (
             <p style={{ fontSize: '.88rem', color: 'var(--f-text-2)', lineHeight: 1.75, margin: 0 }}>
-              {article.excerpt}
+              {decodeHtml(article.excerpt)}
             </p>
           )}
 
@@ -391,7 +391,10 @@ export default function ArticleModal({ article, onClose }: Props) {
         </div>
 
         {/* ── FOOTER fixe : formulaire commentaire ────────────────────────── */}
-        <div style={{ padding: '.9rem 1.5rem', borderTop: '1px solid var(--f-border)', flexShrink: 0, background: 'var(--f-surface)' }}>
+        <div style={{ padding: '.75rem 1.5rem .9rem', borderTop: '2px solid var(--f-border)', flexShrink: 0, background: 'var(--f-bg)' }}>
+          <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.58rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--f-text-3)', margin: '0 0 .5rem 0' }}>
+            {t('commentsLabel').replace(/\(.*\)/, '').trim()} →
+          </p>
           <form onSubmit={submit} style={{ display: 'flex', gap: '.5rem', alignItems: 'flex-end' }}>
             <textarea
               ref={inputRef}
@@ -401,7 +404,7 @@ export default function ArticleModal({ article, onClose }: Props) {
               maxLength={500}
               rows={2}
               style={{
-                flex: 1, resize: 'none', background: 'var(--f-bg)', border: '1px solid var(--f-border)',
+                flex: 1, resize: 'none', background: 'var(--f-surface)', border: '1.5px solid var(--f-border)',
                 borderRadius: 8, padding: '.5rem .7rem', fontFamily: "'Geist Mono', monospace",
                 fontSize: '.74rem', color: 'var(--f-text-1)', outline: 'none', boxSizing: 'border-box',
                 transition: 'border-color .15s',

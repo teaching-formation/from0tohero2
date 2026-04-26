@@ -26,6 +26,19 @@ export function fmtTime(iso: string): string {
   });
 }
 
+/** Décode les entités HTML courantes (ex: &amp;amp; → &) — safe, sans DOM */
+export function decodeHtml(str: string | undefined | null): string {
+  if (!str) return '';
+  return str
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&#x27;/g, "'")
+    .replace(/&nbsp;/g, ' ');
+}
+
 /** Retourne une durée relative : "il y a 5min", "il y a 3h", "il y a 2j" */
 export function timeAgo(date: string): string {
   const diff = Date.now() - new Date(date).getTime();
