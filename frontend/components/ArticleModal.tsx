@@ -279,7 +279,7 @@ export default function ArticleModal({ article, onClose }: Props) {
         </div>
 
         {/* ── BODY scrollable ──────────────────────────────────────────────── */}
-        <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '.9rem' }}>
+        <div ref={scrollRef} style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '.9rem' }}>
 
           {article.excerpt && (
             <p style={{ fontSize: '.88rem', color: 'var(--f-text-2)', lineHeight: 1.75, margin: 0 }}>

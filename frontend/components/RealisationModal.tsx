@@ -288,7 +288,7 @@ export default function RealisationModal({ realisation, onClose }: Props) {
         </div>
 
         {/* ── BODY scrollable ──────────────────────────────────────────────── */}
-        <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '.9rem' }}>
+        <div ref={scrollRef} style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '.9rem' }}>
 
           {/* Excerpt */}
           {realisation.excerpt && (
