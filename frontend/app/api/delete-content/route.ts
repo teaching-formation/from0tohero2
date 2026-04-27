@@ -1,6 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { createAdminClient } from '@/lib/supabase/admin';
+
+// Correspondance table → content_type dans content_embeddings
+const TABLE_TO_CONTENT_TYPE: Record<string, string> = {
+  tips:        'tip',
+  articles:    'article',
+  realisations:'realisation',
+  collections: 'collection',
+};
 
 const ALLOWED_TABLES = ['articles', 'realisations', 'evenements', 'collections', 'tips'] as const;
 type AllowedTable = typeof ALLOWED_TABLES[number];
@@ -47,6 +56,18 @@ export async function POST(req: Request) {
 
     const { error } = await supabaseAdmin.from(table).delete().eq('id', id);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    // Supprimer aussi de l'index Ask Hero si ce type est indexé
+    const contentType = TABLE_TO_CONTENT_TYPE[table];
+    if (contentType) {
+      createAdminClient()
+        .from('content_embeddings')
+        .delete()
+        .eq('content_type', contentType)
+        .eq('content_id', id)
+        .then(() => {})
+        .catch(() => {});
+    }
 
     return NextResponse.json({ ok: true });
   } catch (err) {
