@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useLocale } from 'next-intl';
 
 type Message = { role: 'user' | 'assistant'; content: string };
@@ -10,6 +10,7 @@ export default function TutorWidget() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [speakingIdx, setSpeakingIdx] = useState<number | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -30,9 +31,43 @@ export default function TutorWidget() {
     if (open) setTimeout(() => inputRef.current?.focus(), 100);
   }, [open]);
 
+  // Stop speech when panel closes
+  useEffect(() => {
+    if (!open) {
+      window.speechSynthesis?.cancel();
+      setSpeakingIdx(null);
+    }
+  }, [open]);
+
+  // ── Text-to-speech ────────────────────────────────────────────
+  const speak = useCallback((text: string, idx: number) => {
+    if (!window.speechSynthesis) return;
+
+    // Si déjà en train de parler ce message → stop
+    if (speakingIdx === idx) {
+      window.speechSynthesis.cancel();
+      setSpeakingIdx(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    // Nettoyer les balises markdown **bold** pour la lecture
+    const clean = text.replace(/\*\*([^*]+)\*\*/g, '$1');
+    const utterance = new SpeechSynthesisUtterance(clean);
+    utterance.lang = locale === 'fr' ? 'fr-FR' : 'en-US';
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    utterance.onstart = () => setSpeakingIdx(idx);
+    utterance.onend = () => setSpeakingIdx(null);
+    utterance.onerror = () => setSpeakingIdx(null);
+    window.speechSynthesis.speak(utterance);
+  }, [speakingIdx, locale]);
+
   async function send() {
     const q = input.trim();
     if (!q || loading) return;
+    window.speechSynthesis?.cancel();
+    setSpeakingIdx(null);
     setInput('');
     const newMessages: Message[] = [...messages, { role: 'user', content: q }];
     setMessages(newMessages);
@@ -67,11 +102,46 @@ export default function TutorWidget() {
   }
 
   function renderContent(text: string) {
-    // Simple markdown: **bold**
     return text.split(/(\*\*[^*]+\*\*)/).map((part, i) =>
       part.startsWith('**') && part.endsWith('**')
         ? <strong key={i}>{part.slice(2, -2)}</strong>
         : <span key={i}>{part}</span>
+    );
+  }
+
+  // Bouton 🔊 réutilisable
+  function SpeakButton({ text, idx }: { text: string; idx: number }) {
+    const active = speakingIdx === idx;
+    return (
+      <button
+        onClick={() => speak(text, idx)}
+        title={active ? (locale === 'fr' ? 'Arrêter' : 'Stop') : (locale === 'fr' ? 'Écouter' : 'Listen')}
+        style={{
+          background: 'none',
+          border: 'none',
+          cursor: 'pointer',
+          padding: '2px 4px',
+          color: active ? '#f97316' : 'var(--f-text-3)',
+          opacity: active ? 1 : 0.5,
+          transition: 'opacity .15s, color .15s',
+          flexShrink: 0,
+          lineHeight: 1,
+        }}
+      >
+        {active ? (
+          // Icône "stop"
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="4" y="4" width="16" height="16" rx="2"/>
+          </svg>
+        ) : (
+          // Icône "speaker"
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+        )}
+      </button>
     );
   }
 
@@ -137,6 +207,7 @@ export default function TutorWidget() {
               }}>
                 {renderContent(greeting)}
               </div>
+              <SpeakButton text={greeting.replace(/\*\*/g, '')} idx={-1} />
             </div>
 
             {/* Conversation */}
@@ -164,6 +235,9 @@ export default function TutorWidget() {
                 }}>
                   {m.role === 'assistant' ? renderContent(m.content) : m.content}
                 </div>
+                {m.role === 'assistant' && (
+                  <SpeakButton text={m.content} idx={i} />
+                )}
               </div>
             ))}
 
