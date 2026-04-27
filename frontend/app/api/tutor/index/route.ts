@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Mistral } from '@mistralai/mistralai';
 
 const mistral = new Mistral({ apiKey: process.env.MISTRAL_API_KEY });
@@ -13,7 +13,7 @@ async function embed(text: string): Promise<number[]> {
 }
 
 async function upsert(
-  supabase: Awaited<ReturnType<typeof createClient>>,
+  supabase: ReturnType<typeof createAdminClient>,
   row: { content_type: string; content_id: string; title: string; body: string; embedding: number[] }
 ) {
   await supabase.from('content_embeddings').upsert(row, {
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     let indexed = 0;
 
     // ── TIPS ──────────────────────────────────────────────────

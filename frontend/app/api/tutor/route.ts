@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { Mistral } from '@mistralai/mistralai';
 
 const mistral = new Mistral({ apiKey: process.env.MISTRAL_API_KEY });
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const queryEmbedding = embRes.data[0].embedding;
 
     // 2. Recherche du contenu similaire dans Supabase
-    const supabase = await createClient();
+    const supabase = createAdminClient();
     const { data: matches } = await supabase.rpc('search_content', {
       query_embedding: queryEmbedding,
       match_threshold: 0.45,
