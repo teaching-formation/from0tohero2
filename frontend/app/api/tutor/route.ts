@@ -16,7 +16,10 @@ export async function POST(request: Request) {
       model: 'mistral-embed',
       inputs: [question],
     });
-    const queryEmbedding = embRes.data[0].embedding;
+    const queryEmbedding = embRes.data[0]?.embedding;
+    if (!queryEmbedding) {
+      return NextResponse.json({ error: 'Embedding indisponible' }, { status: 500 });
+    }
 
     // 2. Recherche du contenu similaire dans Supabase
     const supabase = createAdminClient();

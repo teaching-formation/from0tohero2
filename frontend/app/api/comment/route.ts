@@ -32,6 +32,10 @@ export async function POST(req: NextRequest) {
   if (!content_type || !content_id || !content)
     return NextResponse.json({ error: 'Paramètres manquants' }, { status: 400 });
 
+  const ALLOWED_TYPES = ['realisation', 'article'];
+  if (!ALLOWED_TYPES.includes(content_type))
+    return NextResponse.json({ error: 'Type de contenu invalide' }, { status: 400 });
+
   const trimmed = String(content).trim();
   if (trimmed.length < 2 || trimmed.length > 500)
     return NextResponse.json({ error: 'Commentaire invalide (2-500 caractères)' }, { status: 400 });
