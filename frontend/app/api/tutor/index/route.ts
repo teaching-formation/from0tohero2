@@ -112,7 +112,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, indexed });
   } catch (err) {
-    console.error('[tutor/index]', err);
-    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[tutor/index]', msg);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
