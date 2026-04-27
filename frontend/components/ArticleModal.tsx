@@ -295,7 +295,7 @@ export default function ArticleModal({ article, onClose }: Props) {
               padding: '6px 16px', borderRadius: 99, textDecoration: 'none',
             }}>{t('readArticle')}</a>
             <LikeButton contentType="article" contentId={article.id} initialCount={0} initialLiked={false} />
-            <ShareButton url={article.external_url} title={article.title} text={article.excerpt} />
+            <ShareButton url={article.external_url || 'https://from0tohero.dev/articles'} title={article.title} text={article.excerpt ?? undefined} />
           </div>
 
           {/* Commentaires */}

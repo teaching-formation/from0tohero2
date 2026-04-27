@@ -325,7 +325,7 @@ export default function RealisationModal({ realisation, onClose }: Props) {
               }}>{t('repo')}</a>
             )}
             <LikeButton contentType="realisation" contentId={realisation.id} initialCount={0} initialLiked={false} />
-            <ShareButton url={realisation.demo_url || realisation.repo_url || `https://from0tohero.dev`} title={realisation.title} text={realisation.excerpt} />
+            <ShareButton url={realisation.demo_url || realisation.repo_url || 'https://from0tohero.dev/realisations'} title={realisation.title} text={realisation.excerpt ?? undefined} />
           </div>
 
           {/* Séparateur + label commentaires */}

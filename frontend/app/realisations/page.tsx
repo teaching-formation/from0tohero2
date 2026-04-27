@@ -356,7 +356,7 @@ export default function RealisationsPage() {
                         {commentCount > 0 && <span>{commentCount}</span>}
                       </button>
                       <div style={{ display: 'flex', gap: '.4rem', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
-                        <ShareButton url={r.demo_url || r.repo_url || `https://from0tohero.dev/praticiens/${r.praticiens?.slug}`} title={r.title} text={r.excerpt} />
+                        <ShareButton url={r.demo_url || r.repo_url || (r.praticiens?.slug ? `https://from0tohero.dev/praticiens/${r.praticiens.slug}` : 'https://from0tohero.dev/realisations')} title={r.title} text={r.excerpt ?? undefined} />
                         <LikeButton contentType="realisation" contentId={r.id} initialCount={0} initialLiked={false} />
                       </div>
                     </div>

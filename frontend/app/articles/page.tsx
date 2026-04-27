@@ -258,7 +258,7 @@ export default function ArticlesPage() {
                       </button>
                     </div>
                     <div style={{ display: 'flex', gap: '.4rem', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
-                      <ShareButton url={a.external_url} title={a.title} text={a.excerpt} />
+                      <ShareButton url={a.external_url || 'https://from0tohero.dev/articles'} title={a.title} text={a.excerpt ?? undefined} />
                       <a
                         href={a.external_url}
                         target="_blank"

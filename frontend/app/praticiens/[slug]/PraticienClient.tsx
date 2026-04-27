@@ -231,7 +231,7 @@ export default function PraticienClient({ praticien: p, realisations, collection
               <div key={col.id} style={{ background: 'var(--f-surface)', border: '1px solid var(--f-border)', borderRadius: 12, padding: '1.25rem 1.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '.75rem', marginBottom: '.25rem' }}>
                   <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '1rem', fontWeight: 700, color: 'var(--f-text-1)', margin: 0 }}>{col.title}</p>
-                  <ShareButton url={`https://from0tohero.dev/praticiens/${p.slug}`} title={`${col.title} · ${p.name}`} text={col.description} />
+                  <ShareButton url={`https://from0tohero.dev/praticiens/${p.slug}`} title={`${col.title} · ${p.name}`} text={col.description ?? undefined} />
                 </div>
                 {col.description && (
                   <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', margin: '0 0 1rem 0', lineHeight: 1.6 }}>{col.description}</p>
@@ -336,7 +336,7 @@ export default function PraticienClient({ praticien: p, realisations, collection
                       Lire l&apos;article
                     </a>
                     <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
-                      <ShareButton url={a.external_url} title={a.title} text={a.excerpt} />
+                      <ShareButton url={a.external_url || 'https://from0tohero.dev/articles'} title={a.title} text={a.excerpt ?? undefined} />
                       <LikeButton contentType="article" contentId={a.id} initialCount={0} initialLiked={false} />
                     </div>
                   </div>
@@ -399,7 +399,7 @@ export default function PraticienClient({ praticien: p, realisations, collection
                       {r.repo_url && <a href={r.repo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', textDecoration: 'none' }}>{t('repo')}</a>}
                     </div>
                     <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
-                      <ShareButton url={r.demo_url || r.repo_url || `https://from0tohero.dev/praticiens/${p.slug}`} title={r.title} text={r.excerpt} />
+                      <ShareButton url={r.demo_url || r.repo_url || `https://from0tohero.dev/praticiens/${p.slug}`} title={r.title} text={r.excerpt ?? undefined} />
                       <LikeButton contentType="realisation" contentId={r.id} initialCount={0} initialLiked={false} />
                     </div>
                   </div>
