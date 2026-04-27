@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
+import { indexContent } from '@/lib/indexContent';
 
 export async function POST(req: Request) {
   try {
@@ -24,6 +25,18 @@ export async function POST(req: Request) {
     }).select().single();
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    // Indexer pour Ask Hero (non-bloquant)
+    const itemTitles = Array.isArray(items)
+      ? (items as { title?: string }[]).map(i => i.title || '').filter(Boolean).join(', ')
+      : '';
+    indexContent({
+      content_type: 'collection',
+      content_id:   data.id,
+      title:        title.trim(),
+      body:         `${title.trim()}. ${description?.trim() ?? ''} Ressources : ${itemTitles}`.trim(),
+    }).catch(() => {});
+
     return NextResponse.json(data);
   } catch (err) {
     console.error('[collection/create]', err);

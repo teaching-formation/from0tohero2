@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { createClient } from '@/lib/supabase/server';
 import { slugify } from '@/lib/slugify';
 import { notifyFollowers, createNotification } from '@/lib/createNotification';
+import { indexContent } from '@/lib/indexContent';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -100,6 +101,16 @@ export async function POST(req: Request) {
         }).catch(() => {});
       }
 
+      // Indexer pour Ask Hero (non-bloquant)
+      if (!error && newArticle?.id) {
+        indexContent({
+          content_type: 'article',
+          content_id:   newArticle.id,
+          title:        payload.title,
+          body:         `${payload.title}. ${payload.excerpt ?? ''}`.trim(),
+        }).catch(() => {});
+      }
+
     } else if (type === 'realisation') {
 
       // Réalisations : l'utilisateur doit être authentifié
@@ -158,6 +169,17 @@ export async function POST(req: Request) {
             content_type:  'realisation',
             content_id:    newRealisation.id,
             content_title: payload.title,
+          }).catch(() => {});
+        }
+
+        // Indexer pour Ask Hero (non-bloquant)
+        if (!error && newRealisation?.id) {
+          const stack: string[] = Array.isArray(payload.stack) ? payload.stack : [];
+          indexContent({
+            content_type: 'realisation',
+            content_id:   newRealisation.id,
+            title:        payload.title,
+            body:         `${payload.title}. ${payload.excerpt ?? ''} Stack: ${stack.join(', ')}`.trim(),
           }).catch(() => {});
         }
 

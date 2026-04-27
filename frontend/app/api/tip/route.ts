@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { notifyFollowers } from '@/lib/createNotification';
+import { indexContent } from '@/lib/indexContent';
 
 const CATEGORIES = ['data','devops','cloud','ia','cyber','frontend','backend','fullstack','mobile','web3','embedded','autre'];
 const TYPES      = ['tip','TIL','snippet'];
@@ -65,6 +66,14 @@ export async function POST(req: Request) {
       content_type:  'tip',
       content_id:    tip.id,
       content_title: content.trim().slice(0, 80),
+    }).catch(() => {});
+
+    // Indexer pour Ask Hero (non-bloquant)
+    indexContent({
+      content_type: 'tip',
+      content_id:   tip.id,
+      title:        `${type} · ${category}`,
+      body:         `[${type}] Catégorie: ${category}. ${content.trim()}`,
     }).catch(() => {});
 
     return NextResponse.json({ ok: true, id: tip.id });
