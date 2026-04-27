@@ -60,13 +60,11 @@ export async function POST(req: Request) {
     // Supprimer aussi de l'index Ask Hero si ce type est indexé
     const contentType = TABLE_TO_CONTENT_TYPE[table];
     if (contentType) {
-      createAdminClient()
+      void createAdminClient()
         .from('content_embeddings')
         .delete()
         .eq('content_type', contentType)
-        .eq('content_id', id)
-        .then(() => {})
-        .catch(() => {});
+        .eq('content_id', id);
     }
 
     return NextResponse.json({ ok: true });
