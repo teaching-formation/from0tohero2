@@ -81,9 +81,11 @@ export async function POST(req: Request) {
     } else if (type === 'article') {
       const slug = slugify(payload.title);
       // Si authentifié, on récupère le praticien depuis la session (jamais depuis le payload)
+      // Praticien uniquement depuis la session — jamais depuis le payload pour éviter
+      // qu'un utilisateur non connecté attribue un article à n'importe quel praticien
       const { data: praticien } = user
         ? await supabaseAdmin.from('praticiens').select('id, name').eq('user_id', user.id).maybeSingle()
-        : await supabaseAdmin.from('praticiens').select('id, name').eq('slug', String(payload.username || '')).maybeSingle();
+        : { data: null };
 
       const { data: newArticle, error } = await supabaseAdmin.from('articles').insert({
         slug,

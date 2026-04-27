@@ -9,7 +9,7 @@ async function embed(text: string): Promise<number[]> {
     model: 'mistral-embed',
     inputs: [text.slice(0, 2000)],
   });
-  return (res.data[0].embedding as number[]) ?? [];
+  return (res.data?.[0]?.embedding as number[]) ?? [];
 }
 
 async function upsert(
