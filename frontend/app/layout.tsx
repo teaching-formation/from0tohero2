@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import CursorGlow from '@/components/CursorGlow';
 import PageTransition from '@/components/PageTransition';
 import SplashScreen from '@/components/SplashScreen';
+import TutorWidget from '@/components/TutorWidget';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 
@@ -63,6 +64,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <PageTransition>{children}</PageTransition>
           </main>
           <Footer />
+          <TutorWidget />
         </NextIntlClientProvider>
       </body>
     </html>
