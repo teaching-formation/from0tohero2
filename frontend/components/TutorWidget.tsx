@@ -228,7 +228,7 @@ export default function TutorWidget() {
               >→</button>
             </div>
             <p style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.55rem', color: 'var(--f-text-3)', margin: '.4rem 0 0', textAlign: 'center' }}>
-              {locale === 'fr' ? 'Propulsé par Mistral · from0tohero.dev' : 'Powered by Mistral · from0tohero.dev'}
+              Ask Hero · Beta
             </p>
           </div>
         </div>
