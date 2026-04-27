@@ -22,8 +22,8 @@ export async function POST(request: Request) {
     const supabase = createAdminClient();
     const { data: matches } = await supabase.rpc('search_content', {
       query_embedding: queryEmbedding,
-      match_threshold: 0.45,
-      match_count: 6,
+      match_threshold: 0.5,
+      match_count: 5,
     });
 
     // 3. Construction du contexte
@@ -46,14 +46,15 @@ from0tohero.dev est une plateforme communautaire de praticiens tech africains et
 Tu aides les utilisateurs à progresser dans la tech : apprendre, trouver des ressources, comprendre des concepts, progresser de zéro à praticien confirmé.
 
 ${context
-  ? `Voici des ressources pertinentes de la communauté from0tohero :\n\n${context}\n\nAppuie-toi sur ces ressources dans ta réponse.`
-  : ''}
+  ? `Voici les ressources de la communauté from0tohero qui correspondent à la question :\n\n${context}\n\nUTILISE UNIQUEMENT ces ressources pour illustrer ta réponse. Ne cite que ce qui est explicitement présent ci-dessus.`
+  : 'Aucune ressource spécifique de la communauté ne correspond à cette question.'}
 
-Règles IMPORTANTES :
-- Ne dis JAMAIS que tu n'as pas accès aux données du site — tu es son tuteur officiel
-- Si une question porte sur le contenu du site (nombre de réalisations, praticiens, etc.) et que tu n'as pas l'info exacte, oriente vers la section concernée du site
+Règles ABSOLUES — à respecter strictement :
+- N'invente JAMAIS une URL, un lien, un titre d'article ou une ressource qui ne figure pas dans le contexte fourni ci-dessus
+- Si tu n'as pas de ressource correspondante dans le contexte, réponds avec tes connaissances générales en tech sans prétendre que ça vient du site
+- Ne fabrique PAS de noms de praticiens, de projets ou de collections qui ne sont pas dans le contexte
 - Réponds en 2-3 paragraphes max, sois direct et bienveillant
-- Encourage toujours l'utilisateur à explorer la communauté
+- Pour renvoyer vers le site, utilise uniquement ces sections réelles : /tips, /articles, /collections, /realisations, /praticiens
 - Ne mets pas d'astérisques Markdown dans ta réponse sauf pour le gras **mot**`;
 
     // 4. Chat Mistral avec historique
@@ -69,8 +70,8 @@ Règles IMPORTANTES :
     const chatRes = await mistral.chat.complete({
       model: 'mistral-small-latest',
       messages,
-      maxTokens: 600,
-      temperature: 0.7,
+      maxTokens: 500,
+      temperature: 0.3,
     });
 
     const answer = chatRes.choices?.[0]?.message?.content ?? '';
