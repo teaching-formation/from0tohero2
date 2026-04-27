@@ -13,7 +13,7 @@ export default function ShareButton({ url, title, text }: Props) {
   async function handleShare() {
     if (navigator.share) {
       try {
-        await navigator.share({ title, text, url });
+        await navigator.share({ title, text: text || undefined, url });
         return;
       } catch {
         // annulé par l'utilisateur

@@ -141,9 +141,9 @@ export default function CollectionsPage() {
                     </div>
                     <div style={{ display: 'flex', gap: '.4rem', alignItems: 'center', flexShrink: 0 }}>
                       <ShareButton
-                        url={col.praticiens ? `https://from0tohero.dev/praticiens/${col.praticiens.slug}` : 'https://from0tohero.dev/collections'}
+                        url={`https://from0tohero.dev/collections?q=${encodeURIComponent(col.title)}`}
                         title={`${col.title} · from0tohero`}
-                        text={col.description}
+                        text={col.description ?? undefined}
                       />
                       {items.length > 0 && (
                         <button
