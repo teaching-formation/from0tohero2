@@ -88,11 +88,12 @@ export default function CommentSection({ contentType, contentId }: Props) {
   }
 
   async function deleteComment(id: string) {
-    await fetch('/api/comment', {
+    const res = await fetch('/api/comment', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
     });
+    if (!res.ok) return;
     setComments(cs => cs.filter(c => c.id !== id));
     setCount(c => c - 1);
   }

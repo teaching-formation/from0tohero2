@@ -102,8 +102,10 @@ export default function ArticleModal({ article, onClose }: Props) {
     if (!article) return;
     setLoadingComments(true);
     const res = await fetch(`/api/comment?type=article&id=${article.id}`);
-    const d = await res.json();
-    setComments(d.comments ?? []);
+    if (res.ok) {
+      const d = await res.json();
+      setComments(d.comments ?? []);
+    }
     setLoadingComments(false);
   }, [article]);
 
@@ -185,11 +187,12 @@ export default function ArticleModal({ article, onClose }: Props) {
   }
 
   async function deleteComment(id: string) {
-    await fetch('/api/comment', {
+    const res = await fetch('/api/comment', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
     });
+    if (!res.ok) return;
     setComments(cs => cs.filter(c => c.id !== id));
   }
 
