@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/tutor/index/cron",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}
