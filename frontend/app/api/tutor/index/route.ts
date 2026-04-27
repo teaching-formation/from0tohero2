@@ -110,6 +110,25 @@ export async function POST(request: Request) {
       indexed++;
     }
 
+    // ── PRATICIENS ────────────────────────────────────────────
+    const { data: praticiens } = await supabase
+      .from('praticiens')
+      .select('id, name, role, bio, stack, categories')
+      .eq('status', 'approved');
+
+    for (const p of praticiens ?? []) {
+      const body = `${p.name} — ${p.role}. ${p.bio ?? ''} Stack: ${(p.stack ?? []).join(', ')}`.trim();
+      const embedding = await embed(body);
+      await upsert(supabase, {
+        content_type: 'praticien',
+        content_id: p.id,
+        title: p.name,
+        body,
+        embedding,
+      });
+      indexed++;
+    }
+
     return NextResponse.json({ success: true, indexed });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);

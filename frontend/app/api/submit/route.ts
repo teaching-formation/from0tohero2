@@ -40,7 +40,7 @@ export async function POST(req: Request) {
       const { data: existingSlug } = await supabaseAdmin.from('praticiens').select('id').eq('slug', slug).maybeSingle();
       if (existingSlug) return NextResponse.json({ error: `Le username "${slug}" est déjà utilisé.` }, { status: 409 });
 
-      const { error } = await supabaseAdmin.from('praticiens').insert({
+      const { data: newPraticien, error } = await supabaseAdmin.from('praticiens').insert({
         slug,
         name:          payload.name,
         role:          payload.role,
@@ -64,8 +64,19 @@ export async function POST(req: Request) {
         category_label: cats.includes('autre') ? (payload.category_label || null) : null,
         photo_url:      payload.photo_url || null,
         status:         'approved',
-      });
+      }).select('id').single();
       if (error) insertError = error.message;
+
+      // Indexer pour Ask Hero (non-bloquant)
+      if (!error && newPraticien?.id) {
+        const stack: string[] = Array.isArray(payload.stack) ? payload.stack.filter(Boolean) : [];
+        indexContent({
+          content_type: 'praticien',
+          content_id:   newPraticien.id,
+          title:        payload.name,
+          body:         `${payload.name} — ${payload.role}. ${payload.bio ?? ''} Stack: ${stack.join(', ')}`.trim(),
+        }).catch(() => {});
+      }
 
     } else if (type === 'article') {
       const slug = slugify(payload.title);

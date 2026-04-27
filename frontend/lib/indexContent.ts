@@ -12,7 +12,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 const mistral = new Mistral({ apiKey: process.env.MISTRAL_API_KEY });
 
 export async function indexContent(item: {
-  content_type: 'tip' | 'article' | 'collection' | 'realisation';
+  content_type: 'tip' | 'article' | 'collection' | 'realisation' | 'praticien';
   content_id: string;
   title: string;
   body: string;
