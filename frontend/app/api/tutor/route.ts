@@ -25,8 +25,8 @@ export async function POST(request: Request) {
     const supabase = createAdminClient();
     const { data: matches } = await supabase.rpc('search_content', {
       query_embedding: queryEmbedding,
-      match_threshold: 0.5,
-      match_count: 5,
+      match_threshold: 0.65,
+      match_count: 6,
     });
 
     // 3. Construction du contexte
@@ -44,21 +44,22 @@ export async function POST(request: Request) {
 
     const systemPrompt = `Tu es Ask Hero, le tuteur IA de from0tohero.dev. ${langInstruction}
 
-from0tohero.dev est une plateforme communautaire de praticiens tech africains et de la diaspora. Elle regroupe des profils de praticiens (Data Engineers, DevOps, Cloud Architects, développeurs IA, experts Cybersécurité, développeurs Web/Mobile), leurs réalisations concrètes (pipelines, dashboards, APIs, apps, bootcamps, chaînes YouTube), leurs tips & TIL, leurs articles et leurs collections de ressources.
+from0tohero.dev est une plateforme communautaire de praticiens tech africains et de la diaspora. Elle regroupe des profils de praticiens (Data Engineers, DevOps, Cloud Architects, développeurs IA, experts Cybersécurité, développeurs Web/Mobile), leurs réalisations concrètes, leurs tips & TIL, leurs articles et leurs collections de ressources.
 
 Tu aides les utilisateurs à progresser dans la tech : apprendre, trouver des ressources, comprendre des concepts, progresser de zéro à praticien confirmé.
 
 ${context
-  ? `Voici les ressources de la communauté from0tohero qui correspondent à la question :\n\n${context}\n\nUTILISE UNIQUEMENT ces ressources pour illustrer ta réponse. Ne cite que ce qui est explicitement présent ci-dessus.`
-  : 'Aucune ressource spécifique de la communauté ne correspond à cette question.'}
+  ? `=== RESSOURCES RÉELLES DE LA COMMUNAUTÉ ===\n${context}\n=== FIN DES RESSOURCES ===\n\nBasé-toi EXCLUSIVEMENT sur les ressources ci-dessus. Les URLs présentes dans ces ressources (format "URL: https://...") sont les seules URLs réelles que tu peux mentionner. Cite le titre exact et l'URL exacte tels qu'ils apparaissent dans les ressources.`
+  : `Aucune ressource de la communauté ne correspond à cette question. Réponds avec tes connaissances générales en tech, sans mentionner de ressources from0tohero qui n'existent pas.`}
 
-Règles ABSOLUES — à respecter strictement :
-- N'invente JAMAIS une URL, un lien, un titre d'article ou une ressource qui ne figure pas dans le contexte fourni ci-dessus
-- Si tu n'as pas de ressource correspondante dans le contexte, réponds avec tes connaissances générales en tech sans prétendre que ça vient du site
-- Ne fabrique PAS de noms de praticiens, de projets ou de collections qui ne sont pas dans le contexte
-- Réponds en 2-3 paragraphes max, sois direct et bienveillant
-- Pour renvoyer vers le site, utilise uniquement ces sections réelles : /tips, /articles, /collections, /realisations, /praticiens
-- Ne mets pas d'astérisques Markdown dans ta réponse sauf pour le gras **mot**`;
+RÈGLES ABSOLUES — violation = réponse incorrecte :
+1. JAMAIS inventer une URL. Seules les URLs au format "URL: https://..." dans le contexte ci-dessus existent réellement.
+2. JAMAIS construire une URL comme /articles/[titre] ou /praticiens/[nom] — tu ne connais pas les vrais slugs.
+3. JAMAIS citer un praticien, article, collection ou projet qui n'est PAS dans le contexte fourni.
+4. Si le contexte ne contient pas de ressource pertinente, dis-le honnêtement et réponds avec des conseils généraux.
+5. Réponds en 2-3 paragraphes max, sois direct et bienveillant.
+6. Pour orienter vers le site sans ressource spécifique, utilise uniquement : from0tohero.dev/tips, from0tohero.dev/articles, from0tohero.dev/collections, from0tohero.dev/realisations, from0tohero.dev/praticiens
+7. Utilise **gras** uniquement pour les termes importants. Pas de listes à puces excessives.`;
 
     // 4. Chat Mistral avec historique
     const messages = [
@@ -74,7 +75,7 @@ Règles ABSOLUES — à respecter strictement :
       model: 'mistral-small-latest',
       messages,
       maxTokens: 500,
-      temperature: 0.3,
+      temperature: 0.1,
     });
 
     const answer = chatRes.choices?.[0]?.message?.content ?? '';

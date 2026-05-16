@@ -38,7 +38,11 @@ export async function POST(request: Request) {
       .eq('status', 'approved');
 
     for (const tip of tips ?? []) {
-      const body = `[${tip.type}] Catégorie: ${tip.category}. ${tip.content}`;
+      const body = [
+        `URL: https://from0tohero.dev/tips`,
+        `[${tip.type}] Catégorie: ${tip.category}.`,
+        tip.content,
+      ].join(' ');
       const embedding = await embed(body);
       await upsert(supabase, {
         content_type: 'tip',
@@ -53,11 +57,18 @@ export async function POST(request: Request) {
     // ── ARTICLES ──────────────────────────────────────────────
     const { data: articles } = await supabase
       .from('articles')
-      .select('id, title, excerpt, category, source')
+      .select('id, slug, title, excerpt, category, source, external_url')
       .eq('status', 'approved');
 
     for (const article of articles ?? []) {
-      const body = `${article.title}. ${article.excerpt ?? ''}`.trim();
+      const pageUrl = article.slug
+        ? `https://from0tohero.dev/articles`
+        : 'https://from0tohero.dev/articles';
+      const body = [
+        `URL: ${pageUrl}`,
+        article.title + '.',
+        article.excerpt ?? '',
+      ].join(' ').trim();
       const embedding = await embed(body);
       await upsert(supabase, {
         content_type: 'article',
@@ -72,14 +83,22 @@ export async function POST(request: Request) {
     // ── COLLECTIONS ───────────────────────────────────────────
     const { data: collections } = await supabase
       .from('collections')
-      .select('id, title, description, items')
+      .select('id, slug, title, description, items')
       .eq('status', 'approved');
 
     for (const col of collections ?? []) {
       const items = Array.isArray(col.items)
         ? (col.items as { title: string }[]).map(i => i.title).join(', ')
         : '';
-      const body = `${col.title}. ${col.description ?? ''} Ressources : ${items}`.trim();
+      const url = col.slug
+        ? `https://from0tohero.dev/collections/${col.slug}`
+        : 'https://from0tohero.dev/collections';
+      const body = [
+        `URL: ${url}`,
+        col.title + '.',
+        col.description ?? '',
+        items ? `Ressources : ${items}` : '',
+      ].join(' ').trim();
       const embedding = await embed(body);
       await upsert(supabase, {
         content_type: 'collection',
@@ -94,11 +113,19 @@ export async function POST(request: Request) {
     // ── RÉALISATIONS ──────────────────────────────────────────
     const { data: reals } = await supabase
       .from('realisations')
-      .select('id, title, excerpt, category, type, stack')
+      .select('id, slug, title, excerpt, category, type, stack')
       .eq('status', 'approved');
 
     for (const r of reals ?? []) {
-      const body = `${r.title}. ${r.excerpt ?? ''} Stack: ${(r.stack ?? []).join(', ')}`.trim();
+      const url = r.slug
+        ? `https://from0tohero.dev/realisations`
+        : 'https://from0tohero.dev/realisations';
+      const body = [
+        `URL: ${url}`,
+        r.title + '.',
+        r.excerpt ?? '',
+        r.stack?.length ? `Stack: ${r.stack.join(', ')}` : '',
+      ].join(' ').trim();
       const embedding = await embed(body);
       await upsert(supabase, {
         content_type: 'realisation',
@@ -113,11 +140,19 @@ export async function POST(request: Request) {
     // ── PRATICIENS ────────────────────────────────────────────
     const { data: praticiens } = await supabase
       .from('praticiens')
-      .select('id, name, role, bio, stack, categories')
+      .select('id, slug, name, role, bio, stack, categories')
       .eq('status', 'approved');
 
     for (const p of praticiens ?? []) {
-      const body = `${p.name} — ${p.role}. ${p.bio ?? ''} Stack: ${(p.stack ?? []).join(', ')}`.trim();
+      const url = p.slug
+        ? `https://from0tohero.dev/praticiens/${p.slug}`
+        : 'https://from0tohero.dev/praticiens';
+      const body = [
+        `URL: ${url}`,
+        `${p.name} — ${p.role}.`,
+        p.bio ?? '',
+        p.stack?.length ? `Stack: ${p.stack.join(', ')}` : '',
+      ].join(' ').trim();
       const embedding = await embed(body);
       await upsert(supabase, {
         content_type: 'praticien',
