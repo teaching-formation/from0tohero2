@@ -11,6 +11,7 @@ import { useTranslations } from 'next-intl';
 const PAGE_SIZE = 12;
 
 import { CAT_COLOR, CAT_LABEL, SOURCE_ICON } from '@/lib/constants';
+import { decodeHtml } from '@/lib/utils';
 
 export default function ArticlesPage() {
   const t = useTranslations('articles');
@@ -186,7 +187,7 @@ export default function ArticlesPage() {
                     letterSpacing: '-.015em',
                     lineHeight: 1.3,
                     flex: 1,
-                  }}>{a.title}</h3>
+                  }}>{decodeHtml(a.title)}</h3>
 
                   {/* Auteur + date */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', flexWrap: 'wrap' }}>
@@ -221,7 +222,7 @@ export default function ArticlesPage() {
                       WebkitLineClamp: 3,
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
-                    }}>{a.excerpt}</p>
+                    }}>{decodeHtml(a.excerpt)}</p>
                   )}
 
                   {/* Footer */}
@@ -258,7 +259,7 @@ export default function ArticlesPage() {
                       </button>
                     </div>
                     <div style={{ display: 'flex', gap: '.4rem', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
-                      <ShareButton url={a.external_url || 'https://from0tohero.dev/articles'} title={a.title} text={a.excerpt ?? undefined} />
+                      <ShareButton url={a.external_url || 'https://from0tohero.dev/articles'} title={decodeHtml(a.title)} text={decodeHtml(a.excerpt) || undefined} />
                       <a
                         href={a.external_url}
                         target="_blank"

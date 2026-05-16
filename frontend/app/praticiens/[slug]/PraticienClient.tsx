@@ -12,6 +12,7 @@ import FollowButton from '@/components/FollowButton';
 import CommentSection from '@/components/CommentSection';
 import ShareButton from '@/components/ShareButton';
 import { useTranslations } from 'next-intl';
+import { decodeHtml } from '@/lib/utils';
 
 type CollectionItem = { id: string; title: string; url: string; description: string };
 type Collection = { id: string; title: string; description?: string; items: CollectionItem[] };
@@ -326,9 +327,9 @@ export default function PraticienClient({ praticien: p, realisations, collection
                       </span>
                     )}
                   </div>
-                  <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.05rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0', lineHeight: 1.3 }}>{a.title}</h3>
+                  <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.05rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0', lineHeight: 1.3 }}>{decodeHtml(a.title)}</h3>
                   {a.excerpt && (
-                    <p style={{ fontSize: '.85rem', color: 'var(--f-text-2)', lineHeight: 1.7, margin: '0 0 1rem 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{a.excerpt}</p>
+                    <p style={{ fontSize: '.85rem', color: 'var(--f-text-2)', lineHeight: 1.7, margin: '0 0 1rem 0', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{decodeHtml(a.excerpt)}</p>
                   )}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '.75rem', flexWrap: 'wrap', marginBottom: '.75rem' }}>
                     <a href={a.external_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-sky)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '.35rem' }}>
@@ -336,7 +337,7 @@ export default function PraticienClient({ praticien: p, realisations, collection
                       Lire l&apos;article
                     </a>
                     <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
-                      <ShareButton url={a.external_url || 'https://from0tohero.dev/articles'} title={a.title} text={a.excerpt ?? undefined} />
+                      <ShareButton url={a.external_url || 'https://from0tohero.dev/articles'} title={decodeHtml(a.title)} text={decodeHtml(a.excerpt) || undefined} />
                       <LikeButton contentType="article" contentId={a.id} initialCount={0} initialLiked={false} />
                     </div>
                   </div>
@@ -371,8 +372,8 @@ export default function PraticienClient({ praticien: p, realisations, collection
                     <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.62rem', letterSpacing: '.08em', textTransform: 'uppercase', color: cat.color, border: `1px solid ${cat.border}`, background: cat.bg, padding: '2px 9px', borderRadius: 4 }}>{r.category.toUpperCase()}</span>
                     <span className="f-tag">{r.type}</span>
                   </div>
-                  <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.05rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0' }}>{r.title}</h3>
-                  <p style={{ fontSize: '.85rem', color: 'var(--f-text-2)', lineHeight: 1.7, margin: '0 0 1.1rem 0' }}>{r.excerpt}</p>
+                  <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: '1.05rem', fontWeight: 700, color: 'var(--f-text-1)', margin: '0 0 .5rem 0' }}>{decodeHtml(r.title)}</h3>
+                  <p style={{ fontSize: '.85rem', color: 'var(--f-text-2)', lineHeight: 1.7, margin: '0 0 1.1rem 0' }}>{decodeHtml(r.excerpt)}</p>
                   {(() => {
                     const INVALID = new Set(['null', 'unfound', 'undefined', '']);
                     const clean = (r.stack ?? []).filter((s: string) => s && !INVALID.has(s.toLowerCase().trim()));
@@ -399,7 +400,7 @@ export default function PraticienClient({ praticien: p, realisations, collection
                       {r.repo_url && <a href={r.repo_url} target="_blank" rel="noreferrer" style={{ fontFamily: "'Geist Mono', monospace", fontSize: '.7rem', color: 'var(--f-text-3)', textDecoration: 'none' }}>{t('repo')}</a>}
                     </div>
                     <div style={{ display: 'flex', gap: '.5rem', alignItems: 'center' }}>
-                      <ShareButton url={r.demo_url || r.repo_url || `https://from0tohero.dev/praticiens/${p.slug}`} title={r.title} text={r.excerpt ?? undefined} />
+                      <ShareButton url={r.demo_url || r.repo_url || `https://from0tohero.dev/praticiens/${p.slug}`} title={decodeHtml(r.title)} text={decodeHtml(r.excerpt) || undefined} />
                       <LikeButton contentType="realisation" contentId={r.id} initialCount={0} initialLiked={false} />
                     </div>
                   </div>

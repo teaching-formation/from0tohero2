@@ -19,6 +19,7 @@ type RealisationWithPraticien = {
 };
 
 import { CAT_COLOR, CAT_LABEL, REAL_TYPE_LABELS, REAL_TYPE_ICONS } from '@/lib/constants';
+import { decodeHtml } from '@/lib/utils';
 
 export default function RealisationsPage() {
   const t = useTranslations('realisations');
@@ -210,7 +211,7 @@ export default function RealisationsPage() {
                     margin: 0,
                     letterSpacing: '-.015em',
                     lineHeight: 1.3,
-                  }}>{r.title}</h3>
+                  }}>{decodeHtml(r.title)}</h3>
 
                   {/* Auteur + co-auteurs */}
                   {r.praticiens && (
@@ -252,7 +253,7 @@ export default function RealisationsPage() {
                       WebkitLineClamp: 3,
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
-                    }}>{r.excerpt}</p>
+                    }}>{decodeHtml(r.excerpt)}</p>
                   )}
 
                   {/* Spacer */}
@@ -356,7 +357,7 @@ export default function RealisationsPage() {
                         {commentCount > 0 && <span>{commentCount}</span>}
                       </button>
                       <div style={{ display: 'flex', gap: '.4rem', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
-                        <ShareButton url={r.demo_url || r.repo_url || (r.praticiens?.slug ? `https://from0tohero.dev/praticiens/${r.praticiens.slug}` : 'https://from0tohero.dev/realisations')} title={r.title} text={r.excerpt ?? undefined} />
+                        <ShareButton url={r.demo_url || r.repo_url || (r.praticiens?.slug ? `https://from0tohero.dev/praticiens/${r.praticiens.slug}` : 'https://from0tohero.dev/realisations')} title={decodeHtml(r.title)} text={decodeHtml(r.excerpt) || undefined} />
                         <LikeButton contentType="realisation" contentId={r.id} initialCount={0} initialLiked={false} />
                       </div>
                     </div>
