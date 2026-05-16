@@ -13,13 +13,16 @@ export default function PageTransition({ children }: { children: React.ReactNode
     const el = ref.current;
     if (!el) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    el.animate(
+    const anim = el.animate(
       [
         { opacity: 0, transform: 'translateY(10px)' },
         { opacity: 1, transform: 'translateY(0)' },
       ],
       { duration: 280, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' }
     );
+    // Annuler l'animation quand elle est finie : cela retire le transform persistant
+    // qui crée un stacking context et casse position:fixed (modals, widgets)
+    anim.onfinish = () => anim.cancel();
   }, [pathname]);
 
   return <div ref={ref}>{children}</div>;
