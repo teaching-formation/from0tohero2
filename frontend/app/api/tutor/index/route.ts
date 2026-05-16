@@ -55,15 +55,15 @@ export async function POST(request: Request) {
     }
 
     // ── ARTICLES ──────────────────────────────────────────────
+    // Les articles sont des liens externes (Medium, LinkedIn…) — on utilise l'URL externe
     const { data: articles } = await supabase
       .from('articles')
-      .select('id, slug, title, excerpt, category, source, external_url')
+      .select('id, title, excerpt, category, source, external_url')
       .eq('status', 'approved');
 
     for (const article of articles ?? []) {
-      const pageUrl = article.slug
-        ? `https://from0tohero.dev/articles`
-        : 'https://from0tohero.dev/articles';
+      // Préférer l'URL externe réelle de l'article, sinon la section /articles
+      const pageUrl = article.external_url || 'https://from0tohero.dev/articles';
       const body = [
         `URL: ${pageUrl}`,
         article.title + '.',
@@ -81,24 +81,22 @@ export async function POST(request: Request) {
     }
 
     // ── COLLECTIONS ───────────────────────────────────────────
+    // La table collections n'a pas de colonne slug — on pointe vers la section
     const { data: collections } = await supabase
       .from('collections')
-      .select('id, slug, title, description, items')
+      .select('id, title, description, items')
       .eq('status', 'approved');
 
     for (const col of collections ?? []) {
       const items = Array.isArray(col.items)
         ? (col.items as { title: string }[]).map(i => i.title).join(', ')
         : '';
-      const url = col.slug
-        ? `https://from0tohero.dev/collections/${col.slug}`
-        : 'https://from0tohero.dev/collections';
       const body = [
-        `URL: ${url}`,
+        `URL: https://from0tohero.dev/collections`,
         col.title + '.',
         col.description ?? '',
         items ? `Ressources : ${items}` : '',
-      ].join(' ').trim();
+      ].filter(Boolean).join(' ').trim();
       const embedding = await embed(body);
       await upsert(supabase, {
         content_type: 'collection',
